@@ -33,9 +33,6 @@ export function mostrarLobby(codigoSala) {
     refs.lobbyCodigoSala.textContent = codigoSala;
 }
 
-/**
- * ¡MODIFICADA! Ahora solo prepara la pantalla. El carrusel se carga por separado.
- */
 export function mostrarPantallaJuego(rondaActual, esAnfitrion) {
     console.log("¡La partida ha empezado! Mostrando pantalla de juego.");
     
@@ -62,6 +59,7 @@ export function volverAlMenu() {
     refs.modalAsignarAtributo.style.display = 'none';
     refs.btnQuienSoy.style.display = 'none';
     refs.btnComenzarRonda.style.display = 'none';
+    refs.btnComenzarDebate.style.display = 'none'; // ¡NUEVO!
     refs.mainMenu.style.display = 'flex';
 }
 
@@ -91,17 +89,11 @@ export function mostrarModalAsignacion(rondaActual, atributo) {
     refs.gameRondaInstruccion.textContent = "Desliza y pulsa en un personaje para asignarle tu atributo.";
 }
 
-/**
- * ¡NUEVA! Muestra el modal "Quién Soy".
- */
 export function mostrarModalQuienSoy(personaje) {
     construirModalPersonaje(personaje);
     refs.modalQuienSoy.style.display = 'flex';
 }
 
-/**
- * ¡NUEVA! Esta función redibuja el carrusel CADA VEZ que hay un cambio.
- */
 export function actualizarCarousel(jugadores) {
     refs.characterCarousel.innerHTML = ''; 
     
@@ -111,19 +103,43 @@ export function actualizarCarousel(jugadores) {
         personajes.push(personajeConId);
     });
     
-    // NOTA: No barajamos el carrusel en cada actualización
-    // para que las tarjetas no cambien de sitio solas.
-    // (Puedes añadir .sort() si prefieres que se barajen)
-    
     personajes.forEach(personaje => {
         refs.characterCarousel.appendChild(crearTarjetaPersonaje(personaje, logic.handleCardClick));
     });
+}
+
+/**
+ * ¡NUEVA FUNCIÓN! Muestra el botón de comenzar debate.
+ */
+export function mostrarBotonComenzarDebate(rondaActual) {
+    refs.btnComenzarDebate.textContent = `[ COMENZAR DEBATE RONDA ${rondaActual} ]`;
+    refs.btnComenzarDebate.style.display = 'block';
+}
+
+/**
+ * ¡NUEVA FUNCIÓN! Oculta el botón de comenzar debate.
+ */
+export function ocultarBotonComenzarDebate() {
+    refs.btnComenzarDebate.style.display = 'none';
+}
+
+/**
+ * ¡NUEVA FUNCIÓN! Actualiza la UI para la fase de debate.
+ */
+export function mostrarFaseDebate(rondaActual) {
+    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: DEBATE`;
+    refs.gameRondaInstruccion.textContent = "¡Es hora de debatir! Hablad sobre quién debe ser eliminado.";
+    
+    // Ocultamos los botones de anfitrión de fases anteriores
+    refs.btnComenzarRonda.style.display = 'none';
+    refs.btnComenzarDebate.style.display = 'none';
 }
 
 
 // --- FUNCIONES AUXILIARES DE UI (Privadas) ---
 
 function crearTarjetaPersonaje(personaje, clickHandler) {
+    // ... (sin cambios) ...
     const card = document.createElement('div');
     card.className = 'character-card';
     if (!personaje.estaVivo) { card.classList.add('muerto'); }
@@ -144,6 +160,7 @@ function crearTarjetaPersonaje(personaje, clickHandler) {
 }
 
 function construirModalPersonaje(personaje) {
+    // ... (sin cambios) ...
     const atributosObj = personaje.atributosAsignados || {};
     const atributosHTML = Object.values(atributosObj);
     

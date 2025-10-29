@@ -12,12 +12,12 @@ let state = {
     miAtributoParaAsignar: null,
     soyAnfitrion: false,
     primeraCargaJuego: true,
-    faseAnterior: null, // ¡NUEVO! Para detectar cambios de fase
+    faseAnterior: null,
     
     // Listeners
     refJugadoresEnLobby: null,
     refEstadoPartida: null,
-    refDatosJuego: null, // El único vigilante de juego
+    refDatosJuego: null,
 };
 
 /**
@@ -130,6 +130,9 @@ export function empezarPartida() {
 export function comenzarFaseAsignacion() {
     // ... (sin cambios) ...
     console.log("Anfitrión ha comenzado la fase de asignación...");
+    // Ocultamos el botón para que no se pulse dos veces
+    // (La UI se encargará de esto en el cambio de fase)
+    
     const refPartida = database.ref(`partidas/${state.salaActual}`);
     refPartida.once('value').then((snapshot) => {
         const partida = snapshot.val();
@@ -162,6 +165,22 @@ export function comenzarFaseAsignacion() {
     });
 }
 
+/**
+ * ¡NUEVA FUNCIÓN! Llamada por el Host para iniciar el debate.
+ */
+export function comenzarFaseDebate() {
+    console.log("Anfitrión ha comenzado la fase de debate...");
+    
+    // Ocultamos el botón localmente para evitar doble clic
+    UI.ocultarBotonComenzarDebate();
+    
+    // Cambiamos la fase en Firebase
+    database.ref(`partidas/${state.salaActual}/faseActual`).set('debate')
+        .then(() => console.log("Fase cambiada a 'debate'."))
+        .catch((err) => console.error("Error al cambiar a debate:", err));
+}
+
+
 export function handleCardClick(personajeClickeado) {
     // ... (sin cambios) ...
     database.ref(`partidas/${state.salaActual}/faseActual`).once('value').then(snap => {
@@ -193,11 +212,10 @@ export function handleCardClick(personajeClickeado) {
 }
 
 export function handleSalir() {
-    // ... (sin cambios, pero añadimos el nuevo listener) ...
+    // ... (sin cambios) ...
     console.log("Volviendo al menú principal...");
     
     if (state.salaActual && state.jugadorIdActual) {
-        // ... (lógica de borrado) ...
         database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`).once('value', (snapshot) => {
             if (snapshot.val() && snapshot.val().esAnfitrion) {
                 database.ref(`partidas/${state.salaActual}`).remove();
@@ -210,7 +228,7 @@ export function handleSalir() {
     // Detener TODOS los listeners
     if (state.refJugadoresEnLobby) state.refJugadoresEnLobby.off();
     if (state.refEstadoPartida) state.refEstadoPartida.off();
-    if (state.refDatosJuego) state.refDatosJuego.off(); // ¡Importante!
+    if (state.refDatosJuego) state.refDatosJuego.off();
 
     // Reseteamos variables
     state = {
@@ -236,10 +254,8 @@ function escucharJugadoresEnLobby() {
     });
 }
 
-/**
- * ¡MODIFICADO! Ahora solo lanza el vigilante principal del juego.
- */
 function escucharInicioPartida() {
+    // ... (sin cambios) ...
     if (state.refEstadoPartida) state.refEstadoPartida.off();
     
     state.refEstadoPartida = database.ref(`partidas/${state.salaActual}/estado`);
@@ -248,33 +264,29 @@ function escucharInicioPartida() {
         if (estado === 'jugando') {
             console.log("DETECTADO CAMBIO DE ESTADO: 'jugando'");
             
-            // Detenemos este listener, ya no es necesario
             if (state.refEstadoPartida) state.refEstadoPartida.off();
             state.refEstadoPartida = null;
             
-            // Detenemos el listener del lobby
             if (state.refJugadoresEnLobby) state.refJugadoresEnLobby.off();
             state.refJugadoresEnLobby = null;
 
-            // ¡Iniciamos el vigilante principal del juego!
             escucharDatosJuego();
         }
     });
 }
 
 /**
- * ¡NUEVO VIGILANTE PRINCIPAL! (Reemplaza a escucharFasePartida)
- * Escucha CUALQUIER cambio en la partida y reacciona.
+ * ¡MODIFICADO! Ahora también gestiona los botones del Host
+ * y el cambio a la fase de 'debate'.
  */
 function escucharDatosJuego() {
     if (state.refDatosJuego) state.refDatosJuego.off();
     
-    // Escucha la PARTIDA ENTERA
     state.refDatosJuego = database.ref(`partidas/${state.salaActual}`);
     
     state.refDatosJuego.on('value', (snapshot) => {
         const partida = snapshot.val();
-        if (!partida) return; // Salir si la partida se borró
+        if (!partida) return;
 
         const jugadores = partida.jugadores;
         const faseActual = partida.faseActual;
@@ -288,36 +300,56 @@ function escucharDatosJuego() {
 
         // --- 2. Actualizar Datos Locales y UI ---
         if (jugadores) {
-            // Actualizamos el carrusel (siempre)
             UI.actualizarCarousel(jugadores);
 
-            // Actualizamos nuestro estado local
             if (jugadores[state.jugadorIdActual]) {
                 state.miPersonajeSecreto = jugadores[state.jugadorIdActual].personaje;
                 state.miAtributoParaAsignar = jugadores[state.jugadorIdActual].atributoParaAsignar || null;
             }
 
-            // Mostramos el modal "Quién Soy" solo la primera vez que tengamos personaje
             if (state.faseAnterior === null && state.miPersonajeSecreto) {
                 UI.mostrarModalQuienSoy(state.miPersonajeSecreto);
             }
         }
 
-        // --- 3. Reaccionar a Cambios de Fase ---
+        // --- 3. Lógica de Botones del Anfitrión (¡NUEVO!) ---
+        if (state.soyAnfitrion) {
+            if (faseActual === 'asignacion') {
+                // Contar cuántos faltan por asignar
+                let faltanPorAsignar = 0;
+                if (jugadores) {
+                    Object.values(jugadores).forEach(j => {
+                        if (j.atributoParaAsignar) {
+                            faltanPorAsignar++;
+                        }
+                    });
+                }
+                
+                if (faltanPorAsignar === 0) {
+                    UI.mostrarBotonComenzarDebate(rondaActual);
+                } else {
+                    UI.ocultarBotonComenzarDebate();
+                }
+            } else {
+                // No estamos en asignación, ocultar botones
+                UI.ocultarBotonComenzarDebate();
+            }
+        }
+
+        // --- 4. Reaccionar a Cambios de Fase ---
         if (faseActual !== state.faseAnterior) {
             console.log(`Fase ha cambiado de ${state.faseAnterior} a ${faseActual}`);
             
             if (faseActual === 'asignacion') {
-                // Comprobamos el atributo que acabamos de recibir
                 if (state.miAtributoParaAsignar) {
                     UI.mostrarModalAsignacion(rondaActual, state.miAtributoParaAsignar);
-                } else {
-                    console.log("Fase de asignación, pero no tengo atributo (quizás ya lo asigné).");
                 }
             } 
-            // ... (Aquí irán los else if para 'debate' y 'votacion') ...
+            else if (faseActual === 'debate') {
+                // ¡NUEVO!
+                UI.mostrarFaseDebate(rondaActual);
+            }
             
-            // Actualizamos la fase anterior al final
             state.faseAnterior = faseActual;
         }
     });

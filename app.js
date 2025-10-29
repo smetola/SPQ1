@@ -1,4 +1,4 @@
-// Contenido para: app.js (El nuevo)
+// Contenido para: app.js
 
 import * as UIManager from './uiManager.js';
 import * as GameLogic from './gameLogic.js';
@@ -38,16 +38,17 @@ const elementRefs = {
     btnCerrarModalAsignar: document.getElementById('btnCerrarModalAsignar'),
     
     btnComenzarRonda: document.getElementById('btnComenzarRonda'),
+    
+    // ¡NUEVA REFERENCIA!
+    btnComenzarDebate: document.getElementById('btnComenzarDebate'),
 };
 
 // --- 2. INICIALIZAR MÓDULOS ---
 
-// Pasamos las referencias de UI y los "handlers" de lógica a UIManager
 UIManager.init(elementRefs, {
     handleCardClick: (personaje) => GameLogic.handleCardClick(personaje)
 });
 
-// Pasamos la 'database'
 GameLogic.init(database); // 'database' viene del script de Firebase en index.html
 
 
@@ -76,9 +77,9 @@ elementRefs.btnCerrarModalAsignar.addEventListener('click', () => elementRefs.mo
 // Pantalla de Juego
 elementRefs.btnComenzarRonda.addEventListener('click', GameLogic.comenzarFaseAsignacion);
 
-/**
- * ¡MODIFICADO! Ahora funciona con la lógica modular.
- */
+// ¡NUEVO ESCUCHADOR!
+elementRefs.btnComenzarDebate.addEventListener('click', GameLogic.comenzarFaseDebate);
+
 elementRefs.btnQuienSoy.addEventListener('click', () => {
     const miPersonaje = GameLogic.getMiPersonaje();
     if (miPersonaje) {
