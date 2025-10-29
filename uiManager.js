@@ -6,7 +6,6 @@ let logic = {}; // Almacén para la lógica (para el clic de la tarjeta)
 
 /**
  * Inicializa el manager de UI con las referencias del DOM y la lógica.
- * app.js llamará a esto.
  */
 export function init(elementRefs, logicHandlers) {
     refs = elementRefs;
@@ -34,50 +33,23 @@ export function mostrarLobby(codigoSala) {
     refs.lobbyCodigoSala.textContent = codigoSala;
 }
 
-export function mostrarPantallaJuego(partida, jugadorId) {
+/**
+ * ¡MODIFICADA! Ahora solo prepara la pantalla. El carrusel se carga por separado.
+ */
+export function mostrarPantallaJuego(rondaActual, esAnfitrion) {
     console.log("¡La partida ha empezado! Mostrando pantalla de juego.");
     
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'flex';
     refs.btnQuienSoy.style.display = 'block'; 
-    
-    const jugadores = partida.jugadores;
-    refs.characterCarousel.innerHTML = ''; 
-    
-    let miPersonajeSecreto = null;
-    let soyAnfitrion = false;
-    const personajes = [];
 
-    Object.entries(jugadores).forEach(([id, jugador]) => {
-        if (id === jugadorId) {
-            miPersonajeSecreto = jugador.personaje;
-            soyAnfitrion = jugador.esAnfitrion;
-        }
-        const personajeConId = { ...jugador.personaje, jugadorId: id };
-        personajes.push(personajeConId);
-    });
-    
-    personajes.sort(() => Math.random() - 0.5); // Barajamos
-    
-    personajes.forEach(personaje => {
-        // Pasamos la función 'handleCardClick' al creador de tarjetas
-        refs.characterCarousel.appendChild(crearTarjetaPersonaje(personaje, logic.handleCardClick));
-    });
-    
-    if (miPersonajeSecreto) {
-        construirModalPersonaje(miPersonajeSecreto);
-        refs.modalQuienSoy.style.display = 'flex';
-    }
-
-    if (soyAnfitrion) {
-        refs.btnComenzarRonda.textContent = `[ COMENZAR RONDA ${partida.rondaActual} ]`;
+    if (esAnfitrion) {
+        refs.btnComenzarRonda.textContent = `[ COMENZAR RONDA ${rondaActual} ]`;
         refs.btnComenzarRonda.style.display = 'block';
     }
     
-    refs.gameRondaTitulo.textContent = `RONDA ${partida.rondaActual}: FASE DE CONOCIMIENTO`;
+    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: FASE DE CONOCIMIENTO`;
     refs.gameRondaInstruccion.textContent = "Desliza para ver a todos los supervivientes.";
-
-    return miPersonajeSecreto; // Devolvemos el personaje para guardarlo
 }
 
 export function volverAlMenu() {
@@ -119,7 +91,37 @@ export function mostrarModalAsignacion(rondaActual, atributo) {
     refs.gameRondaInstruccion.textContent = "Desliza y pulsa en un personaje para asignarle tu atributo.";
 }
 
-// --- FUNCIONES AUXILIARES DE UI ---
+/**
+ * ¡NUEVA! Muestra el modal "Quién Soy".
+ */
+export function mostrarModalQuienSoy(personaje) {
+    construirModalPersonaje(personaje);
+    refs.modalQuienSoy.style.display = 'flex';
+}
+
+/**
+ * ¡NUEVA! Esta función redibuja el carrusel CADA VEZ que hay un cambio.
+ */
+export function actualizarCarousel(jugadores) {
+    refs.characterCarousel.innerHTML = ''; 
+    
+    const personajes = [];
+    Object.entries(jugadores).forEach(([id, jugador]) => {
+        const personajeConId = { ...jugador.personaje, jugadorId: id };
+        personajes.push(personajeConId);
+    });
+    
+    // NOTA: No barajamos el carrusel en cada actualización
+    // para que las tarjetas no cambien de sitio solas.
+    // (Puedes añadir .sort() si prefieres que se barajen)
+    
+    personajes.forEach(personaje => {
+        refs.characterCarousel.appendChild(crearTarjetaPersonaje(personaje, logic.handleCardClick));
+    });
+}
+
+
+// --- FUNCIONES AUXILIARES DE UI (Privadas) ---
 
 function crearTarjetaPersonaje(personaje, clickHandler) {
     const card = document.createElement('div');
@@ -137,7 +139,6 @@ function crearTarjetaPersonaje(personaje, clickHandler) {
             ${atributosHTML.map(attr => `<li>${attr}</li>`).join('')}
         </ul>
     `;
-    // Aquí conectamos el handler
     card.addEventListener('click', () => clickHandler(personaje));
     return card;
 }
