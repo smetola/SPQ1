@@ -1,0 +1,38 @@
+Nombre del Juego: Solo puede quedar 1
+
+Setup (Preparación):
+El narrador crea tantos personajes como jugadores haya.
+Cada personaje se crea en una hoja (folio) separada con:
+1.  Nombre (inventado, aleatorio)
+2.  Edad (aleatoria)
+3.  Un Atributo Básico
+
+El narrador reparte de forma anónima un personaje (una hoja) a cada jugador. Solo cada jugador sabe quién es él mismo; no sabe qué personaje son los demás, ni los demás saben quién es él.
+
+Historia (Contexto de Rol):
+El narrador pone en contexto a los jugadores con una historia, que se puede ir ajustando durante la partida. La característica es que un grupo de gente dispar se encuentra en una situación límite continua.
+Ejemplo: Una misión espacial para contactar alienígenas sufre un impacto de asteroide. Se fisura el sistema de oxígeno. La única forma de sobrevivir y llegar al destino (o volver) es consumir menos oxígeno, por lo que progresivamente hay que echar gente de la nave.
+
+Mecánicas del Juego (Por Rondas):
+
+1.  Repartir Atributo: El narrador reparte un atributo (adjetivo) a cada jugador.
+2.  Asignar Atributo: Los jugadores deben escribir ese atributo en la hoja del personaje que quieran (puede ser en el suyo propio o en el de otro). Esto se hace de forma anónima (no se sabe quién escribe qué).
+3.  Progresión de Atributos:
+    * En la primera ronda, los atributos son "flojos" (ej. profesiones: profesor, informático, abogado).
+    * En las siguientes rondas, los atributos serán más impactantes y "locos" (ej. enfermedades, posiciones políticas, traumas, delitos, etc.).
+    * La lista de atributos y sus niveles de relevancia se encuentra en el archivo `atributos.txt`.
+4.  Debate: Cuando todos han terminado de escribir su atributo, los jugadores leen la nueva situación y descubren las características actualizadas de cada personaje. Se da un tiempo límite (ej. 5 minutos) para debatir.
+5.  Votación: Tras el debate, se vota a qué personaje echar. La decisión es subjetiva, aunque se suele seguir el objetivo de la historia (echar al más prescindible).
+
+Objetivo del Jugador:
+La gracia del juego es intentar que no te voten para echarte, pero sin que descubran quién eres (qué personaje controlas).
+
+(Opción de añadido al juego) Personajes Eliminados:
+Cuando un personaje es votado y echado, "muere".
+Sin embargo, el jugador que controlaba a ese personaje *no* es eliminado del juego:
+1.  No se descubre su identidad (quién era).
+2.  Sigue jugando en secreto.
+3.  Sigue recibiendo atributos, asignándolos y votando en todas las rondas siguientes.
+
+Condición de Victoria:
+La partida termina cuando solo queda 1 personaje, el único superviviente y ganador.

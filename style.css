@@ -1,0 +1,452 @@
+/* --- Definición de la estética "Dossier" --- */
+
+/* 'Special Elite' es la fuente de "máquina de escribir".
+   'Roboto' es la fuente limpia y moderna para el resto.
+*/
+:root {
+    --font-titulo: 'Special Elite', monospace;
+    --font-cuerpo: 'Roboto', sans-serif;
+    
+    /* Paleta de colores "Dossier Oscuro" */
+    --color-fondo: #212121; /* Un gris muy oscuro (casi negro) */
+    --color-papel: #333333; /* Un gris oscuro para los contenedores */
+    --color-texto-principal: #E0E0E0; /* Texto principal (casi blanco) */
+    --color-acento: #D32F2F; /* Rojo oscuro para sellos y alertas */
+    --color-borde: #555555;
+}
+
+/* --- Estilos Generales --- */
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto-principal);
+    font-family: var(--font-cuerpo);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px; /* Ancho máximo para móviles */
+    padding: 20px;
+    background-color: var(--color-papel);
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidad */
+    text-align: center;
+}
+
+/* --- Cabecera y Títulos --- */
+.header {
+    border-bottom: 2px dashed var(--color-borde);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-family: var(--font-titulo);
+    color: var(--color-acento); /* Título en rojo "sello" */
+    font-size: 2.5rem; /* 2.5 veces el tamaño normal */
+    margin: 0;
+}
+
+.header h2 {
+    font-family: var(--font-titulo);
+    font-size: 1rem;
+    color: var(--color-texto-principal);
+    margin: 5px 0 0 0;
+}
+
+/* --- Menú Principal (Botones) --- */
+.main-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espacio entre los botones */
+}
+
+.btn-primary {
+    font-family: var(--font-cuerpo);
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 15px;
+    background-color: var(--color-acento); /* Fondo rojo */
+    color: #FFFFFF; /* Texto blanco */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase; /* MAYÚSCULAS */
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+    background-color: #F44336; /* Un rojo más brillante al pasar el ratón */
+}
+
+
+/* --- ================================= --- */
+/* ---     ESTILOS PANTALLA LOBBY        --- */
+/* --- ================================= --- */
+
+.lobby-screen {
+    display: flex; /* Lo cambiaremos a 'flex' con JS para mostrarlo */
+    flex-direction: column;
+    gap: 25px;
+}
+
+.lobby-info {
+    text-align: center;
+    border: 1px dashed var(--color-borde);
+    padding: 15px;
+    background-color: var(--color-fondo); /* Fondo más oscuro para contraste */
+}
+
+.lobby-info span {
+    font-family: var(--font-cuerpo);
+    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lobby-info h3 {
+    font-family: var(--font-titulo);
+    font-size: 3rem;
+    color: var(--color-acento);
+    margin: 5px 0 0 0;
+    letter-spacing: 4px;
+}
+
+.lobby-jugadores h4 {
+    font-family: var(--font-titulo);
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: var(--color-acento);
+    border-bottom: 1px solid var(--color-borde);
+    padding-bottom: 5px;
+}
+
+.lobby-jugadores ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.lobby-jugadores li {
+    font-family: var(--font-cuerpo);
+    font-size: 1.1rem;
+    padding: 8px;
+    background-color: var(--color-fondo);
+    border-bottom: 1px solid var(--color-borde);
+}
+
+/* --- ================================= --- */
+/* ---     ESTILOS BOTÓN SECUNDARIO      --- */
+/* --- ================================= --- */
+
+.btn-secondary {
+    font-family: var(--font-cuerpo);
+    font-weight: 400;
+    font-size: 0.9rem;
+    padding: 10px;
+    background-color: transparent; /* Sin fondo */
+    color: var(--color-texto-principal); /* Texto normal */
+    border: 1px solid var(--color-borde);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px; /* Separación */
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-borde);
+    color: #FFFFFF;
+}
+
+
+/* --- ================================= --- */
+/* ---     ESTILOS PANTALLA UNIRSE       --- */
+/* --- ================================= --- */
+
+.join-screen {
+    display: flex; /* Se activará con JS */
+    flex-direction: column;
+    gap: 15px; /* Espacio entre elementos */
+}
+
+.join-screen h4 {
+    font-family: var(--font-titulo);
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: var(--color-acento);
+    border-bottom: 1px solid var(--color-borde);
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+.join-screen label {
+    font-family: var(--font-titulo);
+    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+}
+
+.form-input {
+    font-family: var(--font-cuerpo);
+    font-size: 1.5rem;
+    padding: 10px;
+    background-color: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    color: var(--color-texto-principal);
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.form-input::placeholder {
+    color: var(--color-borde);
+}
+
+/* Estilo para el input del código (lo hace mayúsculas) */
+#inputCodigoSala {
+    font-family: var(--font-titulo);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+/* --- ================================= --- */
+/* ---     ESTILOS MODAL (POP-UP)        --- */
+/* --- ================================= --- */
+.modal-overlay {
+    position: fixed; /* Cubre toda la pantalla */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Por encima de todo */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background-color: var(--color-papel);
+    padding: 25px;
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.7);
+    text-align: center;
+    max-width: 90%;
+    width: 350px;
+}
+
+.modal-content h3 {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    font-size: 1.8rem;
+    margin-top: 0;
+}
+
+.modal-content p {
+    font-size: 1rem;
+    color: var(--color-texto-principal);
+    margin-bottom: 20px;
+}
+
+/* Ficha de personaje DENTRO del modal */
+.character-card-modal {
+    background-color: var(--color-fondo);
+    border: 1px dashed var(--color-acento); /* Borde rojo para destacarlo */
+    padding: 15px;
+    text-align: left;
+    margin-bottom: 25px;
+}
+.character-card-modal h4 {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    font-size: 1.5rem;
+    margin: 0 0 10px 0;
+}
+.character-card-modal span {
+    font-family: var(--font-cuerpo);
+    font-size: 1rem;
+    color: var(--color-texto-principal);
+    display: block;
+}
+.character-card-modal ul {
+    list-style: none; padding: 0; margin: 10px 0 0 0; font-size: 0.9rem;
+}
+
+
+/* --- ================================= --- */
+/* ---     ESTILOS PANTALLA DE JUEGO     --- */
+/* --- ================================= --- */
+
+.game-screen {
+    display: flex; /* Se activará con JS */
+    flex-direction: column;
+    width: 100%;
+    /* Quitamos el max-width del .container para esta pantalla */
+    max-width: none; 
+}
+
+.game-screen h3 {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 0 0 5px 0;
+}
+
+.game-screen p {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+    margin-bottom: 20px;
+}
+
+/* Botón "Quién Soy" (?) */
+.btn-quiensoy {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Redondo */
+    background-color: var(--color-acento);
+    color: white;
+    font-family: var(--font-titulo);
+    font-size: 2rem;
+    line-height: 50px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 500;
+    padding: 0;
+}
+
+/* --- Estilos del Carrusel --- */
+
+.carousel-container {
+    width: 100%;
+    overflow-x: scroll; /* Permite deslizar horizontalmente */
+    /* Magia: Hacemos que el scroll "frene" en cada tarjeta */
+    scroll-snap-type: x mandatory; 
+    
+    /* Ocultamos la barra de scroll */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE y Edge */
+}
+.carousel-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+.carousel {
+    display: flex;
+    flex-wrap: nowrap; /* Impide que salte de línea */
+    gap: 20px; /* Espacio entre tarjetas */
+    /* Añadimos padding para que la primera y última tarjeta
+       puedan centrarse (truco de UX) */
+    padding: 0 30px; 
+}
+
+/* Tarjeta de Personaje (Folio) */
+.character-card {
+    flex: 0 0 80%; /* Cada tarjeta ocupa el 80% del ancho */
+    max-width: 320px; /* Pero no más de 320px */
+    
+    background-color: var(--color-papel);
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    padding: 20px;
+    box-sizing: border-box;
+    
+    scroll-snap-align: center; /* Centra la tarjeta al frenar el scroll */
+    text-align: left;
+}
+
+.character-card h4 {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    font-size: 1.5rem;
+    margin: 0 0 10px 0;
+    border-bottom: 1px dashed var(--color-borde);
+    padding-bottom: 5px;
+}
+
+.character-card span {
+    font-family: var(--font-cuerpo);
+    font-size: 1rem;
+    color: var(--color-texto-principal);
+    display: block;
+}
+
+.character-card ul {
+    font-family: var(--font-cuerpo);
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+}
+
+.character-card li {
+    padding: 5px;
+    border-bottom: 1px dotted var(--color-borde);
+}
+.character-card li:first-child {
+    font-weight: bold; /* El atributo básico en negrita */
+}
+
+/* --- ================================= --- */
+/* ---  ESTILOS MODAL ASIGNAR ATRIBUTO   --- */
+/* --- ================================= --- */
+
+.atributo-a-asignar {
+    background-color: var(--color-fondo);
+    border: 1px dashed var(--color-acento);
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.atributo-a-asignar span {
+    font-family: var(--font-titulo);
+    font-size: 1.8rem;
+    color: var(--color-acento);
+    font-weight: bold;
+}
+
+/* --- ================================= --- */
+/* ---    ESTILOS TARJETA "CLICABLE"     --- */
+/* --- ================================= --- */
+
+.character-card {
+    /* ... (tus estilos existentes) ... */
+    
+    /* ¡NUEVO! Añadimos feedback visual */
+    cursor: pointer; /* Muestra una "manita" al pasar por encima */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.character-card:hover {
+    transform: translateY(-5px); /* Se eleva ligeramente */
+    box-shadow: 0 8px 15px rgba(0,0,0,0.5); /* Sombra más pronunciada */
+}
+
+/* Estilo para tarjetas de personajes muertos (lo usaremos en el futuro) */
+.character-card.muerto {
+    background-color: #424242; /* Fondo más oscuro */
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.character-card.muerto:hover {
+    transform: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
