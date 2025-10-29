@@ -49,6 +49,10 @@
             
             <h3 id="gameRondaTitulo">FASE DE CONOCIMIENTO</h3>
             <p id="gameRondaInstruccion">Desliza para ver a los supervivientes.</p>
+
+            <div id="gameTimer" class="game-timer" style="display: none;">
+                05:00
+            </div>
             
             <div class="carousel-container">
                 <div id="characterCarousel" class="carousel">
@@ -58,12 +62,15 @@
             <button id="btnComenzarRonda" class="btn-primary" style="display: none; margin-top: 20px;">
                 [ COMENZAR RONDA 1 ]
             </button>
-
+            
             <button id="btnComenzarDebate" class="btn-primary" style="display: none; margin-top: 10px;">
                 [ COMENZAR DEBATE ]
             </button>
-            
-        </main>
+
+            <button id="btnHoldToVote" class="btn-hold" style="display: none;">
+                <span class="btn-hold-text">[ MANTENER PARA VOTAR ]</span>
+                <span id="btnHoldProgress" class="btn-hold-progress"></span>
+            </button>
             
         </main>
 
