@@ -357,17 +357,20 @@ body {
 
 /* Tarjeta de Personaje (Folio) */
 .character-card {
-    flex: 0 0 80%; /* Cada tarjeta ocupa el 80% del ancho */
-    max-width: 320px; /* Pero no más de 320px */
-    
+    position: relative; /* ¡MUY IMPORTANTE! Para el contador de votos */
+    flex: 0 0 80%;
+    max-width: 320px;
     background-color: var(--color-papel);
     border: 1px solid var(--color-borde);
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     padding: 20px;
     box-sizing: border-box;
-    
-    scroll-snap-align: center; /* Centra la tarjeta al frenar el scroll */
+    scroll-snap-align: center;
     text-align: left;
+    
+    /* Feedback visual (que ya teníamos) */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
 }
 
 .character-card h4 {
@@ -524,4 +527,56 @@ body {
 .btn-hold.holding .btn-hold-progress {
     width: 100%;
     transition: width 2s linear; /* La animación de 2 segundos */
+}
+
+/* --- ================================= --- */
+/* ---        ESTILOS VOTACIÓN           --- */
+/* --- ================================= --- */
+
+/* Resaltado para la tarjeta que HE seleccionado */
+.character-card.selected {
+    border: 2px solid #FFFFFF; /* Borde blanco */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); /* Brillo blanco */
+}
+
+/* Contador de votos (se añade con JS) */
+.vote-counter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--color-acento); /* Fondo rojo */
+    color: #FFFFFF;
+    font-family: var(--font-titulo);
+    font-size: 1.2rem;
+    line-height: 30px; /* Centra el número verticalmente */
+    text-align: center;
+    border-radius: 50%; /* Círculo perfecto */
+    z-index: 3; /* Por encima del contenido de la tarjeta */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    
+    /* Animación suave cuando aparece/cambia */
+    transition: transform 0.2s ease;
+    transform: scale(1);
+}
+
+.vote-counter.hidden {
+    transform: scale(0); /* Oculta el contador si es 0 */
+}
+
+
+/* Estilo para botones deshabilitados */
+.btn-primary:disabled {
+    background-color: var(--color-borde);
+    color: #888;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Estilo para el botón de confirmar voto cuando está bloqueado */
+.btn-primary.locked {
+    background-color: #0d4b0d; /* Un verde oscuro */
+    color: #a8e6a8;
+    cursor: not-allowed;
 }

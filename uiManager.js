@@ -124,6 +124,10 @@ export function ocultarBotonComenzarDebate() {
     refs.btnComenzarDebate.style.display = 'none';
 }
 
+export function ocultarBotonComenzarRonda() {
+    refs.btnComenzarRonda.style.display = 'none';
+}
+
 /**
  * ¡MODIFICADO! Ahora muestra el temporizador y el botón de votación (al host).
  */
@@ -228,3 +232,5 @@ function construirModalPersonaje(personaje) {
         </ul>
     `;
 }
+
+// v1.1 - Fix: ocultarBotonComenzarRonda exportado

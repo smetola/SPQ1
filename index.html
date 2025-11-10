@@ -43,20 +43,28 @@
             <button id="btnCancelarUnirse" class="btn-secondary">[ CANCELAR ]</button>
         </main>
 
+        <!-- ======================================== -->
+        <!-- PANTALLA 4: PANTALLA DE JUEGO          -->
+        <!-- ======================================== -->
         <main id="gameScreen" class="game-screen" style="display: none;">
             
+            <!-- Info de la Ronda -->
             <h3 id="gameRondaTitulo">FASE DE CONOCIMIENTO</h3>
             <p id="gameRondaInstruccion">Desliza para ver a los supervivientes.</p>
 
+            <!-- Temporizador -->
             <div id="gameTimer" class="game-timer" style="display: none;">
                 05:00
             </div>
             
+            <!-- El Carrusel de Personajes -->
             <div class="carousel-container">
                 <div id="characterCarousel" class="carousel">
-                    </div>
+                    <!-- Las tarjetas de personaje (folios) se crearán aquí con JavaScript -->
+                </div>
             </div>
 
+            <!-- Botones del Anfitrión -->
             <button id="btnComenzarRonda" class="btn-primary" style="display: none; margin-top: 20px;">
                 [ COMENZAR RONDA 1 ]
             </button>
@@ -65,11 +73,16 @@
                 [ COMENZAR DEBATE ]
             </button>
 
+            <!-- Botón de mantener pulsado -->
             <button id="btnHoldToVote" class="btn-hold" style="display: none;">
                 <span class="btn-hold-text">[ MANTENER PARA VOTAR ]</span>
                 <span id="btnHoldProgress" class="btn-hold-progress"></span>
             </button>
-            
+
+            <!-- ¡NUEVO BOTÓN DE CONFIRMAR VOTO! -->
+            <button id="btnConfirmarVoto" class="btn-primary" style="display: none; margin-top: 20px;" disabled>
+                [ CONFIRMAR VOTO ]
+            </button>    
         </main>
 
     </div> <button id="btnQuienSoy" class="btn-quiensoy" style="display: none;">?</button>
