@@ -28,7 +28,6 @@ const elementRefs = {
     characterCarousel: document.getElementById('characterCarousel'),
     btnQuienSoy: document.getElementById('btnQuienSoy'),
 
-    // ¡NUEVO! Temporizador
     gameTimer: document.getElementById('gameTimer'),
     
     modalQuienSoy: document.getElementById('modalQuienSoy'),
@@ -43,48 +42,21 @@ const elementRefs = {
     btnComenzarRonda: document.getElementById('btnComenzarRonda'),
     btnComenzarDebate: document.getElementById('btnComenzarDebate'),
 
-    // ¡NUEVO! Botón de mantener pulsado
-    btnHoldToVote: document.getElementById('btnHoldToVote'),
-    btnHoldProgress: document.getElementById('btnHoldProgress'),
+    // ¡NUEVO! Botón de confirmar (el de hold se ha ido)
+    btnConfirmarVoto: document.getElementById('btnConfirmarVoto'),
 };
 
 // --- 2. INICIALIZAR MÓDULOS ---
 
 UIManager.init(elementRefs, {
+    // ¡MODIFICADO! handleCardClick ahora es un "router" en gameLogic
     handleCardClick: (personaje) => GameLogic.handleCardClick(personaje)
 });
 
 GameLogic.init(database); // 'database' viene del script de Firebase en index.html
 
 
-// --- 3. LÓGICA LOCAL (PULSACIÓN LARGA) ---
-let holdTimer = null; // Temporizador para la pulsación larga
-const HOLD_DURATION = 2000; // 2 segundos
-
-function startHold() {
-    // Inicia la animación visual
-    UIManager.actualizarBotonHold('start', HOLD_DURATION);
-    
-    // Inicia el temporizador lógico
-    holdTimer = setTimeout(() => {
-        console.log("¡Pulsación larga completada!");
-        GameLogic.comenzarFaseVotacion();
-    }, HOLD_DURATION);
-}
-
-function cancelHold() {
-    // Cancela la animación visual
-    UIManager.actualizarBotonHold('cancel');
-    
-    // Cancela el temporizador lógico
-    if (holdTimer) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-    }
-}
-
-
-// --- 4. CONECTAR "ESCUCHADORES" DE EVENTOS ---
+// --- 3. CONECTAR "ESCUCHADORES" DE EVENTOS ---
 
 // Menú Principal
 elementRefs.btnCrearPartida.addEventListener('click', GameLogic.crearNuevaPartida);
@@ -110,21 +82,12 @@ elementRefs.btnCerrarModalAsignar.addEventListener('click', () => elementRefs.mo
 elementRefs.btnComenzarRonda.addEventListener('click', GameLogic.comenzarFaseAsignacion);
 elementRefs.btnComenzarDebate.addEventListener('click', GameLogic.comenzarFaseDebate);
 
+// ¡NUEVO! Botón de confirmar voto
+elementRefs.btnConfirmarVoto.addEventListener('click', GameLogic.confirmarMiVoto);
+
 elementRefs.btnQuienSoy.addEventListener('click', () => {
     const miPersonaje = GameLogic.getMiPersonaje();
     if (miPersonaje) {
         UIManager.mostrarModalQuienSoy(miPersonaje);
     }
 });
-
-// ¡NUEVO! Eventos para el botón de mantener pulsado
-// Ratón
-elementRefs.btnHoldToVote.addEventListener('mousedown', startHold);
-elementRefs.btnHoldToVote.addEventListener('mouseup', cancelHold);
-elementRefs.btnHoldToVote.addEventListener('mouseleave', cancelHold); // Si el ratón se va
-// Táctil
-elementRefs.btnHoldToVote.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // Evita el "mouse event" fantasma
-    startHold();
-});
-elementRefs.btnHoldToVote.addEventListener('touchend', cancelHold);

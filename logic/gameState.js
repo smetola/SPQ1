@@ -19,6 +19,9 @@ export const state = {
 
     // Temporizadores
     timerInterval: null,
+
+    // ¡NUEVO! Estado de votación local
+    heConfirmadoMiVoto: false,
 };
 
 // Inicialización de la base de datos
@@ -52,6 +55,7 @@ export function resetState() {
         refJugadoresEnLobby: null,
         refEstadoPartida: null,
         refDatosJuego: null,
-        timerInterval: null
+        timerInterval: null,
+        heConfirmadoMiVoto: false // Resetear
     });
 }

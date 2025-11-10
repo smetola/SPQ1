@@ -15,7 +15,6 @@ export function init(elementRefs, logicHandlers) {
 // --- FUNCIONES DE NAVEGACIÓN ---
 
 export function mostrarPantallaUnirse() {
-    // ... (sin cambios)
     console.log("Mostrando pantalla para unirse...");
     refs.mainMenu.style.display = 'none';
     refs.lobbyScreen.style.display = 'none';
@@ -24,7 +23,6 @@ export function mostrarPantallaUnirse() {
 }
 
 export function mostrarLobby(codigoSala) {
-    // ... (sin cambios)
     console.log(`Mostrando lobby para la sala: ${codigoSala}`);
     refs.mainMenu.style.display = 'none';
     refs.joinScreen.style.display = 'none';
@@ -34,7 +32,6 @@ export function mostrarLobby(codigoSala) {
 }
 
 export function mostrarPantallaJuego(rondaActual, esAnfitrion) {
-    // ... (sin cambios)
     console.log("¡La partida ha empezado! Mostrando pantalla de juego.");
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'flex';
@@ -50,7 +47,6 @@ export function mostrarPantallaJuego(rondaActual, esAnfitrion) {
 }
 
 export function volverAlMenu() {
-    // ... (modificado)
     console.log("Volviendo al menú principal...");
     
     refs.joinScreen.style.display = 'none';
@@ -61,13 +57,12 @@ export function volverAlMenu() {
     refs.btnQuienSoy.style.display = 'none';
     refs.btnComenzarRonda.style.display = 'none';
     refs.btnComenzarDebate.style.display = 'none';
-    refs.btnHoldToVote.style.display = 'none'; // ¡NUEVO!
-    refs.gameTimer.style.display = 'none'; // ¡NUEVO!
+    refs.btnConfirmarVoto.style.display = 'none'; // ¡NUEVO!
+    refs.gameTimer.style.display = 'none';
     refs.mainMenu.style.display = 'flex';
 }
 
 export function actualizarListaLobby(jugadores, jugadorIdActual) {
-    // ... (sin cambios)
     refs.listaJugadoresLobby.innerHTML = '';
     if (jugadores) {
         let esAnfitrionEsteJugador = false;
@@ -85,7 +80,6 @@ export function actualizarListaLobby(jugadores, jugadorIdActual) {
 }
 
 export function mostrarModalAsignacion(rondaActual, atributo) {
-    // ... (sin cambios)
     refs.modalAsignarTitulo.textContent = `RONDA ${rondaActual}: ASIGNACIÓN`;
     refs.modalAtributoTexto.textContent = atributo;
     refs.modalAsignarAtributo.style.display = 'flex';
@@ -95,32 +89,39 @@ export function mostrarModalAsignacion(rondaActual, atributo) {
 }
 
 export function mostrarModalQuienSoy(personaje) {
-    // ... (sin cambios)
     construirModalPersonaje(personaje);
     refs.modalQuienSoy.style.display = 'flex';
 }
 
-export function actualizarCarousel(jugadores) {
-    // ... (sin cambios)
+/**
+ * ¡MODIFICADO! Ahora acepta el estado de votación para renderizar contadores y selecciones.
+ */
+export function actualizarCarousel(jugadores, miVotoActual, recuentoVotos) {
     refs.characterCarousel.innerHTML = ''; 
     const personajes = [];
     Object.entries(jugadores).forEach(([id, jugador]) => {
-        const personajeConId = { ...jugador.personaje, jugadorId: id };
-        personajes.push(personajeConId);
+        if (jugador.personaje) { // Asegurarse de que el personaje existe
+            const personajeConId = { ...jugador.personaje, jugadorId: id };
+            personajes.push(personajeConId);
+        }
     });
+
+    // Ordenar: Vivos primero, muertos después
+    personajes.sort((a, b) => (a.estaVivo === b.estaVivo) ? 0 : a.estaVivo ? -1 : 1);
+
     personajes.forEach(personaje => {
-        refs.characterCarousel.appendChild(crearTarjetaPersonaje(personaje, logic.handleCardClick));
+        refs.characterCarousel.appendChild(
+            crearTarjetaPersonaje(personaje, logic.handleCardClick, miVotoActual, recuentoVotos)
+        );
     });
 }
 
 export function mostrarBotonComenzarDebate(rondaActual) {
-    // ... (sin cambios)
     refs.btnComenzarDebate.textContent = `[ COMENZAR DEBATE RONDA ${rondaActual} ]`;
     refs.btnComenzarDebate.style.display = 'block';
 }
 
 export function ocultarBotonComenzarDebate() {
-    // ... (sin cambios)
     refs.btnComenzarDebate.style.display = 'none';
 }
 
@@ -129,37 +130,21 @@ export function ocultarBotonComenzarRonda() {
 }
 
 /**
- * ¡MODIFICADO! Ahora muestra el temporizador y el botón de votación (al host).
+ * ¡MODIFICADO! Ahora es DEBATE + VOTACIÓN.
  */
-export function mostrarFaseDebate(rondaActual, esAnfitrion) {
-    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: DEBATE`;
-    refs.gameRondaInstruccion.textContent = "¡Es hora de debatir! Hablad sobre quién debe ser eliminado.";
+export function mostrarFaseDebate(rondaActual) {
+    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: DEBATE Y VOTACIÓN`;
+    refs.gameRondaInstruccion.textContent = "¡Hora de debatir! Selecciona a quién eliminar y confirma tu voto.";
     
     // Ocultamos botones de fases anteriores
     refs.btnComenzarRonda.style.display = 'none';
     refs.btnComenzarDebate.style.display = 'none';
 
-    // ¡Mostramos el temporizador a TODOS!
+    // Mostramos el temporizador a TODOS
     refs.gameTimer.style.display = 'block';
 
-    // ¡Mostramos el botón de votación SÓLO AL HOST!
-    if (esAnfitrion) {
-        refs.btnHoldToVote.style.display = 'block';
-    }
+    // El botón de confirmar voto se gestiona en 'gestionarBotonConfirmar'
 }
-
-/**
- * ¡NUEVA FUNCIÓN! Actualiza la UI para la fase de votación.
- */
-export function mostrarFaseVotacion(rondaActual) {
-    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: VOTACIÓN`;
-    refs.gameRondaInstruccion.textContent = "¡Hora de votar! Pulsa en el personaje que quieras eliminar.";
-
-    // Ocultamos elementos del debate
-    refs.gameTimer.style.display = 'none';
-    refs.btnHoldToVote.style.display = 'none';
-}
-
 
 /**
  * ¡NUEVA FUNCIÓN! Gestiona el temporizador.
@@ -183,30 +168,65 @@ export function actualizarTimer(segundosRestantes, mostrar = true) {
 }
 
 /**
- * ¡NUEVA FUNCIÓN! Gestiona la animación del botón de mantener pulsado.
+ * ¡NUEVA FUNCIÓN! Gestiona el estado del botón [CONFIRMAR VOTO].
+ */
+export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado) {
+    const btn = refs.btnConfirmarVoto;
+    if (!btn) return;
+
+    if (!mostrar) {
+        btn.style.display = 'none';
+        return;
+    }
+
+    btn.style.display = 'block';
+
+    if (confirmado) {
+        btn.disabled = true;
+        btn.textContent = "[ VOTO CONFIRMADO ]";
+        btn.classList.add('locked'); // Añade clase para estilo "bloqueado"
+    } else if (seleccionado) {
+        btn.disabled = false;
+        btn.textContent = "[ CONFIRMAR VOTO ]";
+        btn.classList.remove('locked');
+    } else {
+        btn.disabled = true;
+        btn.textContent = "[ SELECCIONA UN PERSONAJE ]";
+        btn.classList.remove('locked');
+    }
+}
+
+/**
+ * ¡FUNCIÓN OBSOLETA! (El botón Hold ya no existe)
+ * La mantenemos por si acaso, pero la vaciamos.
  */
 export function actualizarBotonHold(estado, duracionMs = 2000) {
-    if (estado === 'start') {
-        // Añadimos 'holding' para que el CSS inicie la transición de 2s
-        refs.btnHoldProgress.style.transition = `width ${duracionMs / 1000}s linear`;
-        refs.btnHoldToVote.classList.add('holding');
-    } else if (estado === 'cancel') {
-        // Quitamos 'holding' y hacemos que la barra se reinicie rápido (0.3s)
-        refs.btnHoldProgress.style.transition = 'width 0.3s ease-out';
-        refs.btnHoldToVote.classList.remove('holding');
-    }
+    // Ya no hace nada
 }
 
 
 // --- FUNCIONES AUXILIARES DE UI (Privadas) ---
 
-function crearTarjetaPersonaje(personaje, clickHandler) {
-    // ... (sin cambios)
+/**
+ * ¡MODIFICADO! Acepta estado de votación para renderizar UI.
+ */
+function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVotos) {
     const card = document.createElement('div');
     card.className = 'character-card';
-    if (!personaje.estaVivo) { card.classList.add('muerto'); }
+    
+    // Marcar si está muerto
+    if (!personaje.estaVivo) { 
+        card.classList.add('muerto'); 
+    }
+
+    // Marcar si es mi selección actual (¡NUEVO!)
+    if (personaje.jugadorId === miVotoActual) {
+        card.classList.add('selected');
+    }
+
     const atributosObj = personaje.atributosAsignados || {};
     const atributosHTML = Object.values(atributosObj);
+    
     card.innerHTML = `
         <h4>${personaje.nombre.toUpperCase()}</h4>
         <span>Edad: ${personaje.edad}</span>
@@ -215,12 +235,24 @@ function crearTarjetaPersonaje(personaje, clickHandler) {
             ${atributosHTML.map(attr => `<li>${attr}</li>`).join('')}
         </ul>
     `;
+
+    // Añadir contador de votos (¡NUEVO!)
+    const numVotos = recuentoVotos[personaje.jugadorId] || 0;
+    const voteCounter = document.createElement('div');
+    voteCounter.className = 'vote-counter';
+    if (numVotos === 0) {
+        voteCounter.classList.add('hidden');
+    }
+    voteCounter.textContent = numVotos;
+    card.appendChild(voteCounter);
+
+    // Añadir listener
     card.addEventListener('click', () => clickHandler(personaje));
+    
     return card;
 }
 
 function construirModalPersonaje(personaje) {
-    // ... (sin cambios)
     const atributosObj = personaje.atributosAsignados || {};
     const atributosHTML = Object.values(atributosObj);
     refs.modalMiPersonaje.innerHTML = `
@@ -232,5 +264,3 @@ function construirModalPersonaje(personaje) {
         </ul>
     `;
 }
-
-// v1.1 - Fix: ocultarBotonComenzarRonda exportado

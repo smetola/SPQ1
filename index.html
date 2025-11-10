@@ -43,28 +43,20 @@
             <button id="btnCancelarUnirse" class="btn-secondary">[ CANCELAR ]</button>
         </main>
 
-        <!-- ======================================== -->
-        <!-- PANTALLA 4: PANTALLA DE JUEGO          -->
-        <!-- ======================================== -->
         <main id="gameScreen" class="game-screen" style="display: none;">
             
-            <!-- Info de la Ronda -->
             <h3 id="gameRondaTitulo">FASE DE CONOCIMIENTO</h3>
             <p id="gameRondaInstruccion">Desliza para ver a los supervivientes.</p>
 
-            <!-- Temporizador -->
             <div id="gameTimer" class="game-timer" style="display: none;">
                 05:00
             </div>
             
-            <!-- El Carrusel de Personajes -->
             <div class="carousel-container">
                 <div id="characterCarousel" class="carousel">
-                    <!-- Las tarjetas de personaje (folios) se crearán aquí con JavaScript -->
-                </div>
+                    </div>
             </div>
 
-            <!-- Botones del Anfitrión -->
             <button id="btnComenzarRonda" class="btn-primary" style="display: none; margin-top: 20px;">
                 [ COMENZAR RONDA 1 ]
             </button>
@@ -73,13 +65,6 @@
                 [ COMENZAR DEBATE ]
             </button>
 
-            <!-- Botón de mantener pulsado -->
-            <button id="btnHoldToVote" class="btn-hold" style="display: none;">
-                <span class="btn-hold-text">[ MANTENER PARA VOTAR ]</span>
-                <span id="btnHoldProgress" class="btn-hold-progress"></span>
-            </button>
-
-            <!-- ¡NUEVO BOTÓN DE CONFIRMAR VOTO! -->
             <button id="btnConfirmarVoto" class="btn-primary" style="display: none; margin-top: 20px;" disabled>
                 [ CONFIRMAR VOTO ]
             </button>    
@@ -91,10 +76,7 @@
         <div class="modal-content">
             <h3>¡ESTE ERES TÚ!</h3>
             <p>Memoriza bien a tu personaje. Esta es tu identidad secreta.</p>
-            
-            <div id="modalMiPersonaje" class="character-card-modal">
-                </div>
-            
+            <div id="modalMiPersonaje" class="character-card-modal"></div>
             <button id="btnCerrarModal" class="btn-primary">[ ENTENDIDO ]</button>
         </div>
     </div>
@@ -103,11 +85,9 @@
         <div class="modal-content">
             <h3 id="modalAsignarTitulo">RONDA 1: ASIGNACIÓN</h3>
             <p>Te ha tocado el siguiente atributo. Desliza por el carrusel y **pulsa sobre el personaje** al que se lo quieras asignar.</p>
-            
             <div class="atributo-a-asignar">
                 <span id="modalAtributoTexto">ATRIBUTO...</span>
             </div>
-            
             <button id="btnCerrarModalAsignar" class="btn-secondary">[ ENTENDIDO, DEJARME VER ]</button>
         </div>
     </div>
@@ -134,14 +114,3 @@
 
 </body>
 </html>
-
-
-<!-- const firebaseConfig = {
-			apiKey: "AIzaSyBlpUn5swrEaWGlF6N5DC2doVnLV_DZZBs",
-			authDomain: "solopuedequedar1-partygame.firebaseapp.com",
-			databaseURL: "https://solopuedequedar1-partygame-default-rtdb.europe-west1.firebasedatabase.app",
-			projectId: "solopuedequedar1-partygame",
-			storageBucket: "solopuedequedar1-partygame.firebasestorage.app",
-			messagingSenderId: "281876843689",
-			appId: "1:281876843689:web:b77f267d19ec7a59f2adb8"
-		}; -->

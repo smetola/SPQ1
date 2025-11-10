@@ -467,68 +467,6 @@ body {
     letter-spacing: 2px;
 }
 
-
-/* --- ================================= --- */
-/* ---   ESTILOS BOTÓN MANTENER PULSADO  --- */
-/* --- ================================= --- */
-
-.btn-hold {
-    /* Basado en .btn-primary pero con cambios clave */
-    font-family: var(--font-cuerpo);
-    font-weight: 700;
-    font-size: 1.2rem;
-    background-color: var(--color-acento);
-    color: #FFFFFF;
-    border: none;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    
-    width: 100%; /* Ocupa todo el ancho */
-    margin-top: 10px;
-    padding: 0; /* Quitamos el padding para que la barra de progreso funcione */
-
-    /* Magia para la animación */
-    position: relative; /* Contenedor para la barra de progreso */
-    overflow: hidden; /* Mantiene la barra dentro de los bordes */
-    -webkit-user-select: none; /* Evita que el texto se seleccione al mantener pulsado */
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.btn-hold-text {
-    /* El texto se pone por encima de la barra */
-    display: block;
-    padding: 15px; /* El padding que quitamos al botón, lo ponemos aquí */
-    position: relative;
-    z-index: 2;
-}
-
-.btn-hold-progress {
-    /* La barra de progreso */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0%; /* Empieza en 0 */
-    height: 100%;
-    background-color: var(--color-borde); /* Un color más oscuro */
-    z-index: 1; /* Detrás del texto */
-    
-    /* ¡IMPORTANTE! Transición por defecto. 
-       Si el usuario suelta, la barra se reinicia rápido. */
-    transition: width 0.3s ease-out;
-}
-
-/* * Esta clase ".holding" la añadiremos con JavaScript.
- * Cuando el botón la tenga, la barra de progreso
- * se animará hasta el 100% durante 2 segundos.
- */
-.btn-hold.holding .btn-hold-progress {
-    width: 100%;
-    transition: width 2s linear; /* La animación de 2 segundos */
-}
-
 /* --- ================================= --- */
 /* ---        ESTILOS VOTACIÓN           --- */
 /* --- ================================= --- */
