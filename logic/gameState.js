@@ -20,8 +20,8 @@ export const state = {
     // Temporizadores
     timerInterval: null,
 
-    // ¡NUEVO! Estado de votación local
     heConfirmadoMiVoto: false,
+    processingVote: false, // ¡NUEVO SEMÁFORO!
 };
 
 // Inicialización de la base de datos
@@ -56,6 +56,7 @@ export function resetState() {
         refEstadoPartida: null,
         refDatosJuego: null,
         timerInterval: null,
-        heConfirmadoMiVoto: false // Resetear
+        heConfirmadoMiVoto: false,
+        processingVote: false // ¡RESET SEMÁFORO!
     });
 }

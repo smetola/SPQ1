@@ -95,3 +95,39 @@ export function handleSalir() {
     resetState();
     UI.volverAlMenu();
 }
+
+/**
+ * ¡NUEVA FUNCIÓN! Reinicia la partida al estado de Lobby.
+ * Solo la llama el Anfitrión.
+ */
+export function reiniciarPartida() {
+    const database = getDatabase();
+    
+    database.ref(`partidas/${state.salaActual}`).once('value', (snap) => {
+        const partida = snap.val();
+        if (!partida) return;
+
+        const jugadores = partida.jugadores;
+        const actualizaciones = {};
+
+        // 1. Limpiar datos de juego de cada jugador
+        Object.keys(jugadores).forEach(id => {
+            actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/personaje`] = null;
+            actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/atributoParaAsignar`] = null;
+            actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/votoConfirmado`] = null;
+            actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/votoSeleccionado`] = null;
+        });
+
+        // 2. Resetear estado de la partida
+        actualizaciones[`partidas/${state.salaActual}/estado`] = 'lobby';
+        actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'lobby';
+        actualizaciones[`partidas/${state.salaActual}/rondaActual`] = 1;
+        actualizaciones[`partidas/${state.salaActual}/ganador`] = null;
+        actualizaciones[`partidas/${state.salaActual}/ultimoEliminado`] = null;
+        actualizaciones[`partidas/${state.salaActual}/debateEndTime`] = null;
+
+        // 3. Aplicar cambios
+        // Esto será detectado por firebaseSync, que moverá a todos al lobby
+        database.ref().update(actualizaciones);
+    });
+}

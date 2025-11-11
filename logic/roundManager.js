@@ -63,10 +63,23 @@ export function avanzarSiguienteRonda() {
         
         if (personajesVivos <= 1) {
             // ¡FIN DEL JUEGO!
+            let ganadorData = null;
+            
+            if (personajesVivos === 1) {
+                // Encontrar al jugador ganador para obtener su nombre real
+                const jugadorGanador = Object.values(partida.jugadores).find(j => j.personaje?.estaVivo);
+                if (jugadorGanador) {
+                    ganadorData = {
+                        nombreJugador: jugadorGanador.nombre, // El nombre del JUGADOR
+                        nombrePersonaje: jugadorGanador.personaje.nombre // El nombre del PERSONAJE
+                    };
+                }
+            }
+            // Si personajesVivos es 0 (ej. empate en la última ronda), ganadorData se queda 'null'
+
             database.ref(`partidas/${state.salaActual}`).update({
                 faseActual: 'fin',
-                ganador: personajesVivos === 1 ? 
-                    Object.values(partida.jugadores).find(j => j.personaje?.estaVivo)?.personaje : null
+                ganador: ganadorData // Guardamos el objeto con ambos nombres
             });
         } else {
             // Continuar a la siguiente ronda

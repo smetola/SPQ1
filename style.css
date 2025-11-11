@@ -518,3 +518,56 @@ body {
     color: #a8e6a8;
     cursor: not-allowed;
 }
+
+/* --- ================================= --- */
+/* ---     ESTILOS MODAL RESULTADOS      --- */
+/* --- ================================= --- */
+
+.modal-resultados-texto {
+    font-size: 1.1rem;
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+.modal-resultados-texto strong {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    font-size: 1.5rem;
+    display: block; /* Hace que el nombre aparezca en su propia línea */
+    margin: 5px 0;
+    letter-spacing: 1px;
+}
+
+/* --- ================================= --- */
+/* ---     ESTILOS MODAL FIN JUEGO       --- */
+/* --- ================================= --- */
+
+.modal-fin-juego-winner {
+    background-color: var(--color-fondo);
+    border: 2px solid var(--color-acento); /* Borde rojo destacado */
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.modal-fin-juego-winner span {
+    font-size: 1rem;
+    color: var(--color-texto-principal);
+    display: block;
+}
+
+.modal-fin-juego-winner strong {
+    font-family: var(--font-titulo);
+    font-size: 2rem; /* ¡Más grande! */
+    color: var(--color-acento);
+    display: block;
+    margin: 5px 0;
+    letter-spacing: 1px;
+}
+
+.modal-fin-juego-opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 25px;
+}

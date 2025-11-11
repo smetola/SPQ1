@@ -34,12 +34,13 @@ export function comenzarFaseVotacion() {
     }).catch((err) => console.error("Error al cambiar a votación:", err));
 }
 
-// ¡NUEVA! Comenzar fase de resultados (mostrar quién fue eliminado)
+// Comenzar fase de resultados (mostrar quién fue eliminado)
 export function mostrarResultadosVotacion(personajeEliminado) {
     const database = getDatabase();
     
     database.ref(`partidas/${state.salaActual}`).update({
         faseActual: 'resultados',
-        ultimoEliminado: personajeEliminado
+        ultimoEliminado: personajeEliminado,
+        debateEndTime: null // Limpiamos el temporizador
     });
 }

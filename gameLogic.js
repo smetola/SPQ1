@@ -1,7 +1,7 @@
 // gameLogic.js - Punto de entrada principal (re-exporta módulos)
 
 import { state, initDatabase } from './logic/gameState.js';
-import { crearNuevaPartida, unirseAPartida, handleSalir } from './logic/lobbyManager.js';
+import { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida } from './logic/lobbyManager.js';
 import { empezarPartida, avanzarSiguienteRonda } from './logic/roundManager.js';
 import { comenzarFaseDebate } from './logic/phaseManager.js'; // Importa menos de phaseManager
 import { repartirAtributos, asignarAtributoAPersonaje } from './logic/attributeManager.js';
@@ -18,7 +18,7 @@ export function getMiPersonaje() {
 }
 
 // Re-exportar funciones del lobby
-export { crearNuevaPartida, unirseAPartida, handleSalir };
+export { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida };
 
 // Re-exportar funciones de rondas
 export { empezarPartida, avanzarSiguienteRonda };

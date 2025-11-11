@@ -42,14 +42,25 @@ const elementRefs = {
     btnComenzarRonda: document.getElementById('btnComenzarRonda'),
     btnComenzarDebate: document.getElementById('btnComenzarDebate'),
 
-    // ¡NUEVO! Botón de confirmar (el de hold se ha ido)
     btnConfirmarVoto: document.getElementById('btnConfirmarVoto'),
+
+    modalResultados: document.getElementById('modalResultados'),
+    modalResultadosTitulo: document.getElementById('modalResultadosTitulo'),
+    modalResultadosTexto: document.getElementById('modalResultadosTexto'),
+    btnSiguienteRonda: document.getElementById('btnSiguienteRonda'),
+    btnCerrarModalResultados: document.getElementById('btnCerrarModalResultados'),
+
+    // ¡MODIFICADAS/NUEVAS REFERENCIAS!
+    modalFinJuego: document.getElementById('modalFinJuego'),
+    modalGanadorTexto: document.getElementById('modalGanadorTexto'),
+    btnVerTablero: document.getElementById('btnVerTablero'),
+    btnReiniciarLobby: document.getElementById('btnReiniciarLobby'), // ¡NUEVO!
+    btnSalirAlMenu: document.getElementById('btnSalirAlMenu'), // ¡RENOMBRADO!
 };
 
 // --- 2. INICIALIZAR MÓDULOS ---
 
 UIManager.init(elementRefs, {
-    // ¡MODIFICADO! handleCardClick ahora es un "router" en gameLogic
     handleCardClick: (personaje) => GameLogic.handleCardClick(personaje)
 });
 
@@ -81,8 +92,6 @@ elementRefs.btnCerrarModalAsignar.addEventListener('click', () => elementRefs.mo
 // Pantalla de Juego
 elementRefs.btnComenzarRonda.addEventListener('click', GameLogic.comenzarFaseAsignacion);
 elementRefs.btnComenzarDebate.addEventListener('click', GameLogic.comenzarFaseDebate);
-
-// ¡NUEVO! Botón de confirmar voto
 elementRefs.btnConfirmarVoto.addEventListener('click', GameLogic.confirmarMiVoto);
 
 elementRefs.btnQuienSoy.addEventListener('click', () => {
@@ -90,4 +99,30 @@ elementRefs.btnQuienSoy.addEventListener('click', () => {
     if (miPersonaje) {
         UIManager.mostrarModalQuienSoy(miPersonaje);
     }
+});
+
+// Modal de Resultados
+elementRefs.btnSiguienteRonda.addEventListener('click', () => {
+    elementRefs.modalResultados.style.display = 'none';
+    GameLogic.avanzarSiguienteRonda();
+});
+
+elementRefs.btnCerrarModalResultados.addEventListener('click', () => {
+    elementRefs.modalResultados.style.display = 'none';
+});
+
+// ¡MODIFICADO! Listeners para el modal de Fin de Juego
+elementRefs.btnVerTablero.addEventListener('click', () => {
+    elementRefs.modalFinJuego.style.display = 'none';
+    // El tablero final ya está visible detrás (lo prepara firebaseSync)
+});
+
+elementRefs.btnReiniciarLobby.addEventListener('click', () => {
+    // ¡NUEVO! Solo el anfitrión ve este botón y reinicia la partida
+    GameLogic.reiniciarPartida();
+});
+
+elementRefs.btnSalirAlMenu.addEventListener('click', () => {
+    // ¡MODIFICADO! El jugador normal sale al menú principal
+    GameLogic.handleSalir();
 });
