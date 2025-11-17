@@ -1,18 +1,13 @@
-// attributeManager.js - Gestión de atributos (repartir y asignar)
+// logic/attributeManager.js - Gestión de atributos (repartir y asignar)
 
-import { state, getDatabase } from './gameState.js';
+import { state, getDatabase, getModalManager } from './gameState.js';
 import * as Data from '../gameData.js';
 
-// Función auxiliar: selección aleatoria
-function seleccionarElementoAleatorio(array, borrar = false) {
-    if (array.length === 0) return "Dato Agotado";
-    const indice = Math.floor(Math.random() * array.length);
-    const elemento = array[indice];
-    if (borrar) array.splice(indice, 1);
-    return elemento;
-}
-
-// Repartir atributos al inicio de cada ronda
+/**
+ * ¡REESCRITO!
+ * Reparte atributos basándose en el 'progressionIndex' y el 'progresionTiers'
+ * almacenados en Firebase, en lugar de en 'rondaActual'.
+ */
 export function repartirAtributos() {
     console.log("🎯 repartirAtributos() llamada - Sala:", state.salaActual);
     const database = getDatabase();
@@ -21,21 +16,57 @@ export function repartirAtributos() {
         const partida = snapshot.val();
         if (!partida) return;
         
-        const jugadorIDs = Object.keys(partida.jugadores);
-        const listaAtributosRonda = Data.LISTAS_ATRIBUTOS[partida.rondaActual] || Data.ATRIBUTOS_LIFEORDEATH;
-        let atributosDisponiblesRonda = [...listaAtributosRonda]; 
-        
+        const listas = partida.listasAtributosDisponibles;
+        const progresion = partida.progresionTiers;
+        const index = partida.progressionIndex || 0;
+
+        // 1. Determinar qué tier (mazo) usar
+        const tierUsar = progresion[index] || "lifeordeath"; // 'lifeordeath' por si acaso
+        console.log(`Repartiendo atributos. Índice de progresión: ${index}. Tier: ${tierUsar}`);
+
+        // --- 2. Función auxiliar para coger atributos y gestionar si se acaban ---
+        const tiersOrdenados = ["bronce", "plata", "oro", "platino", "diamante", "lifeordeath"];
+        let tierActualIndex = tiersOrdenados.indexOf(tierUsar);
+
+        function getNextAttribute() {
+            if (tierActualIndex >= tiersOrdenados.length) {
+                tierActualIndex = tiersOrdenados.length - 1;
+            }
+
+            let tierActual = tiersOrdenados[tierActualIndex];
+            let listaActual = listas[tierActual];
+            
+            while (!listaActual || listaActual.length === 0) {
+                console.warn(`Tier '${tierActual}' está vacío. Pasando al siguiente.`);
+                tierActualIndex++;
+                if (tierActualIndex >= tiersOrdenados.length) {
+                    console.error("¡Se agotaron todos los atributos! Reiniciando 'lifeordeath'.");
+                    listas.lifeordeath = [...Data.LISTAS_ATRIBUTOS.lifeordeath]; 
+                    tierActualIndex = tiersOrdenados.length - 1;
+                }
+                tierActual = tiersOrdenados[tierActualIndex];
+                listaActual = listas[tierActual];
+            }
+
+            // Seleccionamos y BORRAMOS (splice) el atributo
+            const indice = Math.floor(Math.random() * listaActual.length);
+            const atributo = listaActual.splice(indice, 1)[0];
+            return atributo;
+        }
+
+        // --- 3. Repartir atributos a TODOS los jugadores (vivos o muertos) ---
         const actualizaciones = {};
+        const jugadorIDs = Object.keys(partida.jugadores);
 
         jugadorIDs.forEach((id) => {
-            let atributoRepartido = seleccionarElementoAleatorio(atributosDisponiblesRonda, true);
-            if (atributoRepartido === "Dato Agotado") {
-                atributosDisponiblesRonda = [...listaAtributosRonda];
-                atributoRepartido = seleccionarElementoAleatorio(atributosDisponiblesRonda, true);
-            }
+            const atributoRepartido = getNextAttribute();
             actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/atributoParaAsignar`] = atributoRepartido;
         });
         
+        // 4. Actualizar la base de datos con las listas "recortadas"
+        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = listas;
+        
+        // 5. Cambiar de fase
         actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'asignacion';
         
         database.ref().update(actualizaciones)
@@ -44,26 +75,33 @@ export function repartirAtributos() {
 }
 
 // Asignar atributo a un personaje (clic en tarjeta)
-export function asignarAtributoAPersonaje(personajeClickeado) {
+// (Esta función no cambia)
+export async function asignarAtributoAPersonaje(personajeClickeado) {
     const database = getDatabase();
+    const modal = getModalManager();
     
-    database.ref(`partidas/${state.salaActual}/faseActual`).once('value').then(snap => {
+    database.ref(`partidas/${state.salaActual}/faseActual`).once('value').then(async snap => {
         if (snap.val() !== 'asignacion') return;
         if (!state.miAtributoParaAsignar) {
-            alert("Ya has asignado tu atributo para esta ronda.");
+            await modal.mostrarAlerta("Ya has asignado tu atributo para esta ronda.");
             return;
         }
         if (!personajeClickeado.estaVivo) {
-            alert("No puedes asignar atributos a un personaje muerto.");
+            await modal.mostrarAlerta("No puedes asignar atributos a un personaje muerto.", "PERSONAJE ELIMINADO");
             return;
         }
         
-        if (confirm(`¿Estás seguro de que quieres asignar "${state.miAtributoParaAsignar}" a ${personajeClickeado.nombre}?`)) {
+        const confirmar = await modal.mostrarConfirmacion(
+            `¿Estás seguro de que quieres asignar "${state.miAtributoParaAsignar}" a ${personajeClickeado.nombre}?`,
+            "CONFIRMAR ASIGNACIÓN"
+        );
+        
+        if (confirmar) {
             database.ref(`partidas/${state.salaActual}/jugadores/${personajeClickeado.jugadorId}/personaje/atributosAsignados`)
                 .push(state.miAtributoParaAsignar);
             database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}/atributoParaAsignar`).remove();
 
-            alert("¡Atributo asignado!");
+            await modal.mostrarAlerta("¡Atributo asignado!", "ÉXITO");
             state.miAtributoParaAsignar = null;
         }
     });

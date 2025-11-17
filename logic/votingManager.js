@@ -1,22 +1,23 @@
 // logic/votingManager.js - Gestión de votación y eliminación
 
-import { state, getDatabase } from './gameState.js';
+import { state, getDatabase, getModalManager } from './gameState.js';
 // ¡Eliminada la importación de 'mostrarResultadosVotacion'!
 
 /**
  * Selecciona un personaje para votar (voto no definitivo).
  * Se llama al hacer clic en una tarjeta durante la fase 'debate'.
  */
-export function seleccionarVoto(personajeClickeado) {
+export async function seleccionarVoto(personajeClickeado) {
     const database = getDatabase();
+    const modal = getModalManager();
     
     if (state.faseAnterior !== 'debate') return;
     if (state.heConfirmadoMiVoto) {
-        alert("Ya has confirmado tu voto, no puedes cambiarlo.");
+        await modal.mostrarAlerta("Ya has confirmado tu voto, no puedes cambiarlo.");
         return;
     }
     if (!personajeClickeado.estaVivo) {
-        alert("No puedes votar a un personaje muerto.");
+        await modal.mostrarAlerta("No puedes votar a un personaje muerto.", "PERSONAJE ELIMINADO");
         return;
     }
 
@@ -28,12 +29,13 @@ export function seleccionarVoto(personajeClickeado) {
  * Confirma (bloquea) el voto actual.
  * Se llama al pulsar el botón [CONFIRMAR VOTO].
  */
-export function confirmarMiVoto() {
+export async function confirmarMiVoto() {
     const database = getDatabase();
+    const modal = getModalManager();
     
-    database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}/votoSeleccionado`).once('value').then(snap => {
+    database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}/votoSeleccionado`).once('value').then(async snap => {
         if (!snap.exists()) {
-            alert("Debes seleccionar un personaje antes de confirmar tu voto.");
+            await modal.mostrarAlerta("Debes seleccionar un personaje antes de confirmar tu voto.");
             return;
         }
 

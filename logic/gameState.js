@@ -1,6 +1,7 @@
 // gameState.js - Estado compartido del juego
 
 let database = null;
+let modalManager = null; // Gestor de modales personalizados
 
 // Estado del juego (compartido entre todos los módulos)
 export const state = {
@@ -31,6 +32,14 @@ export function initDatabase(db) {
 
 export function getDatabase() {
     return database;
+}
+
+export function initModalManager(mm) {
+    modalManager = mm;
+}
+
+export function getModalManager() {
+    return modalManager;
 }
 
 // Resetear estado (al salir de la partida)

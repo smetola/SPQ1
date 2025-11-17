@@ -3,6 +3,15 @@
 import { state, getDatabase } from './gameState.js';
 import * as UI from '../uiManager.js';
 
+// Comenzar fase de conocimiento (transición desde la historia)
+export function comenzarFaseConocimiento() {
+    const database = getDatabase();
+    
+    database.ref(`partidas/${state.salaActual}`).update({
+        faseActual: 'conocimiento'
+    }).catch((err) => console.error("Error al cambiar a conocimiento:", err));
+}
+
 // Comenzar fase de asignación (reparte atributos a los jugadores)
 // Esta función se importa y usa desde attributeManager, pero la dejo aquí 
 // porque gestiona la TRANSICIÓN de fase

@@ -1,15 +1,16 @@
 // gameLogic.js - Punto de entrada principal (re-exporta módulos)
 
-import { state, initDatabase } from './logic/gameState.js';
+import { state, initDatabase, initModalManager } from './logic/gameState.js';
 import { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida } from './logic/lobbyManager.js';
 import { empezarPartida, avanzarSiguienteRonda } from './logic/roundManager.js';
-import { comenzarFaseDebate } from './logic/phaseManager.js'; // Importa menos de phaseManager
+import { comenzarFaseConocimiento, comenzarFaseDebate } from './logic/phaseManager.js'; // Importa fase conocimiento
 import { repartirAtributos, asignarAtributoAPersonaje } from './logic/attributeManager.js';
 import { seleccionarVoto, confirmarMiVoto } from './logic/votingManager.js'; // ¡NUEVAS importaciones!
 
 // Inicialización
-export function init(db) {
+export function init(db, mm) {
     initDatabase(db);
+    initModalManager(mm);
 }
 
 // Getter de estado
@@ -24,7 +25,7 @@ export { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida };
 export { empezarPartida, avanzarSiguienteRonda };
 
 // Re-exportar funciones de fases
-export { comenzarFaseDebate };
+export { comenzarFaseConocimiento, comenzarFaseDebate };
 // 'comenzarFaseVotacion' ya no se llama desde la UI, sino desde el temporizador o el host
 
 // Re-exportar funciones de atributos

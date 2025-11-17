@@ -27,6 +27,7 @@ body {
     align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
+    position: relative; /* Para posicionar el botón de salida */
 }
 
 .container {
@@ -83,6 +84,42 @@ body {
 
 .btn-primary:hover {
     background-color: #F44336; /* Un rojo más brillante al pasar el ratón */
+}
+
+/* --- Botón de salida (esquina superior izquierda) --- */
+.btn-exit {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    background-color: rgba(51, 51, 51, 0.8); /* Fondo semi-transparente */
+    border: 1px solid var(--color-borde);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000; /* Para que esté siempre encima */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-exit svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-texto-principal);
+    transition: color 0.3s ease;
+}
+
+.btn-exit:hover {
+    background-color: var(--color-acento);
+    border-color: var(--color-acento);
+    transform: scale(1.1);
+}
+
+.btn-exit:hover svg {
+    color: #FFFFFF;
 }
 
 
@@ -570,4 +607,106 @@ body {
     flex-direction: column;
     gap: 10px; /* Espacio entre los botones */
     margin-top: 25px;
+}
+
+/* --- ================================= --- */
+/* ---     ESTILOS MODAL GENÉRICO        --- */
+/* --- ================================= --- */
+
+.modal-generico-botones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#modalGenericoInput {
+    margin: 15px 0;
+}
+
+/* --- ================================= --- */
+/* ---   ESTILOS PANTALLA DE HISTORIA    --- */
+/* --- ================================= --- */
+
+.story-screen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.story-container {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.story-title {
+    font-family: var(--font-titulo);
+    font-size: 2.5rem;
+    color: var(--color-acento);
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.story-subtitle {
+    font-family: var(--font-titulo);
+    font-size: 1.2rem;
+    color: var(--color-texto-principal);
+    margin: 0 0 30px 0;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.story-text {
+    font-family: var(--font-cuerpo);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-texto-principal);
+    text-align: left;
+    margin: 0 0 40px 0;
+    padding: 25px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-borde);
+    border-radius: 4px;
+    white-space: pre-line;
+}
+
+.story-text em {
+    font-family: var(--font-titulo);
+    font-size: 1.3rem;
+    color: var(--color-acento);
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+    letter-spacing: 1px;
+}
+
+.story-btn {
+    margin-top: 20px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
 }

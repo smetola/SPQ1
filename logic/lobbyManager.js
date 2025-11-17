@@ -1,8 +1,9 @@
-// lobbyManager.js - Gestión del lobby (crear/unirse a partidas)
+// logic/lobbyManager.js - Gestión del lobby (crear/unirse a partidas)
 
-import { state, getDatabase, resetState } from './gameState.js';
+import { state, getDatabase, resetState, getModalManager } from './gameState.js';
 import * as UI from '../uiManager.js';
 import { escucharJugadoresEnLobby, escucharInicioPartida } from './firebaseSync.js';
+import * as Data from '../gameData.js';
 
 // Generar código aleatorio de sala
 function generarCodigoAleatorio(longitud) {
@@ -22,21 +23,33 @@ export function crearNuevaPartida() {
         estado: "lobby", 
         creadaEn: Date.now(), 
         jugadores: {}, 
-        rondaActual: 1, 
+        // 'rondaActual' ya no se usa
         faseActual: 'lobby' 
     };
     
-    database.ref('partidas/' + codigoSala).set(datosPartida)
-        .then(() => {
-            const nombreAnfitrion = prompt("Introduce tu nombre (Anfitrión):", "Anfitrión");
+    const refPartida = database.ref('partidas/' + codigoSala);
+
+    refPartida.set(datosPartida)
+        .then(async () => {
+            const modal = getModalManager();
+            const nombreAnfitrion = await modal.mostrarPrompt(
+                "Introduce tu nombre para crear la partida:",
+                "Anfitrión",
+                "CREAR PARTIDA"
+            );
+            
+            if (!nombreAnfitrion) return; // Cancelado
+            
             const refJugador = database.ref(`partidas/${codigoSala}/jugadores`).push({ 
-                nombre: nombreAnfitrion || "Anfitrión", 
+                nombre: nombreAnfitrion, 
                 esAnfitrion: true 
             });
             
             state.jugadorIdActual = refJugador.key;
             state.soyAnfitrion = true;
             state.salaActual = codigoSala;
+
+            refPartida.onDisconnect().remove();
 
             UI.mostrarLobby(codigoSala);
             escucharJugadoresEnLobby();
@@ -46,20 +59,22 @@ export function crearNuevaPartida() {
 }
 
 // Unirse a partida existente
-export function unirseAPartida(codigo, nombre) {
+export async function unirseAPartida(codigo, nombre) {
+    const modal = getModalManager();
+    
     if (!codigo || !nombre) {
-        alert("Debes introducir un nombre y un código de sala.");
+        await modal.mostrarAlerta("Debes introducir un nombre y un código de sala.");
         return;
     }
     
     const database = getDatabase();
-    database.ref(`partidas/${codigo}`).once('value').then((snapshot) => {
+    database.ref(`partidas/${codigo}`).once('value').then(async (snapshot) => {
         if (!snapshot.exists()) {
-            alert("No se encontró ninguna partida con ese código.");
+            await modal.mostrarAlerta("No se encontró ninguna partida con ese código.", "ERROR");
             return;
         }
         if (snapshot.val().estado !== 'lobby') { 
-            alert("Esta partida ya ha comenzado. No puedes unirte."); 
+            await modal.mostrarAlerta("Esta partida ya ha comenzado. No puedes unirte.", "PARTIDA INICIADA"); 
             return; 
         }
         
@@ -83,13 +98,14 @@ export function handleSalir() {
     const database = getDatabase();
     
     if (state.salaActual && state.jugadorIdActual) {
-        database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`).once('value', (snapshot) => {
-            if (snapshot.val()?.esAnfitrion) {
-                database.ref(`partidas/${state.salaActual}`).remove();
-            } else {
-                database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`).remove();
-            }
-        });
+        const refPartida = database.ref(`partidas/${state.salaActual}`);
+        
+        if (state.soyAnfitrion) {
+            refPartida.onDisconnect().cancel(); 
+            refPartida.remove();
+        } else {
+            database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`).remove();
+        }
     }
     
     resetState();
@@ -97,8 +113,8 @@ export function handleSalir() {
 }
 
 /**
- * ¡NUEVA FUNCIÓN! Reinicia la partida al estado de Lobby.
- * Solo la llama el Anfitrión.
+ * ¡MODIFICADO!
+ * Reinicia la partida al Lobby y resetea la progresión de tiers.
  */
 export function reiniciarPartida() {
     const database = getDatabase();
@@ -109,6 +125,20 @@ export function reiniciarPartida() {
 
         const jugadores = partida.jugadores;
         const actualizaciones = {};
+        
+        // ¡NUEVO! Recalcular la progresión de tiers para el lobby
+        const numJugadores = Object.keys(jugadores).length;
+        let progresionTiers = [];
+        const baseProgression = ["bronce", "plata", "oro"];
+        const finProgression = ["lifeordeath", "lifeordeath", "lifeordeath"];
+
+        if (numJugadores <= 4) {
+            progresionTiers = [...baseProgression, "platino", "diamante", ...finProgression];
+        } else if (numJugadores === 5) {
+            progresionTiers = [...baseProgression, "platino", "diamante", "diamante", ...finProgression];
+        } else {
+            progresionTiers = [...baseProgression, "platino", "platino", "diamante", "diamante", ...finProgression];
+        }
 
         // 1. Limpiar datos de juego de cada jugador
         Object.keys(jugadores).forEach(id => {
@@ -121,13 +151,16 @@ export function reiniciarPartida() {
         // 2. Resetear estado de la partida
         actualizaciones[`partidas/${state.salaActual}/estado`] = 'lobby';
         actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'lobby';
-        actualizaciones[`partidas/${state.salaActual}/rondaActual`] = 1;
         actualizaciones[`partidas/${state.salaActual}/ganador`] = null;
         actualizaciones[`partidas/${state.salaActual}/ultimoEliminado`] = null;
         actualizaciones[`partidas/${state.salaActual}/debateEndTime`] = null;
+        
+        // ¡NUEVO! Resetea las listas y la progresión
+        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = JSON.parse(JSON.stringify(Data.LISTAS_ATRIBUTOS));
+        actualizaciones[`partidas/${state.salaActual}/progresionTiers`] = progresionTiers;
+        actualizaciones[`partidas/${state.salaActual}/progressionIndex`] = 0;
 
         // 3. Aplicar cambios
-        // Esto será detectado por firebaseSync, que moverá a todos al lobby
         database.ref().update(actualizaciones);
     });
 }

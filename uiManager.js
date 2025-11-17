@@ -20,6 +20,7 @@ export function mostrarPantallaUnirse() {
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
     refs.joinScreen.style.display = 'flex';
+    refs.btnSalirPartida.style.display = 'flex'; // Mostrar botón de salida
 }
 
 export function mostrarLobby(codigoSala) {
@@ -29,27 +30,33 @@ export function mostrarLobby(codigoSala) {
     refs.gameScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'flex';
     refs.lobbyCodigoSala.textContent = codigoSala;
+    refs.btnSalirPartida.style.display = 'flex'; // Mostrar botón de salida
 
-    // Limpiar pantallas de juego por si acaso
     ocultarModalResultados();
     ocultarModalFinJuego();
 }
 
-export function mostrarPantallaJuego(rondaActual, esAnfitrion) {
+/**
+ * ¡MODIFICADO!
+ * Ya no acepta 'rondaActual'. El texto es genérico.
+ */
+export function mostrarPantallaJuego(esAnfitrion) {
     console.log("¡La partida ha empezado! Mostrando pantalla de juego.");
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'flex';
-    refs.btnQuienSoy.style.display = 'block'; 
+    refs.btnQuienSoy.style.display = 'block';
+    refs.btnSalirPartida.style.display = 'flex'; // Mostrar botón de salida
 
     ocultarModalResultados();
     ocultarModalFinJuego();
 
     if (esAnfitrion) {
-        refs.btnComenzarRonda.textContent = `[ COMENZAR RONDA ${rondaActual} ]`;
+        // Texto genérico, solo se usa para la primera ronda
+        refs.btnComenzarRonda.textContent = "[ COMENZAR RONDA ]";
         refs.btnComenzarRonda.style.display = 'block';
     }
     
-    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: FASE DE CONOCIMIENTO`;
+    refs.gameRondaTitulo.textContent = "FASE DE CONOCIMIENTO";
     refs.gameRondaInstruccion.textContent = "Desliza para ver a todos los supervivientes.";
 }
 
@@ -68,6 +75,7 @@ export function volverAlMenu() {
     refs.btnComenzarDebate.style.display = 'none';
     refs.btnConfirmarVoto.style.display = 'none';
     refs.gameTimer.style.display = 'none';
+    refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida
     refs.mainMenu.style.display = 'flex';
 }
 
@@ -79,6 +87,34 @@ export function ocultarModalResultados() {
 
 export function ocultarModalFinJuego() {
     if (refs.modalFinJuego) refs.modalFinJuego.style.display = 'none';
+}
+
+// --- FUNCIONES DE PANTALLA DE HISTORIA ---
+
+export function mostrarPantallaHistoria(historia, esAnfitrion) {
+    console.log("Mostrando pantalla de historia...");
+    
+    // Ocultar todas las demás pantallas
+    refs.mainMenu.style.display = 'none';
+    refs.joinScreen.style.display = 'none';
+    refs.lobbyScreen.style.display = 'none';
+    refs.gameScreen.style.display = 'none';
+    
+    // Mostrar pantalla de historia
+    refs.storyScreen.style.display = 'flex';
+    refs.btnSalirPartida.style.display = 'flex';
+    
+    // Rellenar contenido
+    refs.storyTitulo.textContent = historia.titulo;
+    refs.storySubtitulo.textContent = historia.subtitulo;
+    refs.storyTexto.innerHTML = historia.texto;
+    
+    // Mostrar botón solo para el anfitrión
+    refs.btnComenzarViaje.style.display = esAnfitrion ? 'block' : 'none';
+}
+
+export function ocultarPantallaHistoria() {
+    refs.storyScreen.style.display = 'none';
 }
 
 
@@ -101,12 +137,16 @@ export function actualizarListaLobby(jugadores, jugadorIdActual) {
     }
 }
 
-export function mostrarModalAsignacion(rondaActual, atributo) {
-    refs.modalAsignarTitulo.textContent = `RONDA ${rondaActual}: ASIGNACIÓN`;
+/**
+ * ¡MODIFICADO!
+ * Ya no acepta 'rondaActual'. El texto es genérico.
+ */
+export function mostrarModalAsignacion(atributo) {
+    refs.modalAsignarTitulo.textContent = "FASE DE ASIGNACIÓN";
     refs.modalAtributoTexto.textContent = atributo;
     refs.modalAsignarAtributo.style.display = 'flex';
     
-    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: ASIGNACIÓN`;
+    refs.gameRondaTitulo.textContent = "FASE DE ASIGNACIÓN";
     refs.gameRondaInstruccion.textContent = "Desliza y pulsa en un personaje para asignarle tu atributo.";
 }
 
@@ -134,8 +174,12 @@ export function actualizarCarousel(jugadores, miVotoActual, recuentoVotos) {
     });
 }
 
-export function mostrarBotonComenzarDebate(rondaActual) {
-    refs.btnComenzarDebate.textContent = `[ COMENZAR DEBATE RONDA ${rondaActual} ]`;
+/**
+ * ¡MODIFICADO!
+ * Ya no acepta 'rondaActual'. El texto es genérico.
+ */
+export function mostrarBotonComenzarDebate() {
+    refs.btnComenzarDebate.textContent = "[ COMENZAR DEBATE ]";
     refs.btnComenzarDebate.style.display = 'block';
 }
 
@@ -147,8 +191,12 @@ export function ocultarBotonComenzarRonda() {
     refs.btnComenzarRonda.style.display = 'none';
 }
 
-export function mostrarFaseDebate(rondaActual) {
-    refs.gameRondaTitulo.textContent = `RONDA ${rondaActual}: DEBATE Y VOTACIÓN`;
+/**
+ * ¡MODIFICADO!
+ * Ya no acepta 'rondaActual'. El texto es genérico.
+ */
+export function mostrarFaseDebate() {
+    refs.gameRondaTitulo.textContent = "DEBATE Y VOTACIÓN";
     refs.gameRondaInstruccion.textContent = "¡Hora de debatir! Selecciona a quién eliminar y confirma tu voto.";
     
     refs.btnComenzarRonda.style.display = 'none';
@@ -156,20 +204,14 @@ export function mostrarFaseDebate(rondaActual) {
     refs.gameTimer.style.display = 'block';
 }
 
-/**
- * ¡NUEVA FUNCIÓN! Actualiza la pantalla de juego al estado final.
- */
 export function mostrarPantallaFinJuego() {
     refs.gameRondaTitulo.textContent = "PARTIDA TERMINADA";
     refs.gameRondaInstruccion.textContent = "Este es el tablero final. ¡Solo puede quedar 1!";
     
-    // Ocultar todos los botones de acción de ronda
     refs.btnComenzarRonda.style.display = 'none';
     refs.btnComenzarDebate.style.display = 'none';
     refs.btnConfirmarVoto.style.display = 'none';
     refs.gameTimer.style.display = 'none';
-
-    // Dejamos el botón '?' visible para que puedan ver quiénes eran
 }
 
 
@@ -246,9 +288,6 @@ export function mostrarModalResultados(nombreEliminado, esAnfitrion) {
     refs.modalResultados.style.display = 'flex';
 }
 
-/**
- * ¡MODIFICADO! Muestra el modal de Fin de Partida y los botones correctos.
- */
 export function mostrarModalFinJuego(ganador, esAnfitrion) {
     if (!refs.modalFinJuego) return;
 
@@ -268,10 +307,8 @@ export function mostrarModalFinJuego(ganador, esAnfitrion) {
         `;
     }
 
-    // Botón común
     refs.btnVerTablero.style.display = 'block';
 
-    // Botones específicos
     if (esAnfitrion) {
         refs.btnReiniciarLobby.style.display = 'block';
         refs.btnSalirAlMenu.style.display = 'none';

@@ -24,7 +24,6 @@ export function escucharInicioPartida() {
     state.refEstadoPartida.on('value', (snapshot) => {
         const estado = snapshot.val();
         
-        // Inicio normal
         if (estado === 'jugando') {
             if (state.refEstadoPartida) state.refEstadoPartida.off();
             state.refEstadoPartida = null;
@@ -48,36 +47,31 @@ export function escucharDatosJuego() {
         const partida = snapshot.val();
         if (!partida) return;
 
-        const { jugadores, estado, faseActual, rondaActual, debateEndTime, ultimoEliminado, ganador } = partida;
+        // ¡MODIFICADO! 'rondaActual' ya no se usa
+        const { jugadores, estado, faseActual, debateEndTime, ultimoEliminado, ganador } = partida;
 
-        // ¡NUEVO! Detectar si el anfitrión ha reiniciado la partida
+        // ¡NUEVO! Detectar reinicio por el anfitrión
         if (estado === 'lobby' && state.faseAnterior !== null) {
             console.log("Detectado reinicio por el anfitrión. Volviendo al lobby...");
-            if (state.refDatosJuego) state.refDatosJuego.off(); // Detener este listener
+            if (state.refDatosJuego) state.refDatosJuego.off();
             
-            // Resetear estado local (limpia timers, etc.)
-            // Importante: resetState NO limpia salaActual o jugadorIdActual
-            // ¡Vamos a necesitar un resetState() más suave!
-            // Por ahora, limpiamos manualmente:
             if (state.timerInterval) clearInterval(state.timerInterval);
             state.timerInterval = null;
             state.processingVote = false;
             state.primeraCargaJuego = true;
             state.faseAnterior = null;
             
-            // Volver a la pantalla de lobby
             UI.mostrarLobby(state.salaActual);
             
-            // Volver a escuchar el lobby y el inicio
             escucharJugadoresEnLobby();
             escucharInicioPartida();
-            return; // Detener la ejecución de esta función
+            return;
         }
 
 
         // Primera carga
         if (state.primeraCargaJuego) {
-            UI.mostrarPantallaJuego(rondaActual, state.soyAnfitrion);
+            UI.mostrarPantallaJuego(state.soyAnfitrion);
             state.primeraCargaJuego = false;
         }
 
@@ -110,7 +104,7 @@ export function escucharDatosJuego() {
         if (state.soyAnfitrion && faseActual === 'asignacion') {
             const faltanPorAsignar = jugadores ? Object.values(jugadores).filter(j => j.atributoParaAsignar).length : 0;
             if (faltanPorAsignar === 0) {
-                UI.mostrarBotonComenzarDebate(rondaActual);
+                UI.mostrarBotonComenzarDebate();
             } else {
                 UI.ocultarBotonComenzarDebate();
             }
@@ -171,31 +165,38 @@ export function escucharDatosJuego() {
                 UI.ocultarModalResultados();
             }
 
-            if (faseActual === 'conocimiento') {
+            if (faseActual === 'historia') {
+                // Nueva fase: Mostrar pantalla de historia
+                const historiaActual = partida.historiaActual;
+                if (historiaActual) {
+                    UI.mostrarPantallaHistoria(historiaActual, state.soyAnfitrion);
+                }
+            }
+            else if (faseActual === 'conocimiento') {
                 state.processingVote = false;
-                UI.mostrarPantallaJuego(rondaActual, state.soyAnfitrion);
+                UI.ocultarPantallaHistoria();
+                UI.mostrarPantallaJuego(state.soyAnfitrion);
             }
             else if (faseActual === 'asignacion') {
                 state.processingVote = false;
                 UI.ocultarBotonComenzarRonda();
                 if (state.miAtributoParaAsignar) {
-                    UI.mostrarModalAsignacion(rondaActual, state.miAtributoParaAsignar);
+                    UI.mostrarModalAsignacion(state.miAtributoParaAsignar);
                 }
             } 
             else if (faseActual === 'debate') {
                 state.processingVote = false;
                 state.heConfirmadoMiVoto = false; 
-                UI.mostrarFaseDebate(rondaActual);
+                UI.mostrarFaseDebate();
             }
             else if (faseActual === 'resultados') {
                 state.processingVote = false;
                 UI.mostrarModalResultados(ultimoEliminado, state.soyAnfitrion);
             }
             else if (faseActual === 'fin') {
-                // ¡LÓGICA CORREGIDA!
                 state.processingVote = false;
-                UI.mostrarPantallaFinJuego(); // Prepara el tablero de fondo
-                UI.mostrarModalFinJuego(ganador, state.soyAnfitrion); // Muestra el modal
+                UI.mostrarPantallaFinJuego();
+                UI.mostrarModalFinJuego(ganador, state.soyAnbitrion); // Corrección: soyAnfitrion
             }
             
             state.faseAnterior = faseActual;

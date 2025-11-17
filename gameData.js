@@ -47,6 +47,34 @@ export const ATRIBUTOS_LIFEORDEATH = [
     "Quiere ganar en kills a Mao Zedong", "Tiene muy mala hORTOgráfia.", "Sólo compra jabón alemán de 1945"
 ];
 export const LISTAS_ATRIBUTOS = {
-    1: ATRIBUTOS_BRONCE, 2: ATRIBUTOS_PLATA, 3: ATRIBUTOS_ORO,
-    4: ATRIBUTOS_PLATINO, 5: ATRIBUTOS_DIAMANTE, 6: ATRIBUTOS_LIFEORDEATH 
+    "bronce": ATRIBUTOS_BRONCE,
+    "plata": ATRIBUTOS_PLATA,
+    "oro": ATRIBUTOS_ORO,
+    "platino": ATRIBUTOS_PLATINO,
+    "diamante": ATRIBUTOS_DIAMANTE,
+    "lifeordeath": ATRIBUTOS_LIFEORDEATH
 };
+
+// Historias narrativas para la introducción del juego
+export const HISTORIAS = [
+    {
+        titulo: "LA NAVE DE LA ESPERANZA",
+        subtitulo: "Un viaje sin retorno",
+        texto: `El año es 2087. La Tierra agoniza. Los gobiernos mundiales han invertido sus últimos recursos en una misión desesperada: enviar una nave colonial hacia Kepler-442b, el único planeta habitable detectado a 1.200 años luz de distancia.\n\nVosotros sois los elegidos. Los supervivientes. La última esperanza de la humanidad.\n\nPero la nave está perdiendo recursos críticos. El sistema de soporte vital falla. Los suministros se agotan. La realidad es brutal: no todos llegaréis al destino.\n\nCada jornada, deberéis decidir quién es prescindible. Quién no merece representar a la humanidad en el nuevo mundo. Las decisiones que toméis definirán el futuro de nuestra especie... o su extinción definitiva.\n\n<em>Solo puede quedar uno.</em>`
+    },
+    {
+        titulo: "EL ÚLTIMO BOTE",
+        subtitulo: "Titanic, 15 de abril de 1912",
+        texto: `El agua helada del Atlántico Norte inunda los pasillos. Los gritos resuenan en la noche. El Titanic, el barco "insumergible", se hunde irremediablemente hacia el abismo.\n\nQueda un último bote salvavidas. Capacidad: una persona.\n\nVosotros os habéis encontrado en la cubierta superior. Todos tenéis el mismo objetivo: sobrevivir. Pero solo uno podrá subir. Solo uno verá el amanecer.\n\nLas olas golpean con furia. El tiempo se agota. Cada minuto que pasa, el barco se inclina más hacia la oscuridad. Debéis decidir quién merece vivir... y quién debe quedarse atrás para ser tragado por el mar.\n\nLas decisiones difíciles definen quiénes somos realmente.\n\n<em>Solo puede quedar uno.</em>`
+    },
+    {
+        titulo: "LA ISLA DEL HAMBRE",
+        subtitulo: "Náufragos sin esperanza",
+        texto: `El naufragio fue hace 47 días. La isla parecía un paraíso tropical al principio, pero pronto descubristeis la verdad: no hay comida. Los árboles no dan frutos. El mar está vacío. La tierra es estéril.\n\nEl hambre os devora. Los cuerpos se debilitan. La desesperación se convierte en locura.\n\nY entonces, alguien pronuncia lo impensable: "Si queremos sobrevivir... uno de nosotros debe ser el sacrificio".\n\nLa idea es atroz. Inhumana. Pero el hambre no entiende de moral. Cada día que pasa, la muerte se acerca más. Y vosotros debéis decidir: ¿quién será el primero en caer? ¿Quién será recordado como el mártir... o como la cena?\n\nLa civilización es solo una ilusión que se desvanece cuando el estómago ruge.\n\n<em>Solo puede quedar uno.</em>`
+    },
+    {
+        titulo: "EL HELICÓPTERO DE RESCUE",
+        subtitulo: "Centro comercial, día 14 del apocalipsis",
+        texto: `Los zombis invadieron la ciudad hace dos semanas. Los gritos cesaron hace días. Ahora solo queda el silencio... y los gruñidos de los muertos vivientes que merodean las calles.\n\nVosotros habéis sobrevivido atrincherados en la azotea del centro comercial. Sin comida. Sin agua potable. Sin esperanza.\n\nHasta que escucháis el sonido de las hélices. Un helicóptero de rescate desciende del cielo. Pero el piloto grita por encima del ruido: "¡Solo puedo llevar a uno! ¡El combustible no alcanza para más peso!"\n\nLa horda ya ha detectado el ruido. Suben por las escaleras. Tenéis segundos para decidir quién subirá al helicóptero... y quién se quedará para enfrentar la muerte más horrible imaginable.\n\nNo hay tiempo para debates. Solo para supervivencia.\n\n<em>Solo puede quedar uno.</em>`
+    }
+];

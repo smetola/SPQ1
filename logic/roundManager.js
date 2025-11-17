@@ -1,6 +1,6 @@
 // roundManager.js - Gestión de rondas
 
-import { state, getDatabase } from './gameState.js';
+import { state, getDatabase, getModalManager } from './gameState.js';
 import * as Data from '../gameData.js';
 
 // Función auxiliar: selección aleatoria
@@ -12,23 +12,45 @@ function seleccionarElementoAleatorio(array, borrar = false) {
     return elemento;
 }
 
-// Empezar la partida (crear personajes)
-export function empezarPartida() {
+/**
+ * ¡MODIFICADO!
+ * Ya no usa 'rondaActual'. En su lugar, crea un array de progresión
+ * de tiers basado en el número de jugadores.
+ */
+export async function empezarPartida() {
     const database = getDatabase();
+    const modal = getModalManager();
     
-    database.ref(`partidas/${state.salaActual}`).once('value').then((snapshot) => {
+    database.ref(`partidas/${state.salaActual}`).once('value').then(async (snapshot) => {
         const jugadorIDs = Object.keys(snapshot.val().jugadores);
+        const numJugadores = jugadorIDs.length;
         
-        if (jugadorIDs.length < 2) { 
-            alert("Se necesitan al menos 2 jugadores para empezar."); 
+        if (numJugadores < 2) { 
+            await modal.mostrarAlerta("Se necesitan al menos 2 jugadores para empezar.", "JUGADORES INSUFICIENTES"); 
             return; 
         }
+
+        // --- ¡NUEVA LÓGICA DE PROGRESIÓN! ---
+        let progresionTiers = [];
+        const baseProgression = ["bronce", "plata", "oro"];
+        const finProgression = ["lifeordeath", "lifeordeath", "lifeordeath"]; // Relleno para el final
+
+        if (numJugadores <= 4) {
+            // (4p) B, P, O, P, D, L
+            progresionTiers = [...baseProgression, "platino", "diamante", ...finProgression];
+        } else if (numJugadores === 5) {
+            // (5p) B, P, O, P, D, D, L
+            progresionTiers = [...baseProgression, "platino", "diamante", "diamante", ...finProgression];
+        } else {
+            // (6p+) B, P, O, P, P, D, D, L
+            progresionTiers = [...baseProgression, "platino", "platino", "diamante", "diamante", ...finProgression];
+        }
+        // ------------------------------------
 
         const actualizaciones = {};
         let nombresDisponibles = [...Data.NOMBRES_PERSONAJE];
         let atributosBasicosDisponibles = [...Data.ATRIBUTOS_BRONCE];
 
-        // Crear personajes para cada jugador
         jugadorIDs.forEach((id) => {
             actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/personaje`] = {
                 nombre: seleccionarElementoAleatorio(nombresDisponibles, true),
@@ -39,8 +61,17 @@ export function empezarPartida() {
             };
         });
 
-        actualizaciones[`partidas/${state.salaActual}/rondaActual`] = 1;
-        actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'conocimiento';
+        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = JSON.parse(JSON.stringify(Data.LISTAS_ATRIBUTOS));
+        
+        // ¡NUEVO! Guarda la progresión en Firebase
+        actualizaciones[`partidas/${state.salaActual}/progresionTiers`] = progresionTiers;
+        actualizaciones[`partidas/${state.salaActual}/progressionIndex`] = 0;
+        
+        // Seleccionar historia aleatoria
+        const historiaSeleccionada = Data.HISTORIAS[Math.floor(Math.random() * Data.HISTORIAS.length)];
+        actualizaciones[`partidas/${state.salaActual}/historiaActual`] = historiaSeleccionada;
+        
+        actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'historia';
         actualizaciones[`partidas/${state.salaActual}/estado`] = 'jugando'; 
 
         database.ref().update(actualizaciones)
@@ -48,16 +79,16 @@ export function empezarPartida() {
     });
 }
 
-// Avanzar a la siguiente ronda (después de eliminar a alguien)
-// ¡FUNCIÓN PARA EL FUTURO!
+/**
+ * ¡MODIFICADO!
+ * Ya no incrementa 'rondaActual'. En su lugar, incrementa 'progressionIndex'.
+ */
 export function avanzarSiguienteRonda() {
     const database = getDatabase();
     
     database.ref(`partidas/${state.salaActual}`).once('value').then((snapshot) => {
         const partida = snapshot.val();
-        const nuevaRonda = partida.rondaActual + 1;
         
-        // Comprobar si solo queda 1 personaje vivo (condición de victoria)
         const personajesVivos = Object.values(partida.jugadores)
             .filter(j => j.personaje?.estaVivo).length;
         
@@ -66,25 +97,30 @@ export function avanzarSiguienteRonda() {
             let ganadorData = null;
             
             if (personajesVivos === 1) {
-                // Encontrar al jugador ganador para obtener su nombre real
                 const jugadorGanador = Object.values(partida.jugadores).find(j => j.personaje?.estaVivo);
                 if (jugadorGanador) {
                     ganadorData = {
-                        nombreJugador: jugadorGanador.nombre, // El nombre del JUGADOR
-                        nombrePersonaje: jugadorGanador.personaje.nombre // El nombre del PERSONAJE
+                        nombreJugador: jugadorGanador.nombre,
+                        nombrePersonaje: jugadorGanador.personaje.nombre
                     };
                 }
             }
-            // Si personajesVivos es 0 (ej. empate en la última ronda), ganadorData se queda 'null'
 
             database.ref(`partidas/${state.salaActual}`).update({
                 faseActual: 'fin',
-                ganador: ganadorData // Guardamos el objeto con ambos nombres
+                ganador: ganadorData
             });
         } else {
-            // Continuar a la siguiente ronda
+            // ¡NUEVO! Incrementar el índice de progresión
+            let nuevoIndex = (partida.progressionIndex || 0) + 1;
+            
+            // Evitar que el índice se salga del array
+            if (nuevoIndex >= partida.progresionTiers.length) {
+                nuevoIndex = partida.progresionTiers.length - 1;
+            }
+
             database.ref(`partidas/${state.salaActual}`).update({
-                rondaActual: nuevaRonda,
+                progressionIndex: nuevoIndex, // Actualiza el índice
                 faseActual: 'conocimiento'
             });
         }
