@@ -93,11 +93,53 @@ function onAppReturnsToForeground() {
     // Forzar reconexión de Firebase si es necesario
     database.goOnline();
     
-    // Si hay partida activa, actualizar presencia
+    // Si hay partida activa, actualizar presencia Y reactivar listeners
     if (state.salaActual && state.jugadorIdActual) {
-        console.log('🔄 Actualizando presencia al volver...');
-        actualizarPresenciaJugador();
+        console.log('🔄 Reconectando a la partida...');
+        
+        // Esperar un poco para que Firebase reconecte
+        setTimeout(() => {
+            actualizarPresenciaJugador();
+            reactivarListeners();
+        }, 500);
     }
+}
+
+/**
+ * Reactiva los listeners de Firebase según el estado actual de la partida
+ */
+function reactivarListeners() {
+    const database = getDatabase();
+    
+    // Verificar en qué estado está la partida
+    database.ref(`partidas/${state.salaActual}`).once('value', (snapshot) => {
+        const partida = snapshot.val();
+        
+        if (!partida) {
+            console.log('⚠️ La partida ya no existe');
+            return;
+        }
+        
+        const { estado, faseActual } = partida;
+        
+        console.log(`🔄 Reactivando listeners. Estado: ${estado}, Fase: ${faseActual}`);
+        
+        // Importar dinámicamente para evitar dependencias circulares
+        import('./firebaseSync.js').then(({ escucharJugadoresEnLobby, escucharInicioPartida, escucharDatosJuego }) => {
+            if (estado === 'lobby') {
+                // Estamos en el lobby
+                escucharJugadoresEnLobby();
+                escucharInicioPartida();
+            } else if (estado === 'jugando') {
+                // Estamos en plena partida
+                escucharDatosJuego();
+            }
+            
+            console.log('✅ Listeners reactivados');
+        });
+    }).catch((error) => {
+        console.error('❌ Error al verificar estado de partida:', error);
+    });
 }
 
 /**
@@ -127,13 +169,23 @@ function actualizarPresenciaJugador() {
  * (cierra app, pierde internet totalmente, etc.)
  */
 function setupDisconnectHandler(jugadorRef) {
-    // Si el anfitrión se desconecta, borramos la partida completa
+    // Cancelar cualquier onDisconnect anterior para evitar duplicados
+    jugadorRef.onDisconnect().cancel();
+    
     if (state.soyAnfitrion) {
         const partidaRef = getDatabase().ref(`partidas/${state.salaActual}`);
-        partidaRef.onDisconnect().remove();
+        
+        // CAMBIO CRÍTICO: No borrar la partida inmediatamente
+        // Solo marcar al anfitrión como ausente
+        jugadorRef.onDisconnect().update({
+            isPresent: false,
+            disconnectedAt: Date.now()
+        });
+        
+        // La partida solo se borrará si el anfitrión sale manualmente
+        // (ver handleSalir en lobbyManager.js)
     } else {
-        // Si es jugador normal, solo marcarlo como ausente (no eliminarlo)
-        // Esto permite que vuelva si reconecta rápido
+        // Jugador normal: solo marcar como ausente
         jugadorRef.onDisconnect().update({
             isPresent: false,
             disconnectedAt: Date.now()

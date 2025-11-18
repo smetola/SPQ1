@@ -128,11 +128,13 @@ export function handleSalir() {
         
         // Cancelar handlers de onDisconnect antes de salir manualmente
         refJugador.onDisconnect().cancel();
+        refPartida.onDisconnect().cancel(); // Para anfitrión
         
         if (state.soyAnfitrion) {
-            refPartida.onDisconnect().cancel(); 
+            // Anfitrión: borrar partida completa
             refPartida.remove();
         } else {
+            // Jugador: solo eliminarse a sí mismo
             refJugador.remove();
         }
     }
