@@ -34,6 +34,13 @@ export async function empezarPartida() {
     const database = getDatabase();
     const modal = getModalManager();
     
+    // CRÍTICO: Cancelar el onDisconnect del lobby para que la partida no se borre
+    if (state.soyAnfitrion) {
+        const partidaRef = database.ref(`partidas/${state.salaActual}`);
+        partidaRef.onDisconnect().cancel();
+        console.log('🔌 onDisconnect del lobby cancelado - partida persistente');
+    }
+    
     database.ref(`partidas/${state.salaActual}`).once('value').then(async (snapshot) => {
         const jugadorIDs = Object.keys(snapshot.val().jugadores);
         const numJugadores = jugadorIDs.length;
