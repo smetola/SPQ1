@@ -170,6 +170,11 @@ function actualizarPresenciaJugador() {
     }).then(() => {
         console.log('✅ Presencia actualizada');
         
+        // NUEVO: Si eres anfitrión, asegurarte de que los datos de la partida están intactos
+        if (state.soyAnfitrion) {
+            verificarIntegridadPartida();
+        }
+        
         // Re-establecer el onDisconnect para cuando realmente se desconecte
         setupDisconnectHandler(jugadorRef);
     }).catch((error) => {
@@ -178,32 +183,41 @@ function actualizarPresenciaJugador() {
 }
 
 /**
+ * Verifica que la partida tenga todos los datos necesarios (solo anfitrión)
+ */
+function verificarIntegridadPartida() {
+    const database = getDatabase();
+    const partidaRef = database.ref(`partidas/${state.salaActual}`);
+    
+    partidaRef.once('value', (snapshot) => {
+        const partida = snapshot.val();
+        
+        if (!partida) return;
+        
+        // Si faltan campos críticos, no intentar repararlos aquí
+        // (pueden haberse perdido legítimamente)
+        if (!partida.estado || !partida.faseActual) {
+            console.warn('⚠️ Datos de partida incompletos detectados. Pueden restaurarse automáticamente.');
+        }
+    });
+}
+
+/**
  * Configura qué hacer cuando el usuario realmente se desconecta
  * (cierra app, pierde internet totalmente, etc.)
  */
 function setupDisconnectHandler(jugadorRef) {
-    // Cancelar cualquier onDisconnect anterior para evitar duplicados
+    // CAMBIO CRÍTICO: NO usar onDisconnect durante partidas activas
+    // Solo lo usamos para limpieza cuando sales manualmente
+    
+    // Cancelar cualquier onDisconnect anterior
     jugadorRef.onDisconnect().cancel();
     
-    if (state.soyAnfitrion) {
-        const partidaRef = getDatabase().ref(`partidas/${state.salaActual}`);
-        
-        // CAMBIO CRÍTICO: No borrar la partida inmediatamente
-        // Solo marcar al anfitrión como ausente
-        jugadorRef.onDisconnect().update({
-            isPresent: false,
-            disconnectedAt: Date.now()
-        });
-        
-        // La partida solo se borrará si el anfitrión sale manualmente
-        // (ver handleSalir en lobbyManager.js)
-    } else {
-        // Jugador normal: solo marcar como ausente
-        jugadorRef.onDisconnect().update({
-            isPresent: false,
-            disconnectedAt: Date.now()
-        });
-    }
+    // NO hacer nada más. Si el jugador se desconecta, simplemente
+    // su lastSeen dejará de actualizarse y otros jugadores pueden verlo
+    // Cuando vuelva, se reactivará automáticamente
+    
+    console.log('🔌 onDisconnect cancelado (persistencia activa)');
 }
 
 /**

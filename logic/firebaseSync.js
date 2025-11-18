@@ -59,6 +59,13 @@ export function escucharDatosJuego() {
             return;
         }
 
+        // NUEVO: Validar que la partida tenga datos completos
+        if (!partida.estado || !partida.faseActual) {
+            console.warn('⚠️ Datos de partida incompletos (anfitrión desconectado). Esperando reconexión...', partida);
+            // No hacer nada, mantener la UI como está
+            return;
+        }
+
         console.log('🔄 Datos de partida actualizados:', { 
             estado: partida.estado, 
             fase: partida.faseActual,
