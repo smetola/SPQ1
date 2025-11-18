@@ -5,6 +5,7 @@ import * as UI from '../uiManager.js';
 import { escucharJugadoresEnLobby, escucharInicioPartida } from './firebaseSync.js';
 import * as Data from '../gameData.js';
 import { obtenerPoolAtributos } from './attributeGenerator.js';
+import { marcarJugadorPresente } from './connectionManager.js';
 
 // Generar pools expandidos de atributos (originales + generados)
 function generarPoolsExpandidos() {
@@ -55,14 +56,20 @@ export function crearNuevaPartida() {
             
             const refJugador = database.ref(`partidas/${codigoSala}/jugadores`).push({ 
                 nombre: nombreAnfitrion, 
-                esAnfitrion: true 
+                esAnfitrion: true,
+                isPresent: true,
+                lastSeen: Date.now()
             });
             
             state.jugadorIdActual = refJugador.key;
             state.soyAnfitrion = true;
             state.salaActual = codigoSala;
 
+            // Configurar comportamiento de desconexión
             refPartida.onDisconnect().remove();
+            
+            // Marcar jugador como presente y configurar sistema de reconexión
+            marcarJugadorPresente();
 
             UI.mostrarLobby(codigoSala);
             escucharJugadoresEnLobby();
@@ -93,12 +100,17 @@ export async function unirseAPartida(codigo, nombre) {
         
         const refJugador = database.ref(`partidas/${codigo}/jugadores`).push({ 
             nombre: nombre, 
-            esAnfitrion: false 
+            esAnfitrion: false,
+            isPresent: true,
+            lastSeen: Date.now()
         });
         
         state.jugadorIdActual = refJugador.key;
         state.soyAnfitrion = false;
         state.salaActual = codigo;
+        
+        // Marcar jugador como presente y configurar sistema de reconexión
+        marcarJugadorPresente();
         
         UI.mostrarLobby(codigo);
         escucharJugadoresEnLobby();
@@ -112,12 +124,16 @@ export function handleSalir() {
     
     if (state.salaActual && state.jugadorIdActual) {
         const refPartida = database.ref(`partidas/${state.salaActual}`);
+        const refJugador = database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`);
+        
+        // Cancelar handlers de onDisconnect antes de salir manualmente
+        refJugador.onDisconnect().cancel();
         
         if (state.soyAnfitrion) {
             refPartida.onDisconnect().cancel(); 
             refPartida.remove();
         } else {
-            database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`).remove();
+            refJugador.remove();
         }
     }
     

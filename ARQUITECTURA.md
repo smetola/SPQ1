@@ -10,13 +10,16 @@ SPQ1/
 ├── gameLogic.js            # Re-exporta módulos (interfaz pública)
 ├── uiManager.js            # Gestión de UI
 ├── gameData.js             # Datos estáticos
+├── modalManager.js         # Sistema de modales personalizados
 │
 └── logic/
     ├── gameState.js        # Estado compartido + inicialización
+    ├── connectionManager.js # ¡NUEVO! Gestión de conexión y reconexión
     ├── lobbyManager.js     # Crear/unirse a partidas
     ├── roundManager.js     # Gestión de rondas
     ├── phaseManager.js     # Transiciones entre fases
     ├── attributeManager.js # Repartir/asignar atributos
+    ├── attributeGenerator.js # Generador de atributos
     ├── votingManager.js    # Votación y eliminación
     └── firebaseSync.js     # Listeners de Firebase
 
@@ -27,16 +30,37 @@ SPQ1/
 ## 🧩 Descripción de Cada Módulo
 
 ### 📌 **gameState.js** (Estado Compartido)
-**Responsabilidad:** Variables globales del juego.
+**Responsabilidad:** Variables globales del juego y gestión del ciclo de vida.
 
 **Contiene:**
 - `state`: Objeto con toda la información del jugador actual
 - `database`: Referencia a Firebase
-- `initDatabase()`: Inicializar Firebase
-- `resetState()`: Limpiar todo al salir
+- `modalManager`: Referencia al gestor de modales
+- `initDatabase()`: Inicializar Firebase + connectionManager
+- `resetState()`: Limpiar todo al salir (incluye cleanup de conexión)
 
 **¿Cuándo crece?**
 - Cuando añadas más variables de estado (ej. historial de votos, estadísticas...)
+
+---
+
+### 🔌 **connectionManager.js** (Gestión de Conexión) ¡NUEVO!
+**Responsabilidad:** Mantener la conexión estable y reconectar automáticamente.
+
+**Funciones principales:**
+- `initConnectionManager()`: Inicia monitoreo de conexión y Page Visibility API
+- `marcarJugadorPresente()`: Marca jugador como activo y configura onDisconnect
+- `cleanupConnectionManager()`: Limpia listeners al salir
+- `getConnectionStatus()`: Devuelve si estamos conectados
+- `startHeartbeat()` / `stopHeartbeat()`: Sistema opcional de latido (30s)
+
+**¿Qué resuelve?**
+- Desconexiones al cambiar de app en móvil
+- Bloqueo de pantalla
+- Pérdida temporal de internet
+- Reconexión automática sin perder la partida
+
+**Archivo de documentación:** `SISTEMA_CONEXION.md`
 
 ---
 
@@ -47,6 +71,7 @@ SPQ1/
 - `crearNuevaPartida()`
 - `unirseAPartida(codigo, nombre)`
 - `handleSalir()`
+- `reiniciarPartida()`
 
 **¿Cuándo crece?**
 - Sistema de invitaciones

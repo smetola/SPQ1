@@ -1,5 +1,7 @@
 // gameState.js - Estado compartido del juego
 
+import { initConnectionManager, cleanupConnectionManager } from './connectionManager.js';
+
 let database = null;
 let modalManager = null; // Gestor de modales personalizados
 
@@ -28,6 +30,8 @@ export const state = {
 // Inicialización de la base de datos
 export function initDatabase(db) {
     database = db;
+    // Inicializar sistema de gestión de conexión
+    initConnectionManager();
 }
 
 export function getDatabase() {
@@ -44,6 +48,9 @@ export function getModalManager() {
 
 // Resetear estado (al salir de la partida)
 export function resetState() {
+    // Limpiar sistema de conexión
+    cleanupConnectionManager();
+    
     // Limpiar temporizadores
     if (state.timerInterval) clearInterval(state.timerInterval);
     

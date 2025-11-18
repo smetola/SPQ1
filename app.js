@@ -98,6 +98,43 @@ elementRefs.btnCrearPartida.addEventListener('click', GameLogic.crearNuevaPartid
 elementRefs.btnUnirsePartida.addEventListener('click', UIManager.mostrarPantallaUnirse);
 elementRefs.btnComoJugar.addEventListener('click', UIManager.mostrarModalComoJugar);
 
+// Indicador visual de conexión (opcional pero útil)
+const crearIndicadorConexion = () => {
+    const indicador = document.createElement('div');
+    indicador.id = 'connectionIndicator';
+    indicador.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #00ff00;
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+        z-index: 10000;
+        transition: all 0.3s ease;
+    `;
+    document.body.appendChild(indicador);
+    return indicador;
+};
+
+const indicadorConexion = crearIndicadorConexion();
+
+// Escuchar cambios de conexión para actualizar el indicador visual
+database.ref('.info/connected').on('value', (snapshot) => {
+    const conectado = snapshot.val() === true;
+    if (conectado) {
+        indicadorConexion.style.backgroundColor = '#00ff00';
+        indicadorConexion.style.boxShadow = '0 0 8px rgba(0, 255, 0, 0.6)';
+        indicadorConexion.title = 'Conectado';
+    } else {
+        indicadorConexion.style.backgroundColor = '#ff4444';
+        indicadorConexion.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.6)';
+        indicadorConexion.title = 'Desconectado - Reconectando...';
+    }
+});
+
+
 // Modal Cómo Jugar
 elementRefs.btnCerrarComoJugar.addEventListener('click', UIManager.ocultarModalComoJugar);
 
