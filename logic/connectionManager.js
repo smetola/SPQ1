@@ -28,8 +28,13 @@ export function initConnectionManager() {
             
             // Si volvemos de una desconexión y hay una partida activa, actualizar presencia
             if (!wasConnected && state.salaActual && state.jugadorIdActual) {
-                console.log('🔄 Reconectado. Actualizando presencia...');
+                console.log('🔄 Reconectado después de desconexión. Sala:', state.salaActual);
                 actualizarPresenciaJugador();
+                
+                // NUEVO: También reactivar listeners aquí
+                setTimeout(() => {
+                    reactivarListeners();
+                }, 500);
             }
         } else {
             console.log('❌ Desconectado de Firebase');
@@ -93,9 +98,17 @@ function onAppReturnsToForeground() {
     // Forzar reconexión de Firebase si es necesario
     database.goOnline();
     
+    // Intentar recuperar sala de localStorage si se perdió
+    if (!state.salaActual && localStorage.getItem('spq1_salaActual')) {
+        console.log('🔄 Recuperando sala de localStorage...');
+        state.salaActual = localStorage.getItem('spq1_salaActual');
+        state.jugadorIdActual = localStorage.getItem('spq1_jugadorId');
+        state.soyAnfitrion = localStorage.getItem('spq1_esAnfitrion') === 'true';
+    }
+    
     // Si hay partida activa, actualizar presencia Y reactivar listeners
     if (state.salaActual && state.jugadorIdActual) {
-        console.log('🔄 Reconectando a la partida...');
+        console.log('🔄 Reconectando a la partida:', state.salaActual);
         
         // Esperar un poco para que Firebase reconecte
         setTimeout(() => {
@@ -199,6 +212,15 @@ function setupDisconnectHandler(jugadorRef) {
 export function marcarJugadorPresente() {
     if (!state.salaActual || !state.jugadorIdActual) return;
     
+    // Guardar en localStorage para recuperar después de reconexión
+    try {
+        localStorage.setItem('spq1_salaActual', state.salaActual);
+        localStorage.setItem('spq1_jugadorId', state.jugadorIdActual);
+        localStorage.setItem('spq1_esAnfitrion', state.soyAnfitrion.toString());
+    } catch (e) {
+        console.warn('No se pudo guardar en localStorage:', e);
+    }
+    
     const database = getDatabase();
     const jugadorRef = database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`);
     
@@ -227,6 +249,15 @@ export function cleanupConnectionManager() {
         }
         document.removeEventListener(visibilityChange, visibilityChangeHandler);
         visibilityChangeHandler = null;
+    }
+    
+    // Limpiar localStorage
+    try {
+        localStorage.removeItem('spq1_salaActual');
+        localStorage.removeItem('spq1_jugadorId');
+        localStorage.removeItem('spq1_esAnfitrion');
+    } catch (e) {
+        console.warn('No se pudo limpiar localStorage:', e);
     }
     
     console.log('🔌 Sistema de conexión limpiado');

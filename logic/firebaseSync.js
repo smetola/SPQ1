@@ -10,8 +10,13 @@ export function escucharJugadoresEnLobby() {
     
     const database = getDatabase();
     state.refJugadoresEnLobby = database.ref(`partidas/${state.salaActual}/jugadores`);
+    
+    console.log('👂 Listener de jugadores en lobby activado');
+    
     state.refJugadoresEnLobby.on('value', (snapshot) => {
         UI.actualizarListaLobby(snapshot.val(), state.jugadorIdActual);
+    }, (error) => {
+        console.error('❌ Error en listener de lobby:', error);
     });
 }
 
@@ -43,9 +48,22 @@ export function escucharDatosJuego() {
     const database = getDatabase();
     state.refDatosJuego = database.ref(`partidas/${state.salaActual}`);
     
+    console.log('👂 Listener de datos del juego activado para sala:', state.salaActual);
+    
     state.refDatosJuego.on('value', (snapshot) => {
         const partida = snapshot.val();
-        if (!partida) return;
+        
+        // CRÍTICO: Si la partida desaparece, puede ser desconexión temporal
+        if (!partida) {
+            console.warn('⚠️ Partida no encontrada. Esperando reconexión...');
+            return;
+        }
+
+        console.log('🔄 Datos de partida actualizados:', { 
+            estado: partida.estado, 
+            fase: partida.faseActual,
+            jugadores: Object.keys(partida.jugadores || {}).length
+        });
 
         // ¡MODIFICADO! 'rondaActual' ya no se usa
         const { jugadores, estado, faseActual, debateEndTime, ultimoEliminado, ganador } = partida;
