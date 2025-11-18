@@ -73,6 +73,11 @@ const elementRefs = {
     storySubtitulo: document.getElementById('storySubtitulo'),
     storyTexto: document.getElementById('storyTexto'),
     btnComenzarViaje: document.getElementById('btnComenzarViaje'),
+
+    // Modal de Cómo Jugar
+    modalComoJugar: document.getElementById('modalComoJugar'),
+    btnComoJugar: document.getElementById('btnComoJugar'),
+    btnCerrarComoJugar: document.getElementById('btnCerrarComoJugar'),
 };
 
 // --- 2. INICIALIZAR MÓDULOS ---
@@ -91,6 +96,10 @@ GameLogic.init(database, ModalManager); // 'database' viene del script de Fireba
 // Menú Principal
 elementRefs.btnCrearPartida.addEventListener('click', GameLogic.crearNuevaPartida);
 elementRefs.btnUnirsePartida.addEventListener('click', UIManager.mostrarPantallaUnirse);
+elementRefs.btnComoJugar.addEventListener('click', UIManager.mostrarModalComoJugar);
+
+// Modal Cómo Jugar
+elementRefs.btnCerrarComoJugar.addEventListener('click', UIManager.ocultarModalComoJugar);
 
 // Pantalla Unirse
 elementRefs.btnConfirmarUnirse.addEventListener('click', () => {
@@ -103,6 +112,35 @@ elementRefs.btnCancelarUnirse.addEventListener('click', GameLogic.handleSalir);
 // Pantalla Lobby
 elementRefs.btnEmpezarPartida.addEventListener('click', GameLogic.empezarPartida);
 elementRefs.btnSalirLobby.addEventListener('click', GameLogic.handleSalir);
+
+// Modal de Testing de Atributos (opcional - solo si existe)
+elementRefs.btnTestearAtributos = document.getElementById('btnTestearAtributos');
+if (elementRefs.btnTestearAtributos) {
+    elementRefs.btnTestearAtributos.addEventListener('click', UIManager.mostrarModalTestAtributos);
+}
+
+elementRefs.modalTestAtributos = document.getElementById('modalTestAtributos');
+elementRefs.btnCerrarTestAtributos = document.getElementById('btnCerrarTestAtributos');
+elementRefs.btnRegenerarTest = document.getElementById('btnRegenerarTest');
+
+if (elementRefs.btnCerrarTestAtributos) {
+    elementRefs.btnCerrarTestAtributos.addEventListener('click', UIManager.ocultarModalTestAtributos);
+}
+
+if (elementRefs.btnRegenerarTest) {
+    elementRefs.btnRegenerarTest.addEventListener('click', UIManager.regenerarTestAtributos);
+}
+
+// Botones de selector de nivel en el modal de testing
+const botonesNivelTest = document.querySelectorAll('.btn-nivel-test');
+if (botonesNivelTest.length > 0) {
+    botonesNivelTest.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const nivel = e.target.dataset.nivel;
+            UIManager.cambiarNivelTest(nivel);
+        });
+    });
+}
 
 // Modales
 elementRefs.btnCerrarModal.addEventListener('click', () => elementRefs.modalQuienSoy.style.display = 'none');

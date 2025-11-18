@@ -27,6 +27,7 @@
         <main id="mainMenu" class="main-menu">
             <button id="btnCrearPartida" class="btn-primary">[ CREAR PARTIDA ]</button>
             <button id="btnUnirsePartida" class="btn-primary">[ UNIRSE A PARTIDA ]</button>
+            <button id="btnComoJugar" class="btn-secondary">[ CÓMO JUGAR ]</button>
         </main>
 
         <main id="lobbyScreen" class="lobby-screen" style="display: none;">
@@ -39,6 +40,7 @@
                 <ul id="listaJugadoresLobby"></ul>
             </div>
             <button id="btnEmpezarPartida" class="btn-primary">[ EMPEZAR PARTIDA ]</button>
+            <!-- <button id="btnTestearAtributos" class="btn-secondary">[ 🧪 VER GENERADOR DE ATRIBUTOS ]</button> -->
             <button id="btnSalirLobby" class="btn-secondary">[ SALIR DEL LOBBY ]</button>
         </main>
 
@@ -146,16 +148,61 @@
         </div>
     </div>
 
-    <!-- Modal genérico para mensajes personalizados -->
-    <div id="modalGenerico" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h3 id="modalGenericoTitulo">MENSAJE</h3>
-            <p id="modalGenericoTexto">Texto del mensaje...</p>
-            <input type="text" id="modalGenericoInput" class="form-input" style="display: none;" placeholder="Escribe aquí..." maxlength="20">
-            <div id="modalGenericoBotones" class="modal-generico-botones">
-                <button id="btnModalGenericoConfirmar" class="btn-primary">[ ACEPTAR ]</button>
-                <button id="btnModalGenericoCancelar" class="btn-secondary" style="display: none;">[ CANCELAR ]</button>
+    <!-- Modal de Cómo Jugar -->
+    <div id="modalComoJugar" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-como-jugar">
+            <h3 class="modal-como-jugar-titulo">CÓMO JUGAR</h3>
+            <div class="modal-como-jugar-contenido">
+                <section class="regla-seccion">
+                    <h4>📖 LA HISTORIA</h4>
+                    <p>La aplicación os narrará una <strong>situación límite</strong> (nave espacial, naufragio, apocalipsis zombi...) donde tendréis que decidir quién sobrevive.</p>
+                </section>
+
+                <section class="regla-seccion">
+                    <h4>👤 TU PERSONAJE</h4>
+                    <p>Cada jugador recibe un <strong>personaje secreto</strong> con nombre, edad y un atributo básico. Nadie más sabe quién eres.</p>
+                </section>
+
+                <section class="regla-seccion">
+                    <h4>🎯 OBJETIVO</h4>
+                    <p>Ser el último superviviente. Deberás convencer a los demás de que <strong>tú mereces vivir</strong> más que ellos.</p>
+                </section>
+
+                <section class="regla-seccion">
+                    <h4>🎭 PREPARACIÓN</h4>
+                    <p><strong>1.</strong> Un jugador crea la partida y comparte el código de sala.</p>
+                    <p><strong>2.</strong> Los demás se unen con ese código.</p>
+                    <p><strong>3.</strong> El anfitrión inicia la partida (mínimo 2 jugadores).</p>
+                </section>
+
+                <section class="regla-seccion">
+                    <h4>🔄 LAS RONDAS</h4>
+                    <p><strong>Fase 1 - Conocimiento:</strong> Examina a todos los personajes en el carrusel.</p>
+                    <p><strong>Fase 2 - Asignación:</strong> La app te da un atributo (positivo o negativo). Debes asignárselo <strong>anónimamente</strong> a cualquier personaje.</p>
+                    <p><strong>Fase 3 - Debate:</strong> ¡A hablar! Convence a los demás. Tienes 5 minutos.</p>
+                    <p><strong>Fase 4 - Votación:</strong> Selecciona el personaje que quieres eliminar y confirma tu voto.</p>
+                    <p><strong>Fase 5 - Eliminación:</strong> El personaje más votado es eliminado. Se revela quién era.</p>
+                </section>
+
+                <section class="regla-seccion">
+                    <h4>⚡ ATRIBUTOS</h4>
+                    <p>Cada ronda, los atributos se vuelven más <strong>extremos</strong>.</p>
+                    <p>Úsalos estratégicamente para hundir a otros... o salvar a aliados.</p>
+                </section>
+
+                <section class="regla-seccion">
+                    <h4>🏆 VICTORIA</h4>
+                    <p>El juego termina cuando solo queda <strong>un superviviente</strong>. Ese jugador gana.</p>
+                </section>
+
+                <section class="regla-seccion regla-tip">
+                    <h4>💡 CONSEJOS</h4>
+                    <p>• <strong>Miente, traiciona, persuade.</strong> Todo vale.</p>
+                    <p>• Los atributos se asignan anónimamente. Aprovéchalo.</p>
+                    <p>• Lee bien los atributos de cada personaje antes de votar.</p>
+                </section>
             </div>
+            <button id="btnCerrarComoJugar" class="btn-primary">[ ENTENDIDO ]</button>
         </div>
     </div>
 
@@ -172,6 +219,47 @@
         </div>
     </div>
 
+    <!-- Modal de Testing de Generador de Atributos -->
+    <!-- <div id="modalTestAtributos" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-test-atributos">
+            <h3 class="modal-test-titulo">🧪 GENERADOR DE ATRIBUTOS</h3>
+            <p class="modal-test-descripcion">
+                Aquí puedes previsualizar atributos generados algorítmicamente para cada nivel. 
+                Los <strong>originales</strong> se conservan, y el generador crea nuevos inspirándose en ellos.
+            </p>
+            
+            <div class="test-nivel-selector">
+                <button class="btn-nivel-test active" data-nivel="bronce">BRONCE</button>
+                <button class="btn-nivel-test" data-nivel="plata">PLATA</button>
+                <button class="btn-nivel-test" data-nivel="oro">ORO</button>
+                <button class="btn-nivel-test" data-nivel="platino">PLATINO</button>
+                <button class="btn-nivel-test" data-nivel="diamante">DIAMANTE</button>
+                <button class="btn-nivel-test" data-nivel="lifeordeath">LIFE OR DEATH</button>
+            </div>
+
+            <div id="testResultadosContainer" class="test-resultados">
+                <div class="test-tono">
+                    <strong>Tono del nivel:</strong> <span id="testTonoTexto">Cargando...</span>
+                </div>
+                
+                <div class="test-columnas">
+                    <div class="test-columna">
+                        <h4>📝 ORIGINALES (muestra)</h4>
+                        <ul id="testOriginalesLista"></ul>
+                    </div>
+                    <div class="test-columna">
+                        <h4>✨ GENERADOS</h4>
+                        <ul id="testGeneradosLista"></ul>
+                    </div>
+                </div>
+
+                <button id="btnRegenerarTest" class="btn-secondary">[ 🔄 REGENERAR ]</button>
+            </div>
+
+            <button id="btnCerrarTestAtributos" class="btn-primary">[ CERRAR ]</button>
+        </div>
+    </div> -->
+    <!-- Modal de Testing de Generador de Atributos -->
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>

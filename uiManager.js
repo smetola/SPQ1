@@ -1,5 +1,7 @@
 // Contenido para: uiManager.js
 
+import { generarLotePrueba } from './logic/attributeGenerator.js';
+
 // Almacén para las referencias del DOM
 let refs = {};
 let logic = {}; // Almacén para la lógica (para el clic de la tarjeta)
@@ -20,7 +22,7 @@ export function mostrarPantallaUnirse() {
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
     refs.joinScreen.style.display = 'flex';
-    refs.btnSalirPartida.style.display = 'flex'; // Mostrar botón de salida
+    refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida
 }
 
 export function mostrarLobby(codigoSala) {
@@ -30,7 +32,7 @@ export function mostrarLobby(codigoSala) {
     refs.gameScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'flex';
     refs.lobbyCodigoSala.textContent = codigoSala;
-    refs.btnSalirPartida.style.display = 'flex'; // Mostrar botón de salida
+    refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida en lobby
 
     ocultarModalResultados();
     ocultarModalFinJuego();
@@ -66,6 +68,7 @@ export function volverAlMenu() {
     refs.joinScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
+    refs.storyScreen.style.display = 'none'; // Ocultar pantalla de historia
     refs.modalQuienSoy.style.display = 'none';
     refs.modalAsignarAtributo.style.display = 'none';
     ocultarModalResultados();
@@ -115,6 +118,16 @@ export function mostrarPantallaHistoria(historia, esAnfitrion) {
 
 export function ocultarPantallaHistoria() {
     refs.storyScreen.style.display = 'none';
+}
+
+// --- FUNCIONES DE MODAL CÓMO JUGAR ---
+
+export function mostrarModalComoJugar() {
+    refs.modalComoJugar.style.display = 'flex';
+}
+
+export function ocultarModalComoJugar() {
+    refs.modalComoJugar.style.display = 'none';
 }
 
 
@@ -372,4 +385,74 @@ function construirModalPersonaje(personaje) {
             ${atributosHTML.map(attr => `<li>${attr}</li>`).join('')}
         </ul>
     `;
+}
+// --- FUNCIONES PARA MODAL DE TESTING DE ATRIBUTOS ---
+
+let nivelActualTest = 'bronce'; // Nivel por defecto
+
+/**
+ * Muestra el modal de testing de atributos
+ */
+export function mostrarModalTestAtributos() {
+    refs.modalTestAtributos.style.display = 'flex';
+    nivelActualTest = 'bronce';
+    actualizarBotonNivelActivo('bronce');
+    renderizarLotePrueba('bronce');
+}
+
+/**
+ * Oculta el modal de testing de atributos
+ */
+export function ocultarModalTestAtributos() {
+    refs.modalTestAtributos.style.display = 'none';
+}
+
+/**
+ * Cambia el nivel seleccionado en el test
+ */
+export function cambiarNivelTest(nivel) {
+    nivelActualTest = nivel;
+    actualizarBotonNivelActivo(nivel);
+    renderizarLotePrueba(nivel);
+}
+
+/**
+ * Regenera los atributos del nivel actual
+ */
+export function regenerarTestAtributos() {
+    renderizarLotePrueba(nivelActualTest);
+}
+
+/**
+ * Renderiza el lote de prueba para un nivel
+ */
+function renderizarLotePrueba(nivel) {
+    const lote = generarLotePrueba(nivel, 15);
+    
+    // Actualizar tono
+    document.getElementById('testTonoTexto').textContent = lote.tono;
+    
+    // Renderizar originales
+    const listaOriginales = document.getElementById('testOriginalesLista');
+    listaOriginales.innerHTML = lote.originales
+        .map(attr => `<li>${attr}</li>`)
+        .join('');
+    
+    // Renderizar generados
+    const listaGenerados = document.getElementById('testGeneradosLista');
+    listaGenerados.innerHTML = lote.generados
+        .map(attr => `<li>${attr}</li>`)
+        .join('');
+}
+
+/**
+ * Actualiza el botón activo en el selector de niveles
+ */
+function actualizarBotonNivelActivo(nivel) {
+    document.querySelectorAll('.btn-nivel-test').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.nivel === nivel) {
+            btn.classList.add('active');
+        }
+    });
 }

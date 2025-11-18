@@ -2,6 +2,19 @@
 
 import { state, getDatabase, getModalManager } from './gameState.js';
 import * as Data from '../gameData.js';
+import { obtenerPoolAtributos } from './attributeGenerator.js';
+
+// Generar pools expandidos de atributos (originales + generados)
+function generarPoolsExpandidos() {
+    return {
+        bronce: obtenerPoolAtributos('bronce', 20),
+        plata: obtenerPoolAtributos('plata', 20),
+        oro: obtenerPoolAtributos('oro', 20),
+        platino: obtenerPoolAtributos('platino', 20),
+        diamante: obtenerPoolAtributos('diamante', 20),
+        lifeordeath: obtenerPoolAtributos('lifeordeath', 15)
+    };
+}
 
 // Función auxiliar: selección aleatoria
 function seleccionarElementoAleatorio(array, borrar = false) {
@@ -61,7 +74,7 @@ export async function empezarPartida() {
             };
         });
 
-        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = JSON.parse(JSON.stringify(Data.LISTAS_ATRIBUTOS));
+        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = generarPoolsExpandidos();
         
         // ¡NUEVO! Guarda la progresión en Firebase
         actualizaciones[`partidas/${state.salaActual}/progresionTiers`] = progresionTiers;

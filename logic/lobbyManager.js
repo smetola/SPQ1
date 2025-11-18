@@ -4,6 +4,19 @@ import { state, getDatabase, resetState, getModalManager } from './gameState.js'
 import * as UI from '../uiManager.js';
 import { escucharJugadoresEnLobby, escucharInicioPartida } from './firebaseSync.js';
 import * as Data from '../gameData.js';
+import { obtenerPoolAtributos } from './attributeGenerator.js';
+
+// Generar pools expandidos de atributos (originales + generados)
+function generarPoolsExpandidos() {
+    return {
+        bronce: obtenerPoolAtributos('bronce', 20),
+        plata: obtenerPoolAtributos('plata', 20),
+        oro: obtenerPoolAtributos('oro', 20),
+        platino: obtenerPoolAtributos('platino', 20),
+        diamante: obtenerPoolAtributos('diamante', 20),
+        lifeordeath: obtenerPoolAtributos('lifeordeath', 15)
+    };
+}
 
 // Generar código aleatorio de sala
 function generarCodigoAleatorio(longitud) {
@@ -156,7 +169,7 @@ export function reiniciarPartida() {
         actualizaciones[`partidas/${state.salaActual}/debateEndTime`] = null;
         
         // ¡NUEVO! Resetea las listas y la progresión
-        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = JSON.parse(JSON.stringify(Data.LISTAS_ATRIBUTOS));
+        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = generarPoolsExpandidos();
         actualizaciones[`partidas/${state.salaActual}/progresionTiers`] = progresionTiers;
         actualizaciones[`partidas/${state.salaActual}/progressionIndex`] = 0;
 

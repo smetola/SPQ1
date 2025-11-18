@@ -710,3 +710,213 @@ body {
         transform: scale(1.05);
     }
 }
+
+/* --- ================================= --- */
+/* ---   ESTILOS MODAL CÓMO JUGAR       --- */
+/* --- ================================= --- */
+
+.modal-como-jugar {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 30px;
+}
+
+.modal-como-jugar-titulo {
+    font-family: var(--font-titulo);
+    font-size: 2rem;
+    color: var(--color-acento);
+    text-align: center;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+    border-bottom: 2px dashed var(--color-borde);
+    padding-bottom: 15px;
+}
+
+.modal-como-jugar-contenido {
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.regla-seccion {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--color-acento);
+    border-radius: 4px;
+}
+
+.regla-seccion h4 {
+    font-family: var(--font-cuerpo);
+    font-size: 1.2rem;
+    color: var(--color-acento);
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.regla-seccion p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 8px 0;
+    color: var(--color-texto-principal);
+}
+
+.regla-seccion strong {
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+.regla-tip {
+    background-color: rgba(211, 47, 47, 0.1);
+    border-left-color: var(--color-acento);
+}
+
+.regla-tip h4 {
+    color: #F44336;
+}
+
+/* Estilos para el scroll en el modal */
+.modal-como-jugar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-como-jugar::-webkit-scrollbar-track {
+    background: var(--color-fondo);
+    border-radius: 4px;
+}
+
+.modal-como-jugar::-webkit-scrollbar-thumb {
+    background: var(--color-acento);
+    border-radius: 4px;
+}
+
+.modal-como-jugar::-webkit-scrollbar-thumb:hover {
+    background: #F44336;
+}
+
+/* --- Estilos para Modal de Testing de Atributos --- */
+.modal-test-atributos {
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-test-titulo {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.modal-test-descripcion {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #B0B0B0;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.test-nivel-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.btn-nivel-test {
+    padding: 8px 15px;
+    background-color: var(--color-fondo);
+    color: var(--color-texto-principal);
+    border: 1px solid var(--color-borde);
+    font-family: var(--font-titulo);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-nivel-test:hover {
+    background-color: var(--color-borde);
+    border-color: var(--color-acento);
+}
+
+.btn-nivel-test.active {
+    background-color: var(--color-acento);
+    border-color: var(--color-acento);
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+.test-resultados {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.test-tono {
+    font-size: 0.9rem;
+    color: #B0B0B0;
+    margin-bottom: 20px;
+    text-align: left;
+    font-style: italic;
+}
+
+.test-tono strong {
+    color: var(--color-texto-principal);
+}
+
+.test-columnas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.test-columna h4 {
+    font-family: var(--font-titulo);
+    font-size: 1rem;
+    color: var(--color-acento);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.test-columna ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.test-columna ul li {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-left: 3px solid var(--color-acento);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--color-texto-principal);
+}
+
+#testGeneradosLista li {
+    border-left-color: #4CAF50; /* Verde para generados */
+}
+
+#btnRegenerarTest {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 600px) {
+    .test-columnas {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-test-atributos {
+        max-width: 95%;
+    }
+}
+
