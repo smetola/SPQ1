@@ -117,10 +117,12 @@ const crearIndicadorConexion = () => {
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background-color: #00ff00;
-        box-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+        background-color: #ff4444;
+        box-shadow: 0 0 8px rgba(255, 68, 68, 0.6);
         z-index: 10000;
-        transition: all 0.3s ease;
+        transition: opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
     `;
     document.body.appendChild(indicador);
     return indicador;
@@ -132,12 +134,10 @@ const indicadorConexion = crearIndicadorConexion();
 database.ref('.info/connected').on('value', (snapshot) => {
     const conectado = snapshot.val() === true;
     if (conectado) {
-        indicadorConexion.style.backgroundColor = '#00ff00';
-        indicadorConexion.style.boxShadow = '0 0 8px rgba(0, 255, 0, 0.6)';
+        indicadorConexion.style.opacity = '0';
         indicadorConexion.title = 'Conectado';
     } else {
-        indicadorConexion.style.backgroundColor = '#ff4444';
-        indicadorConexion.style.boxShadow = '0 0 8px rgba(255, 68, 68, 0.6)';
+        indicadorConexion.style.opacity = '1';
         indicadorConexion.title = 'Desconectado - Reconectando...';
     }
 });
