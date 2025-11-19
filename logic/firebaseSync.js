@@ -135,6 +135,26 @@ export function escucharDatosJuego() {
             }
         }
         
+        // --- 2.5. Mensajes de espera en Fase de Asignación (para no anfitrión) ---
+        if (!state.soyAnfitrion && faseActual === 'asignacion') {
+            const miEstadoEnAsignacion = jugadores[state.jugadorIdActual] || {};
+            const heAsignadoYa = !miEstadoEnAsignacion.atributoParaAsignar; // Si NO tiene atributo, ya lo asignó
+            
+            if (heAsignadoYa) {
+                // Ya asignó su atributo, esperar a que otros terminen
+                const faltanPorAsignar = Object.values(jugadores).filter(j => j.atributoParaAsignar).length;
+                if (faltanPorAsignar > 0) {
+                    UI.mostrarMensajeEspera(`Esperando a que ${faltanPorAsignar} jugador${faltanPorAsignar > 1 ? 'es' : ''} coloque${faltanPorAsignar > 1 ? 'n' : ''} su${faltanPorAsignar > 1 ? 's' : ''} atributo${faltanPorAsignar > 1 ? 's' : ''}...`);
+                } else {
+                    // Todos asignaron, esperar a que el anfitrión comience el debate
+                    UI.mostrarMensajeEspera("Esperando a que el anfitrión comience el debate...");
+                }
+            } else {
+                // Aún no ha asignado, ocultar mensaje para que vea el modal
+                UI.ocultarMensajeEspera();
+            }
+        }
+        
         // --- 3. Lógica del Temporizador y Fase de Debate ---
         if (faseActual === 'debate') {
             UI.gestionarBotonConfirmar(true, state.heConfirmadoMiVoto, !!(jugadores[state.jugadorIdActual]?.votoSeleccionado));
@@ -196,11 +216,18 @@ export function escucharDatosJuego() {
                 if (historiaActual) {
                     UI.mostrarPantallaHistoria(historiaActual, state.soyAnfitrion);
                 }
+                UI.ocultarMensajeEspera();
             }
             else if (faseActual === 'conocimiento') {
                 state.processingVote = false;
                 UI.ocultarPantallaHistoria();
                 UI.mostrarPantallaJuego(state.soyAnfitrion);
+                // Si NO soy anfitrión, mostrar mensaje de espera
+                if (!state.soyAnfitrion) {
+                    UI.mostrarMensajeEspera("Esperando a que el anfitrión comience la ronda...");
+                } else {
+                    UI.ocultarMensajeEspera();
+                }
             }
             else if (faseActual === 'asignacion') {
                 state.processingVote = false;
@@ -208,23 +235,42 @@ export function escucharDatosJuego() {
                 if (state.miAtributoParaAsignar) {
                     UI.mostrarModalAsignacion(state.miAtributoParaAsignar);
                 }
+                UI.ocultarMensajeEspera(); // Se oculta en el modal
             } 
             else if (faseActual === 'debate') {
                 state.processingVote = false;
                 state.heConfirmadoMiVoto = false; 
                 UI.mostrarFaseDebate();
+                UI.ocultarMensajeEspera();
             }
             else if (faseActual === 'resultados') {
                 state.processingVote = false;
                 UI.mostrarModalResultados(ultimoEliminado, state.soyAnfitrion);
+                // Si NO soy anfitrión, mostrar mensaje de espera
+                if (!state.soyAnfitrion) {
+                    UI.mostrarMensajeEspera("Esperando al anfitrión para continuar...");
+                } else {
+                    UI.ocultarMensajeEspera();
+                }
             }
             else if (faseActual === 'fin') {
                 state.processingVote = false;
                 UI.mostrarPantallaFinJuego();
                 UI.mostrarModalFinJuego(ganador, state.soyAnbitrion); // Corrección: soyAnfitrion
+                UI.ocultarMensajeEspera();
             }
             
             state.faseAnterior = faseActual;
+        }
+        
+        // --- 5. Mostrar mensaje de espera en votación (si NO soy anfitrión y aún no he votado) ---
+        if (faseActual === 'votacion' && !state.soyAnfitrion && !state.heConfirmadoMiVoto) {
+            UI.mostrarMensajeEspera("Esperando a que todos los jugadores voten...");
+        }
+        
+        // --- 6. Mostrar mensaje de espera cuando todos han votado (si NO soy anfitrión) ---
+        if (faseActual === 'votacion' && !state.soyAnfitrion && state.heConfirmadoMiVoto) {
+            UI.mostrarMensajeEspera("Esperando a que los demás jugadores terminen de votar...");
         }
     });
 }

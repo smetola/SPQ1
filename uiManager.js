@@ -456,3 +456,42 @@ function actualizarBotonNivelActivo(nivel) {
         }
     });
 }
+
+/* --- ================================= --- */
+/* ---  MENSAJES DE ESPERA (NO ANFITRIÓN) --- */
+/* --- ================================= --- */
+
+/**
+ * Muestra un mensaje de espera para jugadores que no son anfitrión
+ * @param {string} mensaje - El texto del mensaje a mostrar
+ */
+export function mostrarMensajeEspera(mensaje) {
+    refs.waitingMessageText.textContent = mensaje;
+    refs.waitingMessage.style.display = 'block';
+}
+
+/**
+ * Oculta el mensaje de espera
+ */
+export function ocultarMensajeEspera() {
+    refs.waitingMessage.style.display = 'none';
+}
+
+/**
+ * Muestra el mensaje según la fase actual (para jugadores no anfitrión)
+ * @param {string} fase - La fase actual del juego
+ */
+export function actualizarMensajeEsperaSegunFase(fase) {
+    const mensajes = {
+        'conocimiento': 'Esperando a que el anfitrión comience la ronda...',
+        'asignacion': 'Esperando a que se complete la fase de asignación...',
+        'debate': 'Esperando a que todos terminen de debatir...',
+        'votacion': 'Esperando a que todos voten...',
+        'resultados': 'Esperando al anfitrión para la siguiente ronda...',
+        'finJuego': 'Esperando al anfitrión...'
+    };
+    
+    const mensaje = mensajes[fase] || 'Esperando...';
+    mostrarMensajeEspera(mensaje);
+}
+

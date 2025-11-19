@@ -31,6 +31,8 @@ const elementRefs = {
     btnQuienSoy: document.getElementById('btnQuienSoy'),
 
     gameTimer: document.getElementById('gameTimer'),
+    waitingMessage: document.getElementById('waitingMessage'),
+    waitingMessageText: document.getElementById('waitingMessageText'),
     
     modalQuienSoy: document.getElementById('modalQuienSoy'),
     modalMiPersonaje: document.getElementById('modalMiPersonaje'),
