@@ -69,10 +69,17 @@ export function comprobarYEliminar() {
 
         const jugadores = partida.jugadores;
         const jugadoresVivos = Object.entries(jugadores).filter(([id, j]) => j.personaje?.estaVivo);
+        const esRondaFinal = jugadoresVivos.length === 2;
         
         // --- 1. Recuento de votos ---
         const recuentoVotos = {};
-        jugadoresVivos.forEach(([id, jugador]) => {
+        
+        // Si es la ronda final (2 vivos), contar TODOS los votos (vivos + muertos)
+        const jugadoresQueVotan = esRondaFinal 
+            ? Object.entries(jugadores) 
+            : jugadoresVivos;
+        
+        jugadoresQueVotan.forEach(([id, jugador]) => {
             const voto = jugador.votoSeleccionado;
             if (voto) {
                 recuentoVotos[voto] = (recuentoVotos[voto] || 0) + 1;

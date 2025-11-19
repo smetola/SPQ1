@@ -206,11 +206,20 @@ export function ocultarBotonComenzarRonda() {
 
 /**
  * ¡MODIFICADO!
- * Ya no acepta 'rondaActual'. El texto es genérico.
+ * Si es ronda final (2 vivos), muestra mensaje especial para que los muertos sepan que pueden votar.
  */
-export function mostrarFaseDebate() {
+export function mostrarFaseDebate(jugadoresVivos = null, estoyVivo = true) {
+    const esRondaFinal = jugadoresVivos !== null && jugadoresVivos.length === 2;
+    
     refs.gameRondaTitulo.textContent = "DEBATE Y VOTACIÓN";
-    refs.gameRondaInstruccion.textContent = "¡Hora de debatir! Selecciona a quién eliminar y confirma tu voto.";
+    
+    if (esRondaFinal && !estoyVivo) {
+        refs.gameRondaInstruccion.textContent = "¡RONDA FINAL! Los caídos tienen voz. Tu voto decidirá el destino de los últimos supervivientes.";
+    } else if (esRondaFinal) {
+        refs.gameRondaInstruccion.textContent = "¡RONDA FINAL! Quedan solo 2 supervivientes. Los caídos decidirán vuestro destino.";
+    } else {
+        refs.gameRondaInstruccion.textContent = "¡Hora de debatir! Selecciona a quién eliminar y confirma tu voto.";
+    }
     
     refs.btnComenzarRonda.style.display = 'none';
     refs.btnComenzarDebate.style.display = 'none';
@@ -245,7 +254,7 @@ export function actualizarTimer(segundosRestantes, mostrar = true) {
     refs.gameTimer.textContent = `${minutosStr}:${segundosStr}`;
 }
 
-export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado) {
+export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado, estoyVivo = true, historiaActual = null, esRondaFinal = false) {
     const btn = refs.btnConfirmarVoto;
     if (!btn) return;
 
@@ -256,17 +265,48 @@ export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado) {
 
     btn.style.display = 'block';
 
+    // Si el jugador está muerto y NO es ronda final, mostrar mensaje narrativo
+    if (!estoyVivo && !esRondaFinal) {
+        btn.disabled = true;
+        btn.classList.add('locked');
+        btn.classList.add('mensaje-muerto');
+        
+        // Importar y seleccionar mensaje aleatorio según la historia
+        import('./gameData.js').then(module => {
+            const tituloHistoria = historiaActual?.titulo || null;
+            const mensajeAleatorio = module.obtenerMensajeMuertoAleatorio(tituloHistoria);
+            btn.textContent = mensajeAleatorio;
+        });
+        return;
+    }
+
+    // Lógica normal para jugadores vivos (o muertos en ronda final)
+    btn.classList.remove('mensaje-muerto');
+    
+    // Si es ronda final y el jugador está muerto, añadir indicador especial
+    if (!estoyVivo && esRondaFinal) {
+        btn.classList.add('voto-desde-mas-alla');
+    } else {
+        btn.classList.remove('voto-desde-mas-alla');
+    }
+    
     if (confirmado) {
         btn.disabled = true;
-        btn.textContent = "[ VOTO CONFIRMADO ]";
+        btn.textContent = !estoyVivo && esRondaFinal 
+            ? "[ VOTO DESDE EL MÁS ALLÁ CONFIRMADO ]" 
+            : "[ VOTO CONFIRMADO ]";
         btn.classList.add('locked');
     } else if (seleccionado) {
         btn.disabled = false;
-        btn.textContent = "[ CONFIRMAR VOTO ]";
+        btn.textContent = !estoyVivo && esRondaFinal 
+            ? "[ CONFIRMAR VOTO DESDE EL MÁS ALLÁ ]" 
+            : "[ CONFIRMAR VOTO ]";
         btn.classList.remove('locked');
     } else {
         btn.disabled = true;
-        btn.textContent = "[ SELECCIONA UN PERSONAJE ]";
+        btn.textContent = !estoyVivo && esRondaFinal 
+            ? "[ SELECCIONA DESDE EL MÁS ALLÁ ]" 
+            : "[ SELECCIONA UN PERSONAJE ]";
         btn.classList.remove('locked');
     }
 }

@@ -32,7 +32,7 @@ export const ATRIBUTOS_PLATINO = [
 export const ATRIBUTOS_DIAMANTE = [
     "Le faltan 3 dedos del pie porque se los comio ayer", "Se la chupa a los gatos callejeros", 
     "Cree que es el Mesías", "Es extraterrestre", "Robot", "Bruja", "Le falta calle", 
-    "Tiene superpoderes", "Realiza transfusions de sangre", "Ha probado la carne humana", 
+    "Tiene superpoderes", "Realiza transfusiones de sangre", "Ha probado la carne humana", 
     "Oye hablar a las plantas y a los animales", "Esquizofrénico", "Representante de una secta", 
     "Descubrió el Bosón de Higgs", "Ve a los muertos", "Cree que fue abducido por extraterrestres", 
     "Cancer de planta del pie", "Nació en Chernobyl y tiene los ojos en la nuca", 
@@ -60,21 +60,92 @@ export const HISTORIAS = [
     {
         titulo: "LA NAVE DE LA ESPERANZA",
         subtitulo: "Un viaje sin retorno",
-        texto: `El año es 2087. La Tierra agoniza. Los gobiernos mundiales han invertido sus últimos recursos en una misión desesperada: enviar una nave colonial hacia Kepler-442b, el único planeta habitable detectado a 1.200 años luz de distancia.\n\nVosotros sois los elegidos. Los supervivientes. La última esperanza de la humanidad.\n\nPero la nave está perdiendo recursos críticos. El sistema de soporte vital falla. Los suministros se agotan. La realidad es brutal: no todos llegaréis al destino.\n\nCada jornada, deberéis decidir quién es prescindible. Quién no merece representar a la humanidad en el nuevo mundo. Las decisiones que toméis definirán el futuro de nuestra especie... o su extinción definitiva.\n\n<em>Solo puede quedar uno.</em>`
+        texto: `El año es 2087. La Tierra agoniza. Los gobiernos mundiales han invertido sus últimos recursos en una misión desesperada: enviar una nave colonial hacia Kepler-442b, el único planeta habitable detectado a 1.200 años luz de distancia.\n\nVosotros sois los elegidos. Los supervivientes. La última esperanza de la humanidad.\n\nPero la nave está perdiendo recursos críticos. El sistema de soporte vital falla. Los suministros se agotan. La realidad es brutal: no todos llegaréis al destino.\n\nCada jornada, deberéis decidir quién es prescindible. Quién no merece representar a la humanidad en el nuevo mundo. Las decisiones que toméis definirán el futuro de nuestra especie... o su extinción definitiva.\n\n<em>Solo puede quedar uno.</em>`,
+        mensajesMuertos: [
+            "No puedes votar desde el espacio exterior.",
+            "Estás fuera de la nave... literalmente.",
+            "Tu voto se perdió en el vacío del espacio.",
+            "Flotas en el abismo, sin voz ni voto.",
+            "Tu cuerpo flota entre las estrellas.",
+            "El vacío espacial no transmite votos.",
+            "Fuiste expulsado al vacío. Ya no decides.",
+            "Tu oxígeno se agotó. Tu voz también.",
+            "Los muertos no viajan a Kepler-442b.",
+            "La nave continuará... sin ti.",
+            "Tu destino quedó en el espacio infinito.",
+            "Solo los que respiran pueden decidir."
+        ]
     },
     {
         titulo: "EL ÚLTIMO BOTE",
         subtitulo: "Titanic, 15 de abril de 1912",
-        texto: `El agua helada del Atlántico Norte inunda los pasillos. Los gritos resuenan en la noche. El Titanic, el barco "insumergible", se hunde irremediablemente hacia el abismo.\n\nQueda un último bote salvavidas. Capacidad: una persona.\n\nVosotros os habéis encontrado en la cubierta superior. Todos tenéis el mismo objetivo: sobrevivir. Pero solo uno podrá subir. Solo uno verá el amanecer.\n\nLas olas golpean con furia. El tiempo se agota. Cada minuto que pasa, el barco se inclina más hacia la oscuridad. Debéis decidir quién merece vivir... y quién debe quedarse atrás para ser tragado por el mar.\n\nLas decisiones difíciles definen quiénes somos realmente.\n\n<em>Solo puede quedar uno.</em>`
+        texto: `El agua helada del Atlántico Norte inunda los pasillos. Los gritos resuenan en la noche. El Titanic, el barco "insumergible", se hunde irremediablemente hacia el abismo.\n\nQueda un último bote salvavidas. Capacidad: una persona.\n\nVosotros os habéis encontrado en la cubierta superior. Todos tenéis el mismo objetivo: sobrevivir. Pero solo uno podrá subir. Solo uno verá el amanecer.\n\nLas olas golpean con furia. El tiempo se agota. Cada minuto que pasa, el barco se inclina más hacia la oscuridad. Debéis decidir quién merece vivir... y quién debe quedarse atrás para ser tragado por el mar.\n\nLas decisiones difíciles definen quiénes somos realmente.\n\n<em>Solo puede quedar uno.</em>`,
+        mensajesMuertos: [
+            "El mar se tragó tu voz.",
+            "Las aguas heladas silenciaron tu opinión.",
+            "Tu cuerpo descansa en el fondo del Atlántico.",
+            "Los ahogados no votan.",
+            "El océano es tu tumba. No tu tribuna.",
+            "Tu grito se apagó bajo las olas.",
+            "Solo los que flotan deciden.",
+            "El agua fría congeló tu última palabra.",
+            "Tu destino se hundió con el Titanic.",
+            "Los náufragos perdidos no tienen voz.",
+            "El abismo marino te reclama.",
+            "Las corrientes arrastraron tu voto."
+        ]
     },
     {
         titulo: "LA ISLA DEL HAMBRE",
         subtitulo: "Náufragos sin esperanza",
-        texto: `El naufragio fue hace 47 días. La isla parecía un paraíso tropical al principio, pero pronto descubristeis la verdad: no hay comida. Los árboles no dan frutos. El mar está vacío. La tierra es estéril.\n\nEl hambre os devora. Los cuerpos se debilitan. La desesperación se convierte en locura.\n\nY entonces, alguien pronuncia lo impensable: "Si queremos sobrevivir... uno de nosotros debe ser el sacrificio".\n\nLa idea es atroz. Inhumana. Pero el hambre no entiende de moral. Cada día que pasa, la muerte se acerca más. Y vosotros debéis decidir: ¿quién será el primero en caer? ¿Quién será recordado como el mártir... o como la cena?\n\nLa civilización es solo una ilusión que se desvanece cuando el estómago ruge.\n\n<em>Solo puede quedar uno.</em>`
+        texto: `El naufragio fue hace 47 días. La isla parecía un paraíso tropical al principio, pero pronto descubristeis la verdad: no hay comida. Los árboles no dan frutos. El mar está vacío. La tierra es estéril.\n\nEl hambre os devora. Los cuerpos se debilitan. La desesperación se convierte en locura.\n\nY entonces, alguien pronuncia lo impensable: "Si queremos sobrevivir... uno de nosotros debe ser el sacrificio".\n\nLa idea es atroz. Inhumana. Pero el hambre no entiende de moral. Cada día que pasa, la muerte se acerca más. Y vosotros debéis decidir: ¿quién será el primero en caer? ¿Quién será recordado como el mártir... o como la cena?\n\nLa civilización es solo una ilusión que se desvanece cuando el estómago ruge.\n\n<em>Solo puede quedar uno.</em>`,
+        mensajesMuertos: [
+            "Los devorados no votan.",
+            "Tu carne ya alimentó a otros.",
+            "Los muertos no tienen hambre... ni voto.",
+            "Fuiste el sacrificio. Ahora solo observas.",
+            "Tu destino fue sellado. Y consumido.",
+            "Los huesos no hablan.",
+            "Ya no eres náufrago. Eres alimento.",
+            "Tu última contribución fue nutricional.",
+            "Los caníbales no escuchan a sus cenas.",
+            "Tu voz quedó enterrada en la arena.",
+            "La isla te reclama. Silenciosamente.",
+            "Solo los hambrientos deciden quién sigue."
+        ]
     },
     {
         titulo: "EL HELICÓPTERO DE RESCUE",
         subtitulo: "Centro comercial, día 14 del apocalipsis",
-        texto: `Los zombis invadieron la ciudad hace dos semanas. Los gritos cesaron hace días. Ahora solo queda el silencio... y los gruñidos de los muertos vivientes que merodean las calles.\n\nVosotros habéis sobrevivido atrincherados en la azotea del centro comercial. Sin comida. Sin agua potable. Sin esperanza.\n\nHasta que escucháis el sonido de las hélices. Un helicóptero de rescate desciende del cielo. Pero el piloto grita por encima del ruido: "¡Solo puedo llevar a uno! ¡El combustible no alcanza para más peso!"\n\nLa horda ya ha detectado el ruido. Suben por las escaleras. Tenéis segundos para decidir quién subirá al helicóptero... y quién se quedará para enfrentar la muerte más horrible imaginable.\n\nNo hay tiempo para debates. Solo para supervivencia.\n\n<em>Solo puede quedar uno.</em>`
+        texto: `Los zombis invadieron la ciudad hace dos semanas. Los gritos cesaron hace días. Ahora solo queda el silencio... y los gruñidos de los muertos vivientes que merodean las calles.\n\nVosotros habéis sobrevivido atrincherados en la azotea del centro comercial. Sin comida. Sin agua potable. Sin esperanza.\n\nHasta que escucháis el sonido de las hélices. Un helicóptero de rescate desciende del cielo. Pero el piloto grita por encima del ruido: "¡Solo puedo llevar a uno! ¡El combustible no alcanza para más peso!"\n\nLa horda ya ha detectado el ruido. Suben por las escaleras. Tenéis segundos para decidir quién subirá al helicóptero... y quién se quedará para enfrentar la muerte más horrible imaginable.\n\nNo hay tiempo para debates. Solo para supervivencia.\n\n<em>Solo puede quedar uno.</em>`,
+        mensajesMuertos: [
+            "Los zombis no votan.",
+            "Ya eres uno de ellos. Solo gruñes.",
+            "Los muertos vivientes no deciden.",
+            "Tu cerebro está en el menú. No en el debate.",
+            "Solo buscas carne fresca ahora.",
+            "Los infectados no tienen voz.",
+            "Tu humanidad se fue con el primer mordisco.",
+            "Gruñir no cuenta como voto.",
+            "Los vivos te temen. No te escuchan.",
+            "Tu opinión murió con tu conciencia.",
+            "La horda te reclama. Olvida el resto.",
+            "Los que cayeron solo observan... hambrientos.",
+            "BraiiiiiiinnnzzzZ...",
+            "CereeeebroooooosS..."
+        ]
     }
 ];
+
+// Función auxiliar para obtener mensajes de muertos según la historia actual
+export function obtenerMensajeMuertoAleatorio(tituloHistoria) {
+    const historia = HISTORIAS.find(h => h.titulo === tituloHistoria);
+    
+    if (historia && historia.mensajesMuertos && historia.mensajesMuertos.length > 0) {
+        const mensajes = historia.mensajesMuertos;
+        return mensajes[Math.floor(Math.random() * mensajes.length)];
+    }
+    
+    // Mensaje genérico por si no se encuentra la historia
+    return "Los muertos no tienen voz en esta decisión.";
+}

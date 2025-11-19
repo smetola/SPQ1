@@ -157,7 +157,11 @@ export function escucharDatosJuego() {
         
         // --- 3. Lógica del Temporizador y Fase de Debate ---
         if (faseActual === 'debate') {
-            UI.gestionarBotonConfirmar(true, state.heConfirmadoMiVoto, !!(jugadores[state.jugadorIdActual]?.votoSeleccionado));
+            const jugadoresVivos = Object.values(jugadores).filter(j => j.personaje?.estaVivo);
+            const esRondaFinal = jugadoresVivos.length === 2;
+            const estoyVivo = jugadores[state.jugadorIdActual]?.personaje?.estaVivo ?? true;
+            const historiaActual = partida.historiaActual || null;
+            UI.gestionarBotonConfirmar(true, state.heConfirmadoMiVoto, !!(jugadores[state.jugadorIdActual]?.votoSeleccionado), estoyVivo, historiaActual, esRondaFinal);
 
             if (debateEndTime && state.timerInterval === null) {
                 state.timerInterval = setInterval(() => {
@@ -177,10 +181,16 @@ export function escucharDatosJuego() {
 
             if (state.soyAnfitrion && jugadores) {
                 const jugadoresVivos = Object.values(jugadores).filter(j => j.personaje?.estaVivo);
+                const esRondaFinal = jugadoresVivos.length === 2;
+                
                 if (jugadoresVivos.length > 0) {
-                    const confirmados = jugadoresVivos.filter(j => j.votoConfirmado).length;
+                    // Si es ronda final, esperar a que TODOS voten (vivos + muertos)
+                    // Si no, solo esperar a los vivos
+                    const todosLosJugadores = Object.values(jugadores);
+                    const jugadoresQueDebenVotar = esRondaFinal ? todosLosJugadores : jugadoresVivos;
+                    const confirmados = jugadoresQueDebenVotar.filter(j => j.votoConfirmado).length;
 
-                    if (confirmados === jugadoresVivos.length) {
+                    if (confirmados === jugadoresQueDebenVotar.length) {
                         if (state.timerInterval) {
                             clearInterval(state.timerInterval);
                             state.timerInterval = null;
@@ -239,8 +249,10 @@ export function escucharDatosJuego() {
             } 
             else if (faseActual === 'debate') {
                 state.processingVote = false;
-                state.heConfirmadoMiVoto = false; 
-                UI.mostrarFaseDebate();
+                state.heConfirmadoMiVoto = false;
+                const jugadoresVivos = Object.values(jugadores).filter(j => j.personaje?.estaVivo);
+                const estoyVivo = jugadores[state.jugadorIdActual]?.personaje?.estaVivo ?? true;
+                UI.mostrarFaseDebate(jugadoresVivos, estoyVivo);
                 UI.ocultarMensajeEspera();
             }
             else if (faseActual === 'resultados') {

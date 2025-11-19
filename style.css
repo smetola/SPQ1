@@ -580,6 +580,44 @@ body {
     cursor: not-allowed;
 }
 
+/* Estilo para los mensajes de jugadores muertos */
+.btn-primary.mensaje-muerto {
+    background-color: #1a1a1a; /* Fondo muy oscuro (casi negro) */
+    color: #666666; /* Texto gris oscuro */
+    cursor: not-allowed;
+    border: 1px dashed #444444; /* Borde punteado */
+    font-style: italic;
+    font-size: 1rem;
+    opacity: 0.8;
+    text-transform: none; /* Desactivar mayúsculas */
+    letter-spacing: 0;
+}
+
+/* Estilo especial para votos de muertos en la ronda final */
+.btn-primary.voto-desde-mas-alla {
+    background-color: #2a0a3a; /* Púrpura muy oscuro (místico) */
+    color: #b19cd9; /* Texto púrpura claro */
+    border: 2px solid #6a4c93; /* Borde púrpura */
+    box-shadow: 0 0 10px rgba(106, 76, 147, 0.5); /* Brillo sutil */
+    animation: pulse-ghost 2s ease-in-out infinite;
+}
+
+.btn-primary.voto-desde-mas-alla.locked {
+    background-color: #1a0528;
+    color: #8b7ba8;
+    box-shadow: 0 0 5px rgba(106, 76, 147, 0.3);
+}
+
+/* Animación fantasmal para votos desde el más allá */
+@keyframes pulse-ghost {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(106, 76, 147, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(106, 76, 147, 0.8);
+    }
+}
+
 /* --- ================================= --- */
 /* ---     ESTILOS MODAL RESULTADOS      --- */
 /* --- ================================= --- */
