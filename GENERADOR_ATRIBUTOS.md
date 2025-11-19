@@ -1,18 +1,37 @@
-# 🧪 Generador Algorítmico de Atributos
+# 🧪 Generador Algorítmico de Atributos y Nombres
 
 ## ¿Qué hace?
 
-El generador algorítmico **expande** los atributos del juego manteniendo el tono único de cada nivel. Los **atributos originales se conservan** como base, y el sistema genera nuevos atributos inspirándose en ellos.
+El generador algorítmico **expande** los atributos y nombres del juego manteniendo el tono único de cada nivel. Los **atributos y nombres originales se conservan** como base, y el sistema genera nuevos inspirándose en ellos.
 
 ---
 
 ## Características
 
-✅ **Conserva los originales**: Todos los atributos que creaste manualmente se mantienen intactos  
-✅ **Genera nuevos coherentes**: Crea atributos nuevos que respetan el tono de cada nivel  
-✅ **Inspirado en los originales**: Analiza patrones de tus atributos originales  
-✅ **Panel de testing**: Previsualiza generaciones sin entrar en partida  
+✅ **Conserva los originales**: Todos los atributos y nombres que creaste manualmente se mantienen intactos  
+✅ **Genera nuevos coherentes**: Crea atributos y nombres nuevos que respetan el tono de cada nivel  
+✅ **Nombres españoles**: Incluye nombres comunes, antiguos (Hermenegildo, Segismundo, Eugenia) y raros  
+✅ **Panel de testing con pestañas**: Previsualiza atributos y nombres por separado  
 ✅ **100% offline y gratis**: Sin APIs externas ni dependencias  
+
+---
+
+## Nombres Españoles
+
+### 📊 Distribución
+- **50% Comunes**: Antonio, María, José, Carmen, Manuel, Pedro, etc.
+- **30% Antiguos**: Hermenegildo, Segismundo, Eugenia, Filomena, Genoveva, Clotilde, etc.
+- **20% Raros**: Teófilo, Hilario, Primitivo, Amparo, Asunción, Milagros, etc.
+
+### 🏛️ Ejemplos de nombres antiguos
+**Masculinos**: Hermenegildo, Segismundo, Rigoberto, Casimiro, Eustaquio, Fulgencio, Gumersindo, Policarpo, Pancracio, Saturnino, Evaristo, Nicomedes
+
+**Femeninos**: Eugenia, Filomena, Genoveva, Herminia, Perpetua, Clotilde, Eduvigis, Felicitas, Gertrudis, Hortensia, Jacinta, Modesta
+
+### ✨ Ejemplos de nombres raros
+**Masculinos**: Teófilo, Hilario, Cándido, Primitivo, Blas, Melchor, Gaspar, Baltasar, Ambrosio, Celestino
+
+**Femeninos**: Amparo, Asunción, Consuelo, Encarnación, Milagros, Purificación, Rosario, Soledad, Trinidad, Angustias
 
 ---
 
@@ -49,15 +68,28 @@ El generador algorítmico **expande** los atributos del juego manteniendo el ton
 ### En el lobby (Testing)
 1. Crea o únete a una partida
 2. En el lobby, haz clic en **"🧪 VER GENERADOR DE ATRIBUTOS"**
-3. Selecciona un nivel (Bronce, Plata, Oro...)
-4. Verás:
-   - **ORIGINALES**: Muestra de tus atributos originales
-   - **GENERADOS**: 15 atributos nuevos creados por el algoritmo
-5. Haz clic en **"🔄 REGENERAR"** para ver nuevas combinaciones
+3. Verás dos pestañas: **ATRIBUTOS** y **NOMBRES**
+
+#### Pestaña ATRIBUTOS:
+- Selecciona un nivel (Bronce, Plata, Oro...)
+- Verás:
+  - **ORIGINALES**: Muestra de tus atributos originales
+  - **GENERADOS**: 15 atributos nuevos creados por el algoritmo
+- Haz clic en **"🔄 REGENERAR"** para ver nuevas combinaciones
+
+#### Pestaña NOMBRES:
+- Verás 4 columnas:
+  - **ORIGINALES**: Tus nombres originales (Alex, Carmen, David...)
+  - **COMUNES**: Nombres españoles modernos (Antonio, María, José...)
+  - **ANTIGUOS**: Nombres clásicos españoles (Hermenegildo, Eugenia, Segismundo...)
+  - **RAROS**: Nombres poco comunes (Teófilo, Amparo, Primitivo...)
+- Haz clic en **"🔄 REGENERAR NOMBRES"** para ver nuevas combinaciones
 
 ### En partida (Automático)
-- El sistema **combina automáticamente** atributos originales + generados
-- Por defecto, se añaden **20 atributos generados** por nivel (excepto Life or Death que añade 15)
+- El sistema **combina automáticamente** atributos y nombres originales + generados
+- Por defecto, se añaden:
+  - **20 atributos generados** por nivel (excepto Life or Death que añade 15)
+  - **30 nombres generados** (mezcla de comunes, antiguos y raros)
 - El pool total se mezcla aleatoriamente cada partida
 
 ---
@@ -66,25 +98,32 @@ El generador algorítmico **expande** los atributos del juego manteniendo el ton
 
 ### Archivo: `logic/attributeGenerator.js`
 
-**Función principal:**
+**Funciones principales:**
+
+**Para atributos:**
 ```javascript
 obtenerPoolAtributos(nivel, cantidadGenerados)
 ```
-
-**Parámetros:**
 - `nivel`: 'bronce', 'plata', 'oro', 'platino', 'diamante', 'lifeordeath'
 - `cantidadGenerados`: Número de atributos a generar (por defecto 10)
+- **Retorna**: Array mezclado de atributos (originales + generados)
 
-**Retorna:**
-- Array mezclado de atributos (originales + generados)
+**Para nombres:**
+```javascript
+obtenerPoolNombres(cantidadGenerados)
+```
+- `cantidadGenerados`: Número de nombres a generar (por defecto 30)
+- **Retorna**: Array mezclado de nombres únicos (originales + generados)
+- **Distribución**: 50% comunes, 30% antiguos, 20% raros
 
 ---
 
 ## Cómo ajustar la cantidad
 
-Si quieres **más o menos atributos generados**, edita estos archivos:
+### Ajustar atributos generados
 
-### `logic/lobbyManager.js` (líneas ~10-18)
+Edita `logic/lobbyManager.js` y `logic/roundManager.js` (líneas ~10-18):
+
 ```javascript
 function generarPoolsExpandidos() {
     return {
@@ -98,12 +137,40 @@ function generarPoolsExpandidos() {
 }
 ```
 
-### `logic/roundManager.js` (líneas ~8-16)
+### Ajustar nombres generados
+
+Edita `logic/roundManager.js` (línea ~72):
+
 ```javascript
-// Mismo código, mismos números
+let nombresDisponibles = obtenerPoolNombres(30); // ← Cambia este número
 ```
 
-**Recomendación**: Mantén al menos 15-20 generados para buena variedad.
+**Recomendación**: 
+- Mantén al menos 15-20 atributos generados para buena variedad
+- Mantén al menos 30 nombres para tener suficiente pool
+
+---
+
+## Cómo añadir más nombres
+
+Si quieres **más nombres españoles**, edita `logic/attributeGenerator.js`:
+
+### Ejemplo: Añadir más nombres antiguos
+```javascript
+antiguos: [
+    "Hermenegildo", "Segismundo", "Rigoberto", 
+    // ... (nombres existentes)
+    // ← AÑADE AQUÍ MÁS NOMBRES ANTIGUOS
+    "Adalberto", "Sigfrido", "Wenceslao",
+    // Femeninos
+    "Adelaida", "Cunegunda", "Rosalinda"
+]
+```
+
+### Nombres disponibles para añadir:
+- **Antiguos masculinos**: Adalberto, Sigfrido, Wenceslao, Teobaldo, Atanasio
+- **Antiguos femeninos**: Adelaida, Cunegunda, Rosalinda, Eufemia, Serafina
+- **Raros**: Epifanio, Anacleto, Crescencio, Pánfilo, Desiderio
 
 ---
 

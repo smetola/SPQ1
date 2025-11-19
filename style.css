@@ -66,6 +66,74 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px; /* Espacio entre los botones */
+    position: relative; /* Para posicionar el botón de ajustes */
+}
+
+/* --- Botón de Ajustes (Engranaje) --- */
+.btn-settings {
+    position: fixed; /* Fijo en la pantalla, igual que el botón de salida */
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(51, 51, 51, 0.8); /* Fondo consistente con btn-exit */
+    border: 1px solid var(--color-borde);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px;
+    color: #B0B0B0;
+    transition: all 0.3s ease;
+    z-index: 1000; /* Alto z-index para estar encima */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-settings:hover {
+    background-color: var(--color-papel);
+    color: var(--color-texto-principal);
+    border-color: var(--color-acento);
+    transform: rotate(90deg);
+}
+
+.btn-settings svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* --- Menú Desplegable de Ajustes --- */
+.settings-menu {
+    position: fixed; /* Fijo para acompañar al botón */
+    top: 60px; /* Debajo del botón */
+    left: 15px; /* Alineado a la izquierda */
+    background-color: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 1001;
+    min-width: 200px;
+    animation: fadeIn 0.2s ease;
+}
+
+.settings-item {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--color-texto-principal);
+    font-family: var(--font-cuerpo);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 2px;
+}
+
+.settings-item:hover {
+    background-color: var(--color-papel);
+    color: var(--color-acento);
 }
 
 .btn-primary {
@@ -960,7 +1028,7 @@ body {
 
 /* --- Estilos para Modal de Testing de Atributos --- */
 .modal-test-atributos {
-    max-width: 700px;
+    max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -968,7 +1036,7 @@ body {
 .modal-test-titulo {
     font-family: var(--font-titulo);
     color: var(--color-acento);
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     margin-bottom: 10px;
 }
 
@@ -978,6 +1046,47 @@ body {
     color: #B0B0B0;
     margin-bottom: 20px;
     text-align: left;
+}
+
+/* Pestañas */
+.test-tab-selector {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-borde);
+    padding-bottom: 10px;
+}
+
+.btn-tab-test {
+    padding: 10px 20px;
+    background-color: transparent;
+    color: var(--color-texto-principal);
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-family: var(--font-titulo);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-tab-test:hover {
+    color: var(--color-acento);
+}
+
+.btn-tab-test.active {
+    color: var(--color-acento);
+    border-bottom-color: var(--color-acento);
+    font-weight: bold;
+}
+
+.test-tab-content {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .test-nivel-selector {
@@ -1073,10 +1182,45 @@ body {
     margin-top: 10px;
 }
 
+/* Estilos para pestaña de nombres */
+.test-nombres-info {
+    background-color: rgba(211, 47, 47, 0.1);
+    border-left: 3px solid var(--color-acento);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.test-nombres-info p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+}
+
+.test-columnas-nombres {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.test-columnas-nombres .test-columna ul {
+    max-height: 250px;
+}
+
+#btnRegenerarNombres {
+    width: 100%;
+    margin-top: 10px;
+}
+
 /* Responsive para pantallas pequeñas */
 @media (max-width: 600px) {
     .test-columnas {
         grid-template-columns: 1fr;
+    }
+    
+    .test-columnas-nombres {
+        grid-template-columns: 1fr 1fr;
     }
     
     .modal-test-atributos {

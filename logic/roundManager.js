@@ -2,7 +2,7 @@
 
 import { state, getDatabase, getModalManager } from './gameState.js';
 import * as Data from '../gameData.js';
-import { obtenerPoolAtributos } from './attributeGenerator.js';
+import { obtenerPoolAtributos, obtenerPoolNombres } from './attributeGenerator.js';
 
 // Generar pools expandidos de atributos (originales + generados)
 function generarPoolsExpandidos() {
@@ -68,7 +68,7 @@ export async function empezarPartida() {
         // ------------------------------------
 
         const actualizaciones = {};
-        let nombresDisponibles = [...Data.NOMBRES_PERSONAJE];
+        let nombresDisponibles = obtenerPoolNombres(30); // Pool expandido con nombres españoles
         let atributosBasicosDisponibles = [...Data.ATRIBUTOS_BRONCE];
 
         jugadorIDs.forEach((id) => {

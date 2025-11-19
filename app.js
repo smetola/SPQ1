@@ -158,15 +158,39 @@ elementRefs.btnCancelarUnirse.addEventListener('click', GameLogic.handleSalir);
 elementRefs.btnEmpezarPartida.addEventListener('click', GameLogic.empezarPartida);
 elementRefs.btnSalirLobby.addEventListener('click', GameLogic.handleSalir);
 
-// Modal de Testing de Atributos (opcional - solo si existe)
-elementRefs.btnTestearAtributos = document.getElementById('btnTestearAtributos');
-if (elementRefs.btnTestearAtributos) {
-    elementRefs.btnTestearAtributos.addEventListener('click', UIManager.mostrarModalTestAtributos);
+// Ajustes de Inicio (Engranaje)
+elementRefs.btnAjustesInicio = document.getElementById('btnAjustesInicio');
+elementRefs.menuAjustes = document.getElementById('menuAjustes');
+elementRefs.btnAbrirTestAtributos = document.getElementById('btnAbrirTestAtributos');
+
+if (elementRefs.btnAjustesInicio) {
+    elementRefs.btnAjustesInicio.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evitar que se cierre inmediatamente
+        const estaVisible = elementRefs.menuAjustes.style.display === 'block';
+        elementRefs.menuAjustes.style.display = estaVisible ? 'none' : 'block';
+    });
 }
+
+if (elementRefs.btnAbrirTestAtributos) {
+    elementRefs.btnAbrirTestAtributos.addEventListener('click', () => {
+        elementRefs.menuAjustes.style.display = 'none';
+        UIManager.mostrarModalTestAtributos();
+    });
+}
+
+// Cerrar menú al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if (elementRefs.menuAjustes && elementRefs.menuAjustes.style.display === 'block') {
+        if (!elementRefs.menuAjustes.contains(e.target) && !elementRefs.btnAjustesInicio.contains(e.target)) {
+            elementRefs.menuAjustes.style.display = 'none';
+        }
+    }
+});
 
 elementRefs.modalTestAtributos = document.getElementById('modalTestAtributos');
 elementRefs.btnCerrarTestAtributos = document.getElementById('btnCerrarTestAtributos');
 elementRefs.btnRegenerarTest = document.getElementById('btnRegenerarTest');
+elementRefs.btnRegenerarNombres = document.getElementById('btnRegenerarNombres');
 
 if (elementRefs.btnCerrarTestAtributos) {
     elementRefs.btnCerrarTestAtributos.addEventListener('click', UIManager.ocultarModalTestAtributos);
@@ -176,6 +200,10 @@ if (elementRefs.btnRegenerarTest) {
     elementRefs.btnRegenerarTest.addEventListener('click', UIManager.regenerarTestAtributos);
 }
 
+if (elementRefs.btnRegenerarNombres) {
+    elementRefs.btnRegenerarNombres.addEventListener('click', UIManager.regenerarTestNombres);
+}
+
 // Botones de selector de nivel en el modal de testing
 const botonesNivelTest = document.querySelectorAll('.btn-nivel-test');
 if (botonesNivelTest.length > 0) {
@@ -183,6 +211,17 @@ if (botonesNivelTest.length > 0) {
         btn.addEventListener('click', (e) => {
             const nivel = e.target.dataset.nivel;
             UIManager.cambiarNivelTest(nivel);
+        });
+    });
+}
+
+// Botones de pestañas en el modal de testing
+const botonesTabTest = document.querySelectorAll('.btn-tab-test');
+if (botonesTabTest.length > 0) {
+    botonesTabTest.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tab = e.target.dataset.tab;
+            UIManager.cambiarTabTest(tab);
         });
     });
 }

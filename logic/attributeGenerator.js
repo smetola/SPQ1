@@ -1,7 +1,38 @@
-// Generador algorítmico de atributos
+// Generador algorítmico de atributos y nombres
 // Se inspira en los atributos originales para crear nuevas combinaciones coherentes con cada nivel
 
-import { LISTAS_ATRIBUTOS } from '../gameData.js';
+import { LISTAS_ATRIBUTOS, NOMBRES_PERSONAJE } from '../gameData.js';
+
+// Pool de nombres españoles (comunes + antiguos/raros)
+const NOMBRES_ESPANOLES = {
+    comunes: [
+        "Antonio", "María", "José", "Ana", "Francisco", "Carmen", "Manuel", "Dolores",
+        "Juan", "Pilar", "Pedro", "Teresa", "Jesús", "Rosa", "Luis", "Josefa",
+        "Ángel", "Antonia", "Miguel", "Isabel", "Ramón", "Mercedes", "Rafael", "Concepción",
+        "Vicente", "Francisca", "Fernando", "Cristina", "Andrés", "Patricia",
+        "Pablo", "Beatriz", "Diego", "Natalia", "Raúl", "Silvia", "Álvaro", "Marta",
+        "Adrián", "Sandra", "Ignacio", "Claudia", "Óscar", "Irene", "Víctor", "Nerea"
+    ],
+    antiguos: [
+        "Hermenegildo", "Segismundo", "Rigoberto", "Casimiro", "Eustaquio", "Abundio",
+        "Fulgencio", "Gumersindo", "Policarpo", "Pancracio", "Críspulo", "Saturnino",
+        "Evaristo", "Remigio", "Nicomedes", "Anastasio", "Telesforo", "Restituto",
+        "Eusebio", "Baldomero", "Cesareo", "Demetrio", "Escolástico", "Froilán",
+        // Femeninos antiguos
+        "Eugenia", "Filomena", "Genoveva", "Herminia", "Leonor", "Perpetua",
+        "Clotilde", "Eduvigis", "Felicitas", "Gertrudis", "Hortensia", "Jacinta",
+        "Modesta", "Plácida", "Remedios", "Severina", "Visitación", "Aniceta",
+        "Basilisa", "Casilda", "Dorotea", "Escolástica", "Faustina", "Gregoria"
+    ],
+    raros: [
+        "Teófilo", "Hilario", "Cándido", "Primitivo", "Blas", "Melchor", "Gaspar", "Baltasar",
+        "Ambrosio", "Celestino", "Cipriano", "Emeterio", "Fermín", "Isidro", "Laureano",
+        // Femeninos raros
+        "Amparo", "Asunción", "Consuelo", "Encarnación", "Milagros", "Purificación",
+        "Rosario", "Soledad", "Trinidad", "Angustias", "Dolores", "Pastora",
+        "Covadonga", "Begoña", "Montserrat", "Fátima", "Rocío", "Inmaculada"
+    ]
+};
 
 // Plantillas y componentes por nivel (inspirados en los originales)
 const GENERADOR_CONFIG = {
@@ -141,5 +172,87 @@ export function generarLotePrueba(nivel, cantidad = 15) {
         tono: config ? config.tono : "desconocido",
         originales,
         generados
+    };
+}
+
+// --- FUNCIONES PARA GENERADOR DE NOMBRES ---
+
+/**
+ * Genera un nombre aleatorio español
+ * @param {string} tipo - 'comun', 'antiguo', 'raro', 'mixto' (por defecto 'mixto')
+ * @returns {string} Nombre generado
+ */
+export function generarNombre(tipo = 'mixto') {
+    if (tipo === 'mixto') {
+        // Mezcla: 50% comunes, 30% antiguos, 20% raros
+        const rand = Math.random();
+        if (rand < 0.5) {
+            tipo = 'comunes';
+        } else if (rand < 0.8) {
+            tipo = 'antiguos';
+        } else {
+            tipo = 'raros';
+        }
+    }
+    
+    const lista = NOMBRES_ESPANOLES[tipo] || NOMBRES_ESPANOLES.comunes;
+    return lista[Math.floor(Math.random() * lista.length)];
+}
+
+/**
+ * Obtiene pool completo de nombres: originales + generados
+ * @param {number} cantidadGenerados - Número de nombres a generar (por defecto 20)
+ * @returns {string[]} Pool combinado de nombres únicos
+ */
+export function obtenerPoolNombres(cantidadGenerados = 30) {
+    const originales = [...NOMBRES_PERSONAJE];
+    const generados = new Set();
+    const maxIntentos = cantidadGenerados * 10;
+    let intentos = 0;
+    
+    // Generar nombres únicos que no estén en originales
+    while (generados.size < cantidadGenerados && intentos < maxIntentos) {
+        const nombre = generarNombre('mixto');
+        if (!originales.includes(nombre)) {
+            generados.add(nombre);
+        }
+        intentos++;
+    }
+    
+    // Combinar y mezclar
+    const pool = [...originales, ...Array.from(generados)];
+    return mezclarArray(pool);
+}
+
+/**
+ * Genera un lote de prueba de nombres para visualización
+ * @param {number} cantidadPorTipo - Cantidad de nombres por cada tipo
+ * @returns {Object} { originales, comunes, antiguos, raros }
+ */
+export function generarLotePruebaNombres(cantidadPorTipo = 10) {
+    const originales = NOMBRES_PERSONAJE.slice(0, 8); // Muestra de originales
+    
+    // Generar nombres únicos por tipo
+    const comunes = new Set();
+    const antiguos = new Set();
+    const raros = new Set();
+    
+    while (comunes.size < cantidadPorTipo) {
+        comunes.add(generarNombre('comunes'));
+    }
+    
+    while (antiguos.size < cantidadPorTipo) {
+        antiguos.add(generarNombre('antiguos'));
+    }
+    
+    while (raros.size < cantidadPorTipo) {
+        raros.add(generarNombre('raros'));
+    }
+    
+    return {
+        originales,
+        comunes: Array.from(comunes),
+        antiguos: Array.from(antiguos),
+        raros: Array.from(raros)
     };
 }
