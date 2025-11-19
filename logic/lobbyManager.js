@@ -118,29 +118,134 @@ export async function unirseAPartida(codigo, nombre) {
     }).catch((error) => console.error("Error al comprobar la sala:", error));
 }
 
-// Salir de la partida
-export function handleSalir() {
+/**
+ * Transfiere el rol de anfitrión a otro jugador
+ * @param {string} nuevoAnfitrionId - ID del jugador que será el nuevo anfitrión
+ */
+export async function transferirAnfitrion(nuevoAnfitrionId) {
     const database = getDatabase();
+    const modal = getModalManager();
     
-    if (state.salaActual && state.jugadorIdActual) {
+    if (!state.salaActual || !state.jugadorIdActual) return;
+    
+    try {
         const refPartida = database.ref(`partidas/${state.salaActual}`);
-        const refJugador = database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`);
+        const refJugadorActual = database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`);
+        const refNuevoAnfitrion = database.ref(`partidas/${state.salaActual}/jugadores/${nuevoAnfitrionId}`);
         
-        // Cancelar handlers de onDisconnect antes de salir manualmente
-        refJugador.onDisconnect().cancel();
-        refPartida.onDisconnect().cancel(); // Para anfitrión
+        // 1. Cancelar el onDisconnect del anfitrión anterior (para que no borre la partida)
+        await refPartida.onDisconnect().cancel();
         
-        if (state.soyAnfitrion) {
-            // Anfitrión: borrar partida completa
-            refPartida.remove();
-        } else {
-            // Jugador: solo eliminarse a sí mismo
-            refJugador.remove();
-        }
+        // 2. Actualizar los roles en Firebase
+        await database.ref().update({
+            [`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}/esAnfitrion`]: false,
+            [`partidas/${state.salaActual}/jugadores/${nuevoAnfitrionId}/esAnfitrion`]: true
+        });
+        
+        // 3. Configurar onDisconnect del nuevo anfitrión
+        // IMPORTANTE: Esto se ejecutará en el cliente del nuevo anfitrión cuando detecte el cambio
+        // Por ahora, configuramos que si el nuevo anfitrión se desconecta, borre la partida
+        await refPartida.onDisconnect().remove();
+        
+        // 4. Actualizar estado local
+        state.soyAnfitrion = false;
+        
+        // 5. Mostrar mensaje de confirmación
+        await modal.mostrarAlerta(
+            "Has transferido el rol de anfitrión. El jugador seleccionado ahora tiene el control.",
+            "TRANSFERENCIA COMPLETADA"
+        );
+        
+        // 6. Proceder con la salida normal (ya no eres anfitrión)
+        refJugadorActual.onDisconnect().cancel();
+        await refJugadorActual.remove();
+        
+        resetState();
+        UI.volverAlMenu();
+        
+    } catch (error) {
+        console.error("Error al transferir anfitrión:", error);
+        await modal.mostrarAlerta("Error al transferir el rol de anfitrión.", "ERROR");
+    }
+}
+
+/**
+ * Salir de la partida
+ * Si eres anfitrión, muestra el modal de transferencia primero
+ */
+export async function handleSalir() {
+    const database = getDatabase();
+    const modal = getModalManager();
+    
+    if (!state.salaActual || !state.jugadorIdActual) {
+        resetState();
+        UI.volverAlMenu();
+        return;
     }
     
-    resetState();
-    UI.volverAlMenu();
+    // Si eres anfitrión, mostrar modal de transferencia
+    if (state.soyAnfitrion) {
+        // Obtener lista de otros jugadores
+        const snapshot = await database.ref(`partidas/${state.salaActual}/jugadores`).once('value');
+        const jugadores = snapshot.val();
+        
+        if (!jugadores) {
+            // No hay jugadores (caso raro), salir directamente
+            const refPartida = database.ref(`partidas/${state.salaActual}`);
+            refPartida.onDisconnect().cancel();
+            refPartida.remove();
+            resetState();
+            UI.volverAlMenu();
+            return;
+        }
+        
+        // Filtrar jugadores (excluir al anfitrión actual)
+        const otrosJugadores = Object.entries(jugadores)
+            .filter(([id, _]) => id !== state.jugadorIdActual)
+            .map(([id, datos]) => ({ id, nombre: datos.nombre }));
+        
+        if (otrosJugadores.length === 0) {
+            // No hay otros jugadores, solo cerrar partida
+            const confirmar = await modal.mostrarConfirmacion(
+                "Eres el único jugador en la partida. ¿Quieres cerrar la partida?",
+                "CERRAR PARTIDA"
+            );
+            
+            if (confirmar) {
+                const refPartida = database.ref(`partidas/${state.salaActual}`);
+                refPartida.onDisconnect().cancel();
+                refPartida.remove();
+                resetState();
+                UI.volverAlMenu();
+            }
+            return;
+        }
+        
+        // Mostrar modal de transferencia
+        const resultado = await modal.mostrarTransferenciaAnfitrion(otrosJugadores);
+        
+        if (resultado.accion === 'transferir' && resultado.jugadorId) {
+            // Transferir anfitrión y salir
+            await transferirAnfitrion(resultado.jugadorId);
+        } else if (resultado.accion === 'cerrar') {
+            // Cerrar partida para todos
+            const refPartida = database.ref(`partidas/${state.salaActual}`);
+            refPartida.onDisconnect().cancel();
+            refPartida.remove();
+            resetState();
+            UI.volverAlMenu();
+        }
+        // Si accion === 'cancelar', no hacer nada (quedarse en la partida)
+        
+    } else {
+        // No eres anfitrión: salida normal
+        const refJugador = database.ref(`partidas/${state.salaActual}/jugadores/${state.jugadorIdActual}`);
+        refJugador.onDisconnect().cancel();
+        refJugador.remove();
+        
+        resetState();
+        UI.volverAlMenu();
+    }
 }
 
 /**

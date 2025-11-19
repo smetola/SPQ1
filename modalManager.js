@@ -126,3 +126,55 @@ export function mostrarPrompt(mensaje, valorPorDefecto = "", titulo = "INTRODUCE
         modalRefs.modalGenericoInput.addEventListener('keypress', handleEnter);
     });
 }
+
+/**
+ * Muestra el modal de transferencia de anfitrión
+ * @param {Array} jugadores - Array de objetos {id, nombre} de jugadores disponibles
+ * @returns {Promise<{accion: 'transferir'|'cerrar'|'cancelar', jugadorId?: string}>}
+ */
+export function mostrarTransferenciaAnfitrion(jugadores) {
+    return new Promise((resolve) => {
+        // Construir la lista de jugadores
+        modalRefs.listaJugadoresTransferencia.innerHTML = '';
+        
+        jugadores.forEach(jugador => {
+            const item = document.createElement('div');
+            item.className = 'jugador-transferencia-item';
+            item.innerHTML = `
+                <span class="jugador-transferencia-nombre">${jugador.nombre}</span>
+                <span class="jugador-transferencia-flecha">→</span>
+            `;
+            
+            item.addEventListener('click', () => {
+                modalRefs.modalTransferenciaAnfitrion.style.display = 'none';
+                cleanup();
+                resolve({ accion: 'transferir', jugadorId: jugador.id });
+            });
+            
+            modalRefs.listaJugadoresTransferencia.appendChild(item);
+        });
+        
+        // Mostrar el modal
+        modalRefs.modalTransferenciaAnfitrion.style.display = 'flex';
+        
+        const handleCerrar = () => {
+            modalRefs.modalTransferenciaAnfitrion.style.display = 'none';
+            cleanup();
+            resolve({ accion: 'cerrar' });
+        };
+        
+        const handleCancelar = () => {
+            modalRefs.modalTransferenciaAnfitrion.style.display = 'none';
+            cleanup();
+            resolve({ accion: 'cancelar' });
+        };
+        
+        const cleanup = () => {
+            modalRefs.btnCerrarPartidaDefinitivo.removeEventListener('click', handleCerrar);
+            modalRefs.btnCancelarSalida.removeEventListener('click', handleCancelar);
+        };
+        
+        modalRefs.btnCerrarPartidaDefinitivo.addEventListener('click', handleCerrar);
+        modalRefs.btnCancelarSalida.addEventListener('click', handleCancelar);
+    });
+}

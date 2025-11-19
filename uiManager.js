@@ -154,13 +154,25 @@ export function actualizarListaLobby(jugadores, jugadorIdActual) {
  * ¡MODIFICADO!
  * Ya no acepta 'rondaActual'. El texto es genérico.
  */
-export function mostrarModalAsignacion(atributo) {
+export function mostrarModalAsignacion(atributo, estoyVivo = true) {
     refs.modalAsignarTitulo.textContent = "FASE DE ASIGNACIÓN";
     refs.modalAtributoTexto.textContent = atributo;
     refs.modalAsignarAtributo.style.display = 'flex';
     
+    // Añadir o quitar clase especial para muertos
+    if (!estoyVivo) {
+        refs.modalAsignarAtributo.classList.add('asignacion-opcional');
+    } else {
+        refs.modalAsignarAtributo.classList.remove('asignacion-opcional');
+    }
+    
     refs.gameRondaTitulo.textContent = "FASE DE ASIGNACIÓN";
-    refs.gameRondaInstruccion.textContent = "Desliza y pulsa en un personaje para asignarle tu atributo.";
+    
+    if (!estoyVivo) {
+        refs.gameRondaInstruccion.textContent = "(OPCIONAL) Puedes asignar tu atributo si quieres, pero el debate comenzará sin ti si no lo haces.";
+    } else {
+        refs.gameRondaInstruccion.textContent = "Desliza y pulsa en un personaje para asignarle tu atributo.";
+    }
 }
 
 export function mostrarModalQuienSoy(personaje) {

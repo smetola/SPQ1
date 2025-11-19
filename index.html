@@ -229,6 +229,26 @@
         </div>
     </div>
 
+    <!-- Modal de Transferencia de Anfitrión -->
+    <div id="modalTransferenciaAnfitrion" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-transferencia">
+            <h3 class="modal-transferencia-titulo">⚠️ ESPERA, ERES EL ANFITRIÓN</h3>
+            <p class="modal-transferencia-texto">
+                Si sales ahora, la partida se cerrará para todos. 
+                <strong>¿Quieres transferir el rol de anfitrión a otro jugador?</strong>
+            </p>
+            
+            <div id="listaJugadoresTransferencia" class="lista-jugadores-transferencia">
+                <!-- Se llenará dinámicamente con los jugadores -->
+            </div>
+
+            <div class="modal-transferencia-botones">
+                <button id="btnCerrarPartidaDefinitivo" class="btn-danger">[ CERRAR PARTIDA PARA TODOS ]</button>
+                <button id="btnCancelarSalida" class="btn-secondary">[ CANCELAR ]</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Testing de Generador de Atributos -->
     <!-- <div id="modalTestAtributos" class="modal-overlay" style="display: none;">
         <div class="modal-content modal-test-atributos">

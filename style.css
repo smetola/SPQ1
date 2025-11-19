@@ -288,6 +288,21 @@ body {
     margin-top: 0;
 }
 
+/* Estilo especial para modal de asignación opcional (jugadores muertos) */
+.modal-overlay.asignacion-opcional .modal-content {
+    border: 2px dashed #666666;
+    background-color: #2a2a2a;
+    opacity: 0.9;
+}
+
+.modal-overlay.asignacion-opcional .modal-content h3 {
+    color: #888888;
+}
+
+.modal-overlay.asignacion-opcional .atributo-a-asignar {
+    opacity: 0.7;
+}
+
 .modal-content p {
     font-size: 1rem;
     color: var(--color-texto-principal);
@@ -684,6 +699,93 @@ body {
 
 #modalGenericoInput {
     margin: 15px 0;
+}
+
+/* --- ================================= --- */
+/* --- ESTILOS MODAL TRANSFERENCIA ANFITRIÓN --- */
+/* --- ================================= --- */
+
+.modal-transferencia {
+    max-width: 500px;
+}
+
+.modal-transferencia-titulo {
+    font-family: var(--font-titulo);
+    color: var(--color-acento);
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
+}
+
+.modal-transferencia-texto {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: var(--color-texto-principal);
+}
+
+.lista-jugadores-transferencia {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px dashed var(--color-borde);
+    padding: 15px;
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.jugador-transferencia-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: var(--color-papel);
+    border: 1px solid var(--color-borde);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.jugador-transferencia-item:hover {
+    background-color: rgba(211, 47, 47, 0.1);
+    border-color: var(--color-acento);
+    transform: translateX(5px);
+}
+
+.jugador-transferencia-nombre {
+    font-family: var(--font-cuerpo);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-texto-principal);
+}
+
+.jugador-transferencia-flecha {
+    font-size: 1.2rem;
+    color: var(--color-acento);
+}
+
+.modal-transferencia-botones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-danger {
+    font-family: var(--font-cuerpo);
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 12px;
+    background-color: rgba(211, 47, 47, 0.3);
+    color: #FFFFFF;
+    border: 2px solid var(--color-acento);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-danger:hover {
+    background-color: var(--color-acento);
+    transform: scale(1.02);
 }
 
 /* --- ================================= --- */

@@ -69,6 +69,12 @@ const elementRefs = {
     btnModalGenericoConfirmar: document.getElementById('btnModalGenericoConfirmar'),
     btnModalGenericoCancelar: document.getElementById('btnModalGenericoCancelar'),
 
+    // Modal de transferencia de anfitrión
+    modalTransferenciaAnfitrion: document.getElementById('modalTransferenciaAnfitrion'),
+    listaJugadoresTransferencia: document.getElementById('listaJugadoresTransferencia'),
+    btnCerrarPartidaDefinitivo: document.getElementById('btnCerrarPartidaDefinitivo'),
+    btnCancelarSalida: document.getElementById('btnCancelarSalida'),
+
     // Pantalla de historia
     storyScreen: document.getElementById('storyScreen'),
     storyTitulo: document.getElementById('storyTitulo'),

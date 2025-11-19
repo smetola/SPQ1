@@ -1,6 +1,6 @@
 // logic/firebaseSync.js - Sincronización con Firebase (listeners)
 
-import { state, getDatabase } from './gameState.js';
+import { state, getDatabase, getModalManager } from './gameState.js';
 import * as UI from '../uiManager.js';
 import { comprobarYEliminar } from './votingManager.js';
 
@@ -14,7 +14,49 @@ export function escucharJugadoresEnLobby() {
     console.log('👂 Listener de jugadores en lobby activado');
     
     state.refJugadoresEnLobby.on('value', (snapshot) => {
-        UI.actualizarListaLobby(snapshot.val(), state.jugadorIdActual);
+        const jugadores = snapshot.val();
+        
+        // Actualizar la lista visual del lobby
+        UI.actualizarListaLobby(jugadores, state.jugadorIdActual);
+        
+        // NUEVO: Detectar si nos han transferido el rol de anfitrión
+        if (jugadores && state.jugadorIdActual && jugadores[state.jugadorIdActual]) {
+            const esAnfitrionAhora = jugadores[state.jugadorIdActual].esAnfitrion === true;
+            
+            if (esAnfitrionAhora && !state.soyAnfitrion) {
+                console.log('🎖️ ¡Has recibido el rol de anfitrión!');
+                state.soyAnfitrion = true;
+                
+                // Configurar onDisconnect para proteger la partida
+                const refPartida = database.ref(`partidas/${state.salaActual}`);
+                refPartida.onDisconnect().remove();
+                console.log('🔒 Configurado onDisconnect como nuevo anfitrión');
+                
+                // Mostrar notificación al nuevo anfitrión
+                const modal = getModalManager();
+                if (modal) {
+                    modal.mostrarAlerta(
+                        "El anfitrión anterior ha transferido su rol. Ahora tú controlas la partida.",
+                        "🎖️ ERES EL NUEVO ANFITRIÓN"
+                    ).then(() => {
+                        // Después de cerrar el modal, actualizar la UI
+                        UI.actualizarListaLobby(jugadores, state.jugadorIdActual);
+                    });
+                } else {
+                    // Si no hay modal manager, actualizar directamente
+                    UI.actualizarListaLobby(jugadores, state.jugadorIdActual);
+                }
+            } else if (!esAnfitrionAhora && state.soyAnfitrion) {
+                console.log('📤 Has perdido el rol de anfitrión');
+                state.soyAnfitrion = false;
+                
+                // Cancelar onDisconnect de partida (ya no eres responsable)
+                const refPartida = database.ref(`partidas/${state.salaActual}`);
+                refPartida.onDisconnect().cancel();
+                
+                UI.actualizarListaLobby(jugadores, state.jugadorIdActual);
+            }
+        }
     }, (error) => {
         console.error('❌ Error en listener de lobby:', error);
     });
@@ -100,6 +142,55 @@ export function escucharDatosJuego() {
             state.primeraCargaJuego = false;
         }
 
+        // NUEVO: Detectar transferencia de anfitrión durante el juego
+        // IMPORTANTE: Hacer esto ANTES de procesar la lógica de botones
+        if (jugadores && state.jugadorIdActual && jugadores[state.jugadorIdActual]) {
+            const esAnfitrionAhora = jugadores[state.jugadorIdActual].esAnfitrion === true;
+            
+            if (esAnfitrionAhora && !state.soyAnfitrion) {
+                console.log('🎖️ ¡Has recibido el rol de anfitrión durante el juego!');
+                state.soyAnfitrion = true;
+                
+                // Configurar onDisconnect para proteger la partida
+                const refPartida = database.ref(`partidas/${state.salaActual}`);
+                refPartida.onDisconnect().remove();
+                console.log('🔒 Configurado onDisconnect como nuevo anfitrión (durante juego)');
+                
+                // Actualizar la UI según la fase actual
+                if (faseActual === 'conocimiento') {
+                    UI.mostrarPantallaJuego(true); // Mostrar con botón de anfitrión
+                    UI.ocultarMensajeEspera();
+                }
+                
+                // Mostrar notificación al nuevo anfitrión (sin bloquear el flujo)
+                const modal = getModalManager();
+                if (modal) {
+                    // No await aquí - dejar que el modal se muestre pero continuar el procesamiento
+                    setTimeout(() => {
+                        modal.mostrarAlerta(
+                            "El anfitrión anterior ha transferido su rol. Ahora tú controlas la partida.",
+                            "🎖️ ERES EL NUEVO ANFITRIÓN"
+                        );
+                    }, 100);
+                }
+                
+                // La UI se actualizará automáticamente en este mismo ciclo (más abajo)
+            } else if (!esAnfitrionAhora && state.soyAnfitrion) {
+                console.log('📤 Has perdido el rol de anfitrión durante el juego');
+                state.soyAnfitrion = false;
+                
+                // Cancelar onDisconnect de partida (ya no eres responsable)
+                const refPartida = database.ref(`partidas/${state.salaActual}`);
+                refPartida.onDisconnect().cancel();
+                
+                // Ocultar botones de anfitrión
+                if (faseActual === 'conocimiento') {
+                    UI.ocultarBotonComenzarRonda();
+                    UI.mostrarMensajeEspera("Esperando a que el anfitrión comience la ronda...");
+                }
+            }
+        }
+
         // --- 1. Actualizar datos locales y UI básica ---
         if (jugadores && faseActual !== 'fin') { 
             const recuentoVotos = {};
@@ -127,7 +218,13 @@ export function escucharDatosJuego() {
 
         // --- 2. Lógica de botones del Anfitrión (Fase Asignación) ---
         if (state.soyAnfitrion && faseActual === 'asignacion') {
-            const faltanPorAsignar = jugadores ? Object.values(jugadores).filter(j => j.atributoParaAsignar).length : 0;
+            // Ocultar mensajes de espera (ahora controlas tú)
+            UI.ocultarMensajeEspera();
+            
+            // Solo contar jugadores VIVOS que faltan por asignar
+            const jugadoresVivos = jugadores ? Object.values(jugadores).filter(j => j.personaje?.estaVivo) : [];
+            const faltanPorAsignar = jugadoresVivos.filter(j => j.atributoParaAsignar).length;
+            
             if (faltanPorAsignar === 0) {
                 UI.mostrarBotonComenzarDebate();
             } else {
@@ -135,18 +232,21 @@ export function escucharDatosJuego() {
             }
         }
         
-        // --- 2.5. Mensajes de espera en Fase de Asignación (para no anfitrión) ---
-        if (!state.soyAnfitrion && faseActual === 'asignacion') {
+        // --- 2.5. Mensajes de espera en Fase de Asignación (para no anfitriones) ---
+        else if (!state.soyAnfitrion && faseActual === 'asignacion') {
             const miEstadoEnAsignacion = jugadores[state.jugadorIdActual] || {};
             const heAsignadoYa = !miEstadoEnAsignacion.atributoParaAsignar; // Si NO tiene atributo, ya lo asignó
+            const estoyVivo = miEstadoEnAsignacion.personaje?.estaVivo ?? true;
             
             if (heAsignadoYa) {
-                // Ya asignó su atributo, esperar a que otros terminen
-                const faltanPorAsignar = Object.values(jugadores).filter(j => j.atributoParaAsignar).length;
+                // Ya asignó su atributo (o está muerto), esperar a que otros terminen
+                const jugadoresVivos = Object.values(jugadores).filter(j => j.personaje?.estaVivo);
+                const faltanPorAsignar = jugadoresVivos.filter(j => j.atributoParaAsignar).length;
+                
                 if (faltanPorAsignar > 0) {
-                    UI.mostrarMensajeEspera(`Esperando a que ${faltanPorAsignar} jugador${faltanPorAsignar > 1 ? 'es' : ''} coloque${faltanPorAsignar > 1 ? 'n' : ''} su${faltanPorAsignar > 1 ? 's' : ''} atributo${faltanPorAsignar > 1 ? 's' : ''}...`);
+                    UI.mostrarMensajeEspera(`Esperando a que ${faltanPorAsignar} superviviente${faltanPorAsignar > 1 ? 's' : ''} coloque${faltanPorAsignar > 1 ? 'n' : ''} su${faltanPorAsignar > 1 ? 's' : ''} atributo${faltanPorAsignar > 1 ? 's' : ''}...`);
                 } else {
-                    // Todos asignaron, esperar a que el anfitrión comience el debate
+                    // Todos los vivos asignaron, esperar a que el anfitrión comience el debate
                     UI.mostrarMensajeEspera("Esperando a que el anfitrión comience el debate...");
                 }
             } else {
@@ -243,7 +343,8 @@ export function escucharDatosJuego() {
                 state.processingVote = false;
                 UI.ocultarBotonComenzarRonda();
                 if (state.miAtributoParaAsignar) {
-                    UI.mostrarModalAsignacion(state.miAtributoParaAsignar);
+                    const estoyVivo = jugadores[state.jugadorIdActual]?.personaje?.estaVivo ?? true;
+                    UI.mostrarModalAsignacion(state.miAtributoParaAsignar, estoyVivo);
                 }
                 UI.ocultarMensajeEspera(); // Se oculta en el modal
             } 
