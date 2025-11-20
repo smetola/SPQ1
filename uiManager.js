@@ -1,6 +1,6 @@
 // Contenido para: uiManager.js
 
-import { generarLotePrueba } from './logic/attributeGenerator.js';
+import { generarLotePrueba, generarLotePruebaNombres } from './logic/attributeGenerator.js';
 
 // Almacén para las referencias del DOM
 let refs = {};
@@ -545,5 +545,57 @@ export function actualizarMensajeEsperaSegunFase(fase) {
     
     const mensaje = mensajes[fase] || 'Esperando...';
     mostrarMensajeEspera(mensaje);
+}
+
+/**
+ * Cambia la pestaña activa en el modal de testing
+ */
+export function cambiarTabTest(tabId) {
+    // Actualizar botones
+    document.querySelectorAll('.btn-tab-test').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.tab === tabId) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Actualizar contenido
+    // Construimos el ID esperado: 'testTab' + 'Nombres' (Capitalizado)
+    const targetId = 'testTab' + tabId.charAt(0).toUpperCase() + tabId.slice(1);
+
+    document.querySelectorAll('.test-tab-content').forEach(content => {
+        if (content.id === targetId) {
+            content.style.display = 'block';
+        } else {
+            content.style.display = 'none';
+        }
+    });
+
+    // Si es la pestaña de nombres, cargar datos iniciales si está vacía
+    if (tabId === 'nombres') {
+        const lista = document.getElementById('testNombresComunes');
+        if (lista && lista.children.length === 0) {
+            regenerarTestNombres();
+        }
+    }
+}
+
+/**
+ * Regenera los nombres de prueba
+ */
+export function regenerarTestNombres() {
+    const lote = generarLotePruebaNombres(10);
+    
+    renderizarListaNombres('testNombresOriginales', lote.originales);
+    renderizarListaNombres('testNombresComunes', lote.comunes);
+    renderizarListaNombres('testNombresAntiguos', lote.antiguos);
+    renderizarListaNombres('testNombresRaros', lote.raros);
+}
+
+function renderizarListaNombres(elementId, nombres) {
+    const lista = document.getElementById(elementId);
+    if (lista) {
+        lista.innerHTML = nombres.map(n => `<li>${n}</li>`).join('');
+    }
 }
 

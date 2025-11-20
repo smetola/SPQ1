@@ -1029,6 +1029,7 @@ body {
 
 /* --- Estilos para Modal de Testing de Atributos --- */
 .modal-test-atributos {
+    width: 95%; /* Sobrescribe el ancho fijo de 350px del modal estándar */
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
@@ -1174,7 +1175,10 @@ body {
     color: var(--color-texto-principal);
 }
 
-#testGeneradosLista li {
+#testGeneradosLista li,
+#testNombresComunes li,
+#testNombresAntiguos li,
+#testNombresRaros li {
     border-left-color: #4CAF50; /* Verde para generados */
 }
 
