@@ -15,7 +15,7 @@ export function init(refs) {
  * @param {string} mensaje - El texto a mostrar
  * @param {string} titulo - Título del modal (opcional)
  * @returns {Promise<void>}
- */
+ *///
 export function mostrarAlerta(mensaje, titulo = "ATENCIÓN") {
     return new Promise((resolve) => {
         modalRefs.modalGenericoTitulo.textContent = titulo;
@@ -90,7 +90,7 @@ export function mostrarPrompt(mensaje, valorPorDefecto = "", titulo = "INTRODUCE
         modalRefs.btnModalGenericoCancelar.textContent = '[ CANCELAR ]';
         modalRefs.btnModalGenericoCancelar.style.display = 'block';
         modalRefs.modalGenerico.style.display = 'flex';
-        
+
         // Focus en el input
         setTimeout(() => modalRefs.modalGenericoInput.focus(), 100);
 
@@ -136,7 +136,7 @@ export function mostrarTransferenciaAnfitrion(jugadores) {
     return new Promise((resolve) => {
         // Construir la lista de jugadores
         modalRefs.listaJugadoresTransferencia.innerHTML = '';
-        
+
         jugadores.forEach(jugador => {
             const item = document.createElement('div');
             item.className = 'jugador-transferencia-item';
@@ -144,36 +144,36 @@ export function mostrarTransferenciaAnfitrion(jugadores) {
                 <span class="jugador-transferencia-nombre">${jugador.nombre}</span>
                 <span class="jugador-transferencia-flecha">→</span>
             `;
-            
+
             item.addEventListener('click', () => {
                 modalRefs.modalTransferenciaAnfitrion.style.display = 'none';
                 cleanup();
                 resolve({ accion: 'transferir', jugadorId: jugador.id });
             });
-            
+
             modalRefs.listaJugadoresTransferencia.appendChild(item);
         });
-        
+
         // Mostrar el modal
         modalRefs.modalTransferenciaAnfitrion.style.display = 'flex';
-        
+
         const handleCerrar = () => {
             modalRefs.modalTransferenciaAnfitrion.style.display = 'none';
             cleanup();
             resolve({ accion: 'cerrar' });
         };
-        
+
         const handleCancelar = () => {
             modalRefs.modalTransferenciaAnfitrion.style.display = 'none';
             cleanup();
             resolve({ accion: 'cancelar' });
         };
-        
+
         const cleanup = () => {
             modalRefs.btnCerrarPartidaDefinitivo.removeEventListener('click', handleCerrar);
             modalRefs.btnCancelarSalida.removeEventListener('click', handleCancelar);
         };
-        
+
         modalRefs.btnCerrarPartidaDefinitivo.addEventListener('click', handleCerrar);
         modalRefs.btnCancelarSalida.addEventListener('click', handleCancelar);
     });
