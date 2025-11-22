@@ -6,12 +6,16 @@
 :root {
     --font-titulo: 'Special Elite', monospace;
     --font-cuerpo: 'Roboto', sans-serif;
-    
+
     /* Paleta de colores "Dossier Oscuro" */
-    --color-fondo: #212121; /* Un gris muy oscuro (casi negro) */
-    --color-papel: #333333; /* Un gris oscuro para los contenedores */
-    --color-texto-principal: #E0E0E0; /* Texto principal (casi blanco) */
-    --color-acento: #D32F2F; /* Rojo oscuro para sellos y alertas */
+    --color-fondo: #212121;
+    /* Un gris muy oscuro (casi negro) */
+    --color-papel: #333333;
+    /* Un gris oscuro para los contenedores */
+    --color-texto-principal: #E0E0E0;
+    /* Texto principal (casi blanco) */
+    --color-acento: #D32F2F;
+    /* Rojo oscuro para sellos y alertas */
     --color-borde: #555555;
 }
 
@@ -27,40 +31,247 @@ body {
     align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
-    position: relative; /* Para posicionar el botón de salida */
-    overflow: hidden; /* Evitar scrollbars por el video */
+    position: relative;
+    /* Para posicionar el botón de salida */
+    overflow-y: auto;
+    /* Permitir scroll vertical */
+    overflow-x: hidden;
 }
 
-/* --- Video de Fondo --- */
-.video-background {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -2;
-    object-fit: cover;
-}
-
-.video-overlay {
+/* --- Fondo Atmosférico --- */
+.bg-fixed {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Oscurecer el video para legibilidad */
-    z-index: -1;
+    z-index: -2;
+    background-color: #0a0a0a;
+    /* Negro más profundo */
+    overflow: hidden;
+    animation: screen-distortion 8s infinite linear;
+    /* Distorsión ocasional */
+}
+
+@keyframes screen-distortion {
+
+    0%,
+    95% {
+        transform: skewX(0) scale(1);
+        filter: brightness(1);
+    }
+
+    96% {
+        transform: skewX(2deg) scale(1.01);
+        filter: brightness(1.2);
+    }
+
+    97% {
+        transform: skewX(-2deg) scale(1.01);
+        filter: brightness(0.8);
+    }
+
+    98% {
+        transform: skewX(1deg) scale(1);
+        filter: brightness(1.1);
+    }
+
+    99% {
+        transform: skewX(0) scale(1);
+        filter: brightness(1);
+    }
+
+    100% {
+        transform: skewX(0) scale(1);
+    }
+}
+
+/* 1. Ruido (Noise) - Estática de TV */
+.bg-noise {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.15"/%3E%3C/svg%3E');
+    animation: noise-animation 0.2s infinite steps(5);
+    /* Más rápido y "cortado" */
+    pointer-events: none;
+}
+
+@keyframes noise-animation {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(-10%, 10%);
+    }
+
+    40% {
+        transform: translate(-20%, -10%);
+    }
+
+    60% {
+        transform: translate(10%, -20%);
+    }
+
+    80% {
+        transform: translate(20%, 20%);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* 2. Scanline (Línea de escáner) */
+.bg-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.2) 50%,
+            rgba(0, 0, 0, 0.2));
+    background-size: 100% 4px;
+    animation: scanline-scroll 10s linear infinite;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+@keyframes scanline-scroll {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 0 100%;
+    }
+}
+
+/* 3. Partículas de polvo */
+.bg-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(#ffffff 1px, transparent 1px),
+        radial-gradient(#ffffff 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: 0 0, 25px 25px;
+    opacity: 0.1;
+    animation: particle-float 20s linear infinite;
+}
+
+@keyframes particle-float {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50px);
+    }
+}
+
+/* --- Efecto Glitch para el Título --- */
+.header h1 {
+    position: relative;
+    /* El resto de estilos se heredan, añadimos esto para el glitch */
+}
+
+.header h1::before,
+.header h1::after {
+    content: "SOLO PUEDE QUEDAR 1";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-papel);
+    /* Mismo fondo para ocultar el original */
+    overflow: hidden;
+    clip-path: inset(0 0 0 0);
+    /* Por defecto no recorta nada */
+    opacity: 0;
+}
+
+.header h1::before {
+    left: 2px;
+    text-shadow: -1px 0 red;
+    animation: glitch-anim-1 3s infinite linear alternate-reverse;
+}
+
+.header h1::after {
+    left: -2px;
+    text-shadow: -1px 0 blue;
+    animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% {
+        clip-path: inset(20% 0 80% 0);
+        opacity: 0;
+    }
+
+    2% {
+        clip-path: inset(20% 0 80% 0);
+        opacity: 1;
+    }
+
+    4% {
+        clip-path: inset(60% 0 10% 0);
+        opacity: 1;
+    }
+
+    5% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0% {
+        clip-path: inset(10% 0 60% 0);
+        opacity: 0;
+    }
+
+    2% {
+        clip-path: inset(10% 0 60% 0);
+        opacity: 1;
+    }
+
+    4% {
+        clip-path: inset(80% 0 5% 0);
+        opacity: 1;
+    }
+
+    5% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .container {
     width: 100%;
-    max-width: 400px; /* Ancho máximo para móviles */
+    max-width: 400px;
+    /* Ancho máximo para móviles */
     padding: 20px;
     background-color: var(--color-papel);
     border: 1px solid var(--color-borde);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidad */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    /* Sombra para dar profundidad */
     text-align: center;
 }
 
@@ -73,8 +284,10 @@ body {
 
 .header h1 {
     font-family: var(--font-titulo);
-    color: var(--color-acento); /* Título en rojo "sello" */
-    font-size: 2.5rem; /* 2.5 veces el tamaño normal */
+    color: var(--color-acento);
+    /* Título en rojo "sello" */
+    font-size: 2.5rem;
+    /* 2.5 veces el tamaño normal */
     margin: 0;
 }
 
@@ -89,53 +302,71 @@ body {
 .main-menu {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Espacio entre los botones */
-    position: relative; /* Para posicionar el botón de ajustes */
+    gap: 15px;
+    /* Espacio entre los botones */
+    position: relative;
+    /* Para posicionar el botón de ajustes */
 }
 
 /* --- Botón de Ajustes (Engranaje) --- */
 .btn-settings {
-    position: fixed; /* Fijo en la pantalla, igual que el botón de salida */
+    position: fixed;
+    /* Fijo en la pantalla, igual que el botón de salida */
     top: 15px;
     left: 15px;
-    width: 32px; /* Más pequeño */
-    height: 32px; /* Más pequeño */
-    background: none; /* Sin fondo por defecto */
-    border: none; /* Sin borde por defecto */
-    border-radius: 50%; /* Redondo */
+    width: 32px;
+    /* Más pequeño */
+    height: 32px;
+    /* Más pequeño */
+    background: none;
+    /* Sin fondo por defecto */
+    border: none;
+    /* Sin borde por defecto */
+    border-radius: 50%;
+    /* Redondo */
     cursor: pointer;
     padding: 6px;
-    color: #444444; /* Gris muy oscuro, casi invisible */
+    color: #444444;
+    /* Gris muy oscuro, casi invisible */
     transition: all 0.3s ease;
-    z-index: 1000; /* Alto z-index para estar encima */
+    z-index: 1000;
+    /* Alto z-index para estar encima */
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.6; /* Semi-transparente */
+    opacity: 0.6;
+    /* Semi-transparente */
 }
 
 .btn-settings:hover {
-    background-color: rgba(255, 255, 255, 0.05); /* Fondo muy sutil al hover */
-    color: var(--color-texto-principal); /* Se ilumina al hover */
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Fondo muy sutil al hover */
+    color: var(--color-texto-principal);
+    /* Se ilumina al hover */
     opacity: 1;
     transform: rotate(90deg);
 }
 
 .btn-settings svg {
-    width: 20px; /* Icono más pequeño */
-    height: 20px; /* Icono más pequeño */
+    width: 20px;
+    /* Icono más pequeño */
+    height: 20px;
+    /* Icono más pequeño */
 }
 
 /* --- Menú Desplegable de Ajustes --- */
 .settings-menu {
-    position: fixed; /* Fijo para acompañar al botón */
-    top: 50px; /* Ajustado a la nueva altura */
-    left: 15px; /* Alineado a la izquierda */
+    position: fixed;
+    /* Fijo para acompañar al botón */
+    top: 50px;
+    /* Ajustado a la nueva altura */
+    left: 15px;
+    /* Alineado a la izquierda */
     background-color: var(--color-fondo);
     border: 1px solid var(--color-borde);
     padding: 5px;
     border-radius: 4px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     z-index: 1001;
     min-width: 200px;
     animation: fadeIn 0.2s ease;
@@ -166,17 +397,21 @@ body {
     font-weight: 700;
     font-size: 1.2rem;
     padding: 15px;
-    background-color: var(--color-acento); /* Fondo rojo */
-    color: #FFFFFF; /* Texto blanco */
+    background-color: var(--color-acento);
+    /* Fondo rojo */
+    color: #FFFFFF;
+    /* Texto blanco */
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    text-transform: uppercase; /* MAYÚSCULAS */
+    text-transform: uppercase;
+    /* MAYÚSCULAS */
     letter-spacing: 1px;
 }
 
 .btn-primary:hover {
-    background-color: #F44336; /* Un rojo más brillante al pasar el ratón */
+    background-color: #F44336;
+    /* Un rojo más brillante al pasar el ratón */
 }
 
 /* --- Botón de salida (esquina superior izquierda) --- */
@@ -187,12 +422,14 @@ body {
     width: 40px;
     height: 40px;
     padding: 8px;
-    background-color: rgba(51, 51, 51, 0.8); /* Fondo semi-transparente */
+    background-color: rgba(51, 51, 51, 0.8);
+    /* Fondo semi-transparente */
     border: 1px solid var(--color-borde);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 1000; /* Para que esté siempre encima */
+    z-index: 1000;
+    /* Para que esté siempre encima */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -221,7 +458,8 @@ body {
 /* --- ================================= --- */
 
 .lobby-screen {
-    display: flex; /* Lo cambiaremos a 'flex' con JS para mostrarlo */
+    display: flex;
+    /* Lo cambiaremos a 'flex' con JS para mostrarlo */
     flex-direction: column;
     gap: 25px;
 }
@@ -230,7 +468,8 @@ body {
     text-align: center;
     border: 1px dashed var(--color-borde);
     padding: 15px;
-    background-color: var(--color-fondo); /* Fondo más oscuro para contraste */
+    background-color: var(--color-fondo);
+    /* Fondo más oscuro para contraste */
 }
 
 .lobby-info span {
@@ -282,14 +521,17 @@ body {
     font-weight: 400;
     font-size: 0.9rem;
     padding: 10px;
-    background-color: transparent; /* Sin fondo */
-    color: var(--color-texto-principal); /* Texto normal */
+    background-color: transparent;
+    /* Sin fondo */
+    color: var(--color-texto-principal);
+    /* Texto normal */
     border: 1px solid var(--color-borde);
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-top: 10px; /* Separación */
+    margin-top: 10px;
+    /* Separación */
 }
 
 .btn-secondary:hover {
@@ -303,9 +545,11 @@ body {
 /* --- ================================= --- */
 
 .join-screen {
-    display: flex; /* Se activará con JS */
+    display: flex;
+    /* Se activará con JS */
     flex-direction: column;
-    gap: 15px; /* Espacio entre elementos */
+    gap: 15px;
+    /* Espacio entre elementos */
 }
 
 .join-screen h4 {
@@ -350,16 +594,19 @@ body {
 /* ---     ESTILOS MODAL (POP-UP)        --- */
 /* --- ================================= --- */
 .modal-overlay {
-    position: fixed; /* Cubre toda la pantalla */
+    position: fixed;
+    /* Cubre toda la pantalla */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro semi-transparente */
+    background-color: rgba(0, 0, 0, 0.85);
+    /* Fondo oscuro semi-transparente */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Por encima de todo */
+    z-index: 1000;
+    /* Por encima de todo */
     padding: 20px;
     box-sizing: border-box;
 }
@@ -368,7 +615,7 @@ body {
     background-color: var(--color-papel);
     padding: 25px;
     border: 1px solid var(--color-borde);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.7);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
     text-align: center;
     max-width: 90%;
     width: 350px;
@@ -405,25 +652,32 @@ body {
 /* Ficha de personaje DENTRO del modal */
 .character-card-modal {
     background-color: var(--color-fondo);
-    border: 1px dashed var(--color-acento); /* Borde rojo para destacarlo */
+    border: 1px dashed var(--color-acento);
+    /* Borde rojo para destacarlo */
     padding: 15px;
     text-align: left;
     margin-bottom: 25px;
 }
+
 .character-card-modal h4 {
     font-family: var(--font-titulo);
     color: var(--color-acento);
     font-size: 1.5rem;
     margin: 0 0 10px 0;
 }
+
 .character-card-modal span {
     font-family: var(--font-cuerpo);
     font-size: 1rem;
     color: var(--color-texto-principal);
     display: block;
 }
+
 .character-card-modal ul {
-    list-style: none; padding: 0; margin: 10px 0 0 0; font-size: 0.9rem;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    font-size: 0.9rem;
 }
 
 
@@ -432,11 +686,12 @@ body {
 /* --- ================================= --- */
 
 .game-screen {
-    display: flex; /* Se activará con JS */
+    display: flex;
+    /* Se activará con JS */
     flex-direction: column;
     width: 100%;
     /* Quitamos el max-width del .container para esta pantalla */
-    max-width: none; 
+    max-width: none;
 }
 
 .game-screen h3 {
@@ -461,7 +716,8 @@ body {
     right: 20px;
     width: 50px;
     height: 50px;
-    border-radius: 50%; /* Redondo */
+    border-radius: 50%;
+    /* Redondo */
     background-color: var(--color-acento);
     color: white;
     font-family: var(--font-titulo);
@@ -470,7 +726,7 @@ body {
     text-align: center;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     z-index: 500;
     padding: 0;
 }
@@ -479,40 +735,48 @@ body {
 
 .carousel-container {
     width: 100%;
-    overflow-x: scroll; /* Permite deslizar horizontalmente */
+    overflow-x: scroll;
+    /* Permite deslizar horizontalmente */
     /* Magia: Hacemos que el scroll "frene" en cada tarjeta */
-    scroll-snap-type: x mandatory; 
-    
+    scroll-snap-type: x mandatory;
+
     /* Ocultamos la barra de scroll */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE y Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE y Edge */
 }
+
 .carousel-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none;
+    /* Chrome, Safari */
 }
 
 .carousel {
     display: flex;
-    flex-wrap: nowrap; /* Impide que salte de línea */
-    gap: 20px; /* Espacio entre tarjetas */
+    flex-wrap: nowrap;
+    /* Impide que salte de línea */
+    gap: 20px;
+    /* Espacio entre tarjetas */
     /* Añadimos padding para que la primera y última tarjeta
        puedan centrarse (truco de UX) */
-    padding: 0 30px; 
+    padding: 0 30px;
 }
 
 /* Tarjeta de Personaje (Folio) */
 .character-card {
-    position: relative; /* ¡MUY IMPORTANTE! Para el contador de votos */
+    position: relative;
+    /* ¡MUY IMPORTANTE! Para el contador de votos */
     flex: 0 0 80%;
     max-width: 320px;
     background-color: var(--color-papel);
     border: 1px solid var(--color-borde);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     padding: 20px;
     box-sizing: border-box;
     scroll-snap-align: center;
     text-align: left;
-    
+
     /* Feedback visual (que ya teníamos) */
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
@@ -547,8 +811,10 @@ body {
     padding: 5px;
     border-bottom: 1px dotted var(--color-borde);
 }
+
 .character-card li:first-child {
-    font-weight: bold; /* El atributo básico en negrita */
+    font-weight: bold;
+    /* El atributo básico en negrita */
 }
 
 /* --- ================================= --- */
@@ -576,27 +842,31 @@ body {
 
 .character-card {
     /* ... (tus estilos existentes) ... */
-    
+
     /* ¡NUEVO! Añadimos feedback visual */
-    cursor: pointer; /* Muestra una "manita" al pasar por encima */
+    cursor: pointer;
+    /* Muestra una "manita" al pasar por encima */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .character-card:hover {
-    transform: translateY(-5px); /* Se eleva ligeramente */
-    box-shadow: 0 8px 15px rgba(0,0,0,0.5); /* Sombra más pronunciada */
+    transform: translateY(-5px);
+    /* Se eleva ligeramente */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+    /* Sombra más pronunciada */
 }
 
 /* Estilo para tarjetas de personajes muertos (lo usaremos en el futuro) */
 .character-card.muerto {
-    background-color: #424242; /* Fondo más oscuro */
+    background-color: #424242;
+    /* Fondo más oscuro */
     opacity: 0.6;
     cursor: not-allowed;
 }
 
 .character-card.muerto:hover {
     transform: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* --- ================================= --- */
@@ -605,8 +875,10 @@ body {
 
 .game-timer {
     font-family: var(--font-titulo);
-    font-size: 3rem; /* Tamaño grande */
-    color: var(--color-acento); /* Color rojo de "alerta" */
+    font-size: 3rem;
+    /* Tamaño grande */
+    color: var(--color-acento);
+    /* Color rojo de "alerta" */
     text-align: center;
     margin: 10px 0 20px 0;
     letter-spacing: 2px;
@@ -642,8 +914,10 @@ body {
 
 /* Resaltado para la tarjeta que HE seleccionado */
 .character-card.selected {
-    border: 2px solid #FFFFFF; /* Borde blanco */
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); /* Brillo blanco */
+    border: 2px solid #FFFFFF;
+    /* Borde blanco */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+    /* Brillo blanco */
 }
 
 /* Contador de votos (se añade con JS) */
@@ -653,23 +927,28 @@ body {
     right: 10px;
     width: 30px;
     height: 30px;
-    background-color: var(--color-acento); /* Fondo rojo */
+    background-color: var(--color-acento);
+    /* Fondo rojo */
     color: #FFFFFF;
     font-family: var(--font-titulo);
     font-size: 1.2rem;
-    line-height: 30px; /* Centra el número verticalmente */
+    line-height: 30px;
+    /* Centra el número verticalmente */
     text-align: center;
-    border-radius: 50%; /* Círculo perfecto */
-    z-index: 3; /* Por encima del contenido de la tarjeta */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    
+    border-radius: 50%;
+    /* Círculo perfecto */
+    z-index: 3;
+    /* Por encima del contenido de la tarjeta */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+
     /* Animación suave cuando aparece/cambia */
     transition: transform 0.2s ease;
     transform: scale(1);
 }
 
 .vote-counter.hidden {
-    transform: scale(0); /* Oculta el contador si es 0 */
+    transform: scale(0);
+    /* Oculta el contador si es 0 */
 }
 
 
@@ -683,30 +962,39 @@ body {
 
 /* Estilo para el botón de confirmar voto cuando está bloqueado */
 .btn-primary.locked {
-    background-color: #0d4b0d; /* Un verde oscuro */
+    background-color: #0d4b0d;
+    /* Un verde oscuro */
     color: #a8e6a8;
     cursor: not-allowed;
 }
 
 /* Estilo para los mensajes de jugadores muertos */
 .btn-primary.mensaje-muerto {
-    background-color: #1a1a1a; /* Fondo muy oscuro (casi negro) */
-    color: #666666; /* Texto gris oscuro */
+    background-color: #1a1a1a;
+    /* Fondo muy oscuro (casi negro) */
+    color: #666666;
+    /* Texto gris oscuro */
     cursor: not-allowed;
-    border: 1px dashed #444444; /* Borde punteado */
+    border: 1px dashed #444444;
+    /* Borde punteado */
     font-style: italic;
     font-size: 1rem;
     opacity: 0.8;
-    text-transform: none; /* Desactivar mayúsculas */
+    text-transform: none;
+    /* Desactivar mayúsculas */
     letter-spacing: 0;
 }
 
 /* Estilo especial para votos de muertos en la ronda final */
 .btn-primary.voto-desde-mas-alla {
-    background-color: #2a0a3a; /* Púrpura muy oscuro (místico) */
-    color: #b19cd9; /* Texto púrpura claro */
-    border: 2px solid #6a4c93; /* Borde púrpura */
-    box-shadow: 0 0 10px rgba(106, 76, 147, 0.5); /* Brillo sutil */
+    background-color: #2a0a3a;
+    /* Púrpura muy oscuro (místico) */
+    color: #b19cd9;
+    /* Texto púrpura claro */
+    border: 2px solid #6a4c93;
+    /* Borde púrpura */
+    box-shadow: 0 0 10px rgba(106, 76, 147, 0.5);
+    /* Brillo sutil */
     animation: pulse-ghost 2s ease-in-out infinite;
 }
 
@@ -718,9 +1006,12 @@ body {
 
 /* Animación fantasmal para votos desde el más allá */
 @keyframes pulse-ghost {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 10px rgba(106, 76, 147, 0.5);
     }
+
     50% {
         box-shadow: 0 0 20px rgba(106, 76, 147, 0.8);
     }
@@ -740,7 +1031,8 @@ body {
     font-family: var(--font-titulo);
     color: var(--color-acento);
     font-size: 1.5rem;
-    display: block; /* Hace que el nombre aparezca en su propia línea */
+    display: block;
+    /* Hace que el nombre aparezca en su propia línea */
     margin: 5px 0;
     letter-spacing: 1px;
 }
@@ -751,7 +1043,8 @@ body {
 
 .modal-fin-juego-winner {
     background-color: var(--color-fondo);
-    border: 2px solid var(--color-acento); /* Borde rojo destacado */
+    border: 2px solid var(--color-acento);
+    /* Borde rojo destacado */
     padding: 20px;
     margin: 20px 0;
     text-align: center;
@@ -765,7 +1058,8 @@ body {
 
 .modal-fin-juego-winner strong {
     font-family: var(--font-titulo);
-    font-size: 2rem; /* ¡Más grande! */
+    font-size: 2rem;
+    /* ¡Más grande! */
     color: var(--color-acento);
     display: block;
     margin: 5px 0;
@@ -775,7 +1069,8 @@ body {
 .modal-fin-juego-opciones {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Espacio entre los botones */
+    gap: 10px;
+    /* Espacio entre los botones */
     margin-top: 25px;
 }
 
@@ -905,6 +1200,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -960,9 +1256,12 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.05);
     }
@@ -1053,7 +1352,8 @@ body {
 
 /* --- Estilos para Modal de Testing de Atributos --- */
 .modal-test-atributos {
-    width: 95%; /* Sobrescribe el ancho fijo de 350px del modal estándar */
+    width: 95%;
+    /* Sobrescribe el ancho fijo de 350px del modal estándar */
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
@@ -1111,8 +1411,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .test-nivel-selector {
@@ -1203,7 +1508,8 @@ body {
 #testNombresComunes li,
 #testNombresAntiguos li,
 #testNombresRaros li {
-    border-left-color: #4CAF50; /* Verde para generados */
+    border-left-color: #4CAF50;
+    /* Verde para generados */
 }
 
 #btnRegenerarTest {
@@ -1247,11 +1553,11 @@ body {
     .test-columnas {
         grid-template-columns: 1fr;
     }
-    
+
     .test-columnas-nombres {
         grid-template-columns: 1fr 1fr;
     }
-    
+
     .modal-test-atributos {
         max-width: 95%;
     }
@@ -1292,13 +1598,15 @@ body {
     bottom: 10px;
     left: 10px;
     background-color: rgba(0, 0, 0, 0.85);
-    border: 1px solid #00ff00; /* Verde terminal */
+    border: 1px solid #00ff00;
+    /* Verde terminal */
     color: #00ff00;
     font-family: 'Courier New', monospace;
     font-size: 0.8rem;
     padding: 10px;
     z-index: 9999;
-    pointer-events: none; /* Permitir clics a través */
+    pointer-events: none;
+    /* Permitir clics a través */
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
     min-width: 150px;
 }

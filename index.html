@@ -20,11 +20,12 @@
 
 <body>
 
-    <!-- Video de fondo -->
-    <video autoplay muted loop id="videoFondo" class="video-background">
-        <source src="recursos/fondo.mp4" type="video/mp4">
-    </video>
-    <div class="video-overlay"></div>
+    <!-- Fondo Atmosférico -->
+    <div class="bg-fixed">
+        <div class="bg-noise"></div>
+        <div class="bg-scanline"></div>
+        <div class="bg-particles"></div>
+    </div>
 
     <!-- Botón de salida global -->
     <button id="btnSalirPartida" class="btn-exit" title="Salir de la partida" style="display: none;">
