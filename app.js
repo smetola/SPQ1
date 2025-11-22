@@ -10,21 +10,21 @@ const elementRefs = {
     lobbyScreen: document.getElementById('lobbyScreen'),
     joinScreen: document.getElementById('joinScreen'),
     gameScreen: document.getElementById('gameScreen'),
-    
+
     btnCrearPartida: document.getElementById('btnCrearPartida'),
     btnUnirsePartida: document.getElementById('btnUnirsePartida'),
     btnSalirPartida: document.getElementById('btnSalirPartida'),
-    
+
     btnEmpezarPartida: document.getElementById('btnEmpezarPartida'),
     btnSalirLobby: document.getElementById('btnSalirLobby'),
     lobbyCodigoSala: document.getElementById('lobbyCodigoSala'),
     listaJugadoresLobby: document.getElementById('listaJugadoresLobby'),
-    
+
     btnConfirmarUnirse: document.getElementById('btnConfirmarUnirse'),
     btnCancelarUnirse: document.getElementById('btnCancelarUnirse'),
     inputNombre: document.getElementById('inputNombre'),
     inputCodigoSala: document.getElementById('inputCodigoSala'),
-    
+
     gameRondaTitulo: document.getElementById('gameRondaTitulo'),
     gameRondaInstruccion: document.getElementById('gameRondaInstruccion'),
     characterCarousel: document.getElementById('characterCarousel'),
@@ -33,16 +33,16 @@ const elementRefs = {
     gameTimer: document.getElementById('gameTimer'),
     waitingMessage: document.getElementById('waitingMessage'),
     waitingMessageText: document.getElementById('waitingMessageText'),
-    
+
     modalQuienSoy: document.getElementById('modalQuienSoy'),
     modalMiPersonaje: document.getElementById('modalMiPersonaje'),
     btnCerrarModal: document.getElementById('btnCerrarModal'),
-    
+
     modalAsignarAtributo: document.getElementById('modalAsignarAtributo'),
     modalAsignarTitulo: document.getElementById('modalAsignarTitulo'),
     modalAtributoTexto: document.getElementById('modalAtributoTexto'),
     btnCerrarModalAsignar: document.getElementById('btnCerrarModalAsignar'),
-    
+
     btnComenzarRonda: document.getElementById('btnComenzarRonda'),
     btnComenzarDebate: document.getElementById('btnComenzarDebate'),
 
@@ -158,6 +158,20 @@ elementRefs.btnCancelarUnirse.addEventListener('click', GameLogic.handleSalir);
 elementRefs.btnEmpezarPartida.addEventListener('click', GameLogic.empezarPartida);
 elementRefs.btnSalirLobby.addEventListener('click', GameLogic.handleSalir);
 
+// Botón Añadir Bot
+const btnAnadirBot = document.getElementById('btnAnadirBot');
+if (btnAnadirBot) {
+    btnAnadirBot.addEventListener('click', () => {
+        console.log("🤖 Botón '+ BOT' pulsado. Intentando importar botManager...");
+        import('./logic/botManager.js')
+            .then(module => {
+                console.log("✅ Módulo botManager importado. Creando bot...");
+                module.crearBot();
+            })
+            .catch(err => console.error("❌ Error al importar botManager:", err));
+    });
+}
+
 // Ajustes de Inicio (Engranaje)
 elementRefs.btnAjustesInicio = document.getElementById('btnAjustesInicio');
 elementRefs.menuAjustes = document.getElementById('menuAjustes');
@@ -202,6 +216,14 @@ if (elementRefs.btnRegenerarTest) {
 
 if (elementRefs.btnRegenerarNombres) {
     elementRefs.btnRegenerarNombres.addEventListener('click', UIManager.regenerarTestNombres);
+}
+
+// Modo Desarrollador
+const chkDevMode = document.getElementById('chkDevMode');
+if (chkDevMode) {
+    chkDevMode.addEventListener('change', (e) => {
+        UIManager.toggleDevMode(e.target.checked);
+    });
 }
 
 // Botones de selector de nivel en el modal de testing

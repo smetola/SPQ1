@@ -57,14 +57,14 @@ export function mostrarPantallaJuego(esAnfitrion) {
         refs.btnComenzarRonda.textContent = "[ COMENZAR RONDA ]";
         refs.btnComenzarRonda.style.display = 'block';
     }
-    
+
     refs.gameRondaTitulo.textContent = "FASE DE CONOCIMIENTO";
     refs.gameRondaInstruccion.textContent = "Desliza para ver a todos los supervivientes.";
 }
 
 export function volverAlMenu() {
     console.log("Volviendo al menú principal...");
-    
+
     refs.joinScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
@@ -96,22 +96,22 @@ export function ocultarModalFinJuego() {
 
 export function mostrarPantallaHistoria(historia, esAnfitrion) {
     console.log("Mostrando pantalla de historia...");
-    
+
     // Ocultar todas las demás pantallas
     refs.mainMenu.style.display = 'none';
     refs.joinScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
-    
+
     // Mostrar pantalla de historia
     refs.storyScreen.style.display = 'flex';
     refs.btnSalirPartida.style.display = 'flex';
-    
+
     // Rellenar contenido
     refs.storyTitulo.textContent = historia.titulo;
     refs.storySubtitulo.textContent = historia.subtitulo;
     refs.storyTexto.innerHTML = historia.texto;
-    
+
     // Mostrar botón solo para el anfitrión
     refs.btnComenzarViaje.style.display = esAnfitrion ? 'block' : 'none';
 }
@@ -138,15 +138,24 @@ export function actualizarListaLobby(jugadores, jugadorIdActual) {
     if (jugadores) {
         let esAnfitrionEsteJugador = false;
         Object.entries(jugadores).forEach(([id, jugador]) => {
-            const li = document.createElement('li'); 
+            const li = document.createElement('li');
             li.textContent = jugador.nombre;
-            if (jugador.esAnfitrion) { 
-                li.textContent += " (Anfitrión 👑)"; 
-                if (id === jugadorIdActual) esAnfitrionEsteJugador = true; 
+            if (jugador.esAnfitrion) {
+                li.textContent += " (Anfitrión 👑)";
+                if (id === jugadorIdActual) esAnfitrionEsteJugador = true;
             }
             refs.listaJugadoresLobby.appendChild(li);
+            refs.listaJugadoresLobby.appendChild(li);
         });
-        refs.btnEmpezarPartida.style.display = esAnfitrionEsteJugador ? 'block' : 'none';
+
+        // Mostrar y habilitar botón si es anfitrión y hay suficientes jugadores
+        if (esAnfitrionEsteJugador) {
+            refs.btnEmpezarPartida.style.display = 'block';
+            const numJugadores = Object.keys(jugadores).length;
+            refs.btnEmpezarPartida.disabled = numJugadores < 2;
+        } else {
+            refs.btnEmpezarPartida.style.display = 'none';
+        }
     }
 }
 
@@ -158,16 +167,16 @@ export function mostrarModalAsignacion(atributo, estoyVivo = true) {
     refs.modalAsignarTitulo.textContent = "FASE DE ASIGNACIÓN";
     refs.modalAtributoTexto.textContent = atributo;
     refs.modalAsignarAtributo.style.display = 'flex';
-    
+
     // Añadir o quitar clase especial para muertos
     if (!estoyVivo) {
         refs.modalAsignarAtributo.classList.add('asignacion-opcional');
     } else {
         refs.modalAsignarAtributo.classList.remove('asignacion-opcional');
     }
-    
+
     refs.gameRondaTitulo.textContent = "FASE DE ASIGNACIÓN";
-    
+
     if (!estoyVivo) {
         refs.gameRondaInstruccion.textContent = "(OPCIONAL) Puedes asignar tu atributo si quieres, pero el debate comenzará sin ti si no lo haces.";
     } else {
@@ -181,7 +190,7 @@ export function mostrarModalQuienSoy(personaje) {
 }
 
 export function actualizarCarousel(jugadores, miVotoActual, recuentoVotos) {
-    refs.characterCarousel.innerHTML = ''; 
+    refs.characterCarousel.innerHTML = '';
     const personajes = [];
     Object.entries(jugadores).forEach(([id, jugador]) => {
         if (jugador.personaje) {
@@ -222,9 +231,9 @@ export function ocultarBotonComenzarRonda() {
  */
 export function mostrarFaseDebate(jugadoresVivos = null, estoyVivo = true) {
     const esRondaFinal = jugadoresVivos !== null && jugadoresVivos.length === 2;
-    
+
     refs.gameRondaTitulo.textContent = "DEBATE Y VOTACIÓN";
-    
+
     if (esRondaFinal && !estoyVivo) {
         refs.gameRondaInstruccion.textContent = "¡RONDA FINAL! Los caídos tienen voz. Tu voto decidirá el destino de los últimos supervivientes.";
     } else if (esRondaFinal) {
@@ -232,7 +241,7 @@ export function mostrarFaseDebate(jugadoresVivos = null, estoyVivo = true) {
     } else {
         refs.gameRondaInstruccion.textContent = "¡Hora de debatir! Selecciona a quién eliminar y confirma tu voto.";
     }
-    
+
     refs.btnComenzarRonda.style.display = 'none';
     refs.btnComenzarDebate.style.display = 'none';
     refs.gameTimer.style.display = 'block';
@@ -241,7 +250,7 @@ export function mostrarFaseDebate(jugadoresVivos = null, estoyVivo = true) {
 export function mostrarPantallaFinJuego() {
     refs.gameRondaTitulo.textContent = "PARTIDA TERMINADA";
     refs.gameRondaInstruccion.textContent = "Este es el tablero final. ¡Solo puede quedar 1!";
-    
+
     refs.btnComenzarRonda.style.display = 'none';
     refs.btnComenzarDebate.style.display = 'none';
     refs.btnConfirmarVoto.style.display = 'none';
@@ -256,13 +265,13 @@ export function actualizarTimer(segundosRestantes, mostrar = true) {
     }
 
     refs.gameTimer.style.display = 'block';
-    
+
     const minutos = Math.floor(segundosRestantes / 60);
     const segundos = Math.floor(segundosRestantes % 60);
-    
+
     const minutosStr = minutos < 10 ? '0' + minutos : minutos;
     const segundosStr = segundos < 10 ? '0' + segundos : segundos;
-    
+
     refs.gameTimer.textContent = `${minutosStr}:${segundosStr}`;
 }
 
@@ -282,7 +291,7 @@ export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado, estoy
         btn.disabled = true;
         btn.classList.add('locked');
         btn.classList.add('mensaje-muerto');
-        
+
         // Importar y seleccionar mensaje aleatorio según la historia
         import('./gameData.js').then(module => {
             const tituloHistoria = historiaActual?.titulo || null;
@@ -294,30 +303,30 @@ export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado, estoy
 
     // Lógica normal para jugadores vivos (o muertos en ronda final)
     btn.classList.remove('mensaje-muerto');
-    
+
     // Si es ronda final y el jugador está muerto, añadir indicador especial
     if (!estoyVivo && esRondaFinal) {
         btn.classList.add('voto-desde-mas-alla');
     } else {
         btn.classList.remove('voto-desde-mas-alla');
     }
-    
+
     if (confirmado) {
         btn.disabled = true;
-        btn.textContent = !estoyVivo && esRondaFinal 
-            ? "[ VOTO DESDE EL MÁS ALLÁ CONFIRMADO ]" 
+        btn.textContent = !estoyVivo && esRondaFinal
+            ? "[ VOTO DESDE EL MÁS ALLÁ CONFIRMADO ]"
             : "[ VOTO CONFIRMADO ]";
         btn.classList.add('locked');
     } else if (seleccionado) {
         btn.disabled = false;
-        btn.textContent = !estoyVivo && esRondaFinal 
-            ? "[ CONFIRMAR VOTO DESDE EL MÁS ALLÁ ]" 
+        btn.textContent = !estoyVivo && esRondaFinal
+            ? "[ CONFIRMAR VOTO DESDE EL MÁS ALLÁ ]"
             : "[ CONFIRMAR VOTO ]";
         btn.classList.remove('locked');
     } else {
         btn.disabled = true;
-        btn.textContent = !estoyVivo && esRondaFinal 
-            ? "[ SELECCIONA DESDE EL MÁS ALLÁ ]" 
+        btn.textContent = !estoyVivo && esRondaFinal
+            ? "[ SELECCIONA DESDE EL MÁS ALLÁ ]"
             : "[ SELECCIONA UN PERSONAJE ]";
         btn.classList.remove('locked');
     }
@@ -357,7 +366,7 @@ export function mostrarModalFinJuego(ganador, esAnfitrion) {
     if (!refs.modalFinJuego) return;
 
     ocultarModalResultados();
-    
+
     if (ganador) {
         refs.modalGanadorTexto.innerHTML = `
             <span>El único superviviente es...</span>
@@ -381,7 +390,7 @@ export function mostrarModalFinJuego(ganador, esAnfitrion) {
         refs.btnReiniciarLobby.style.display = 'none';
         refs.btnSalirAlMenu.style.display = 'block';
     }
-    
+
     refs.modalFinJuego.style.display = 'flex';
 }
 
@@ -391,9 +400,9 @@ export function mostrarModalFinJuego(ganador, esAnfitrion) {
 function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVotos) {
     const card = document.createElement('div');
     card.className = 'character-card';
-    
-    if (!personaje.estaVivo) { 
-        card.classList.add('muerto'); 
+
+    if (!personaje.estaVivo) {
+        card.classList.add('muerto');
     }
 
     if (personaje.jugadorId === miVotoActual) {
@@ -402,7 +411,7 @@ function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVo
 
     const atributosObj = personaje.atributosAsignados || {};
     const atributosHTML = Object.values(atributosObj);
-    
+
     card.innerHTML = `
         <h4>${personaje.nombre.toUpperCase()}</h4>
         <span>Edad: ${personaje.edad}</span>
@@ -422,7 +431,7 @@ function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVo
     card.appendChild(voteCounter);
 
     card.addEventListener('click', () => clickHandler(personaje));
-    
+
     return card;
 }
 
@@ -480,16 +489,16 @@ export function regenerarTestAtributos() {
  */
 function renderizarLotePrueba(nivel) {
     const lote = generarLotePrueba(nivel, 15);
-    
+
     // Actualizar tono
     document.getElementById('testTonoTexto').textContent = lote.tono;
-    
+
     // Renderizar originales
     const listaOriginales = document.getElementById('testOriginalesLista');
     listaOriginales.innerHTML = lote.originales
         .map(attr => `<li>${attr}</li>`)
         .join('');
-    
+
     // Renderizar generados
     const listaGenerados = document.getElementById('testGeneradosLista');
     listaGenerados.innerHTML = lote.generados
@@ -542,7 +551,7 @@ export function actualizarMensajeEsperaSegunFase(fase) {
         'resultados': 'Esperando al anfitrión para la siguiente ronda...',
         'finJuego': 'Esperando al anfitrión...'
     };
-    
+
     const mensaje = mensajes[fase] || 'Esperando...';
     mostrarMensajeEspera(mensaje);
 }
@@ -585,7 +594,7 @@ export function cambiarTabTest(tabId) {
  */
 export function regenerarTestNombres() {
     const lote = generarLotePruebaNombres(10);
-    
+
     renderizarListaNombres('testNombresOriginales', lote.originales);
     renderizarListaNombres('testNombresComunes', lote.comunes);
     renderizarListaNombres('testNombresAntiguos', lote.antiguos);
@@ -597,5 +606,45 @@ function renderizarListaNombres(elementId, nombres) {
     if (lista) {
         lista.innerHTML = nombres.map(n => `<li>${n}</li>`).join('');
     }
+}
+
+// --- FUNCIONES MODO DESARROLLADOR ---
+
+let devModeEnabled = false;
+
+export function toggleDevMode(enabled) {
+    devModeEnabled = enabled;
+    const devOverlay = document.getElementById('devOverlay');
+    const btnAnadirBot = document.getElementById('btnAnadirBot');
+
+    if (devOverlay) {
+        devOverlay.style.display = enabled ? 'block' : 'none';
+    }
+
+    if (btnAnadirBot) {
+        btnAnadirBot.style.display = enabled ? 'block' : 'none';
+    }
+    console.log("Modo Desarrollador:", enabled ? "ACTIVADO" : "DESACTIVADO");
+}
+
+export function updateDevOverlay(info) {
+    if (!devModeEnabled) return;
+
+    const content = document.getElementById('devContent');
+    if (!content) return;
+
+    let html = '';
+
+    if (info.tier) {
+        html += `<div>TIER: <strong>${info.tier.toUpperCase()}</strong></div>`;
+    }
+    if (info.fase) {
+        html += `<div>FASE: ${info.fase.toUpperCase()}</div>`;
+    }
+    if (info.jugadorId) {
+        html += `<div>ID: ${info.jugadorId.substring(0, 6)}...</div>`;
+    }
+
+    content.innerHTML = html;
 }
 

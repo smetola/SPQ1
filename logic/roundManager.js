@@ -33,66 +33,57 @@ function seleccionarElementoAleatorio(array, borrar = false) {
 export async function empezarPartida() {
     const database = getDatabase();
     const modal = getModalManager();
-    
+
     // CRÍTICO: Cancelar el onDisconnect del lobby para que la partida no se borre
     if (state.soyAnfitrion) {
         const partidaRef = database.ref(`partidas/${state.salaActual}`);
         partidaRef.onDisconnect().cancel();
         console.log('🔌 onDisconnect del lobby cancelado - partida persistente');
     }
-    
+
     database.ref(`partidas/${state.salaActual}`).once('value').then(async (snapshot) => {
         const jugadorIDs = Object.keys(snapshot.val().jugadores);
         const numJugadores = jugadorIDs.length;
-        
-        if (numJugadores < 2) { 
-            await modal.mostrarAlerta("Se necesitan al menos 2 jugadores para empezar.", "JUGADORES INSUFICIENTES"); 
-            return; 
-        }
 
-        // --- ¡NUEVA LÓGICA DE PROGRESIÓN! ---
-        let progresionTiers = [];
-        const baseProgression = ["bronce", "plata", "oro"];
-        const finProgression = ["lifeordeath", "lifeordeath", "lifeordeath"]; // Relleno para el final
-
-        if (numJugadores <= 4) {
-            // (4p) B, P, O, P, D, L
-            progresionTiers = [...baseProgression, "platino", "diamante", ...finProgression];
-        } else if (numJugadores === 5) {
-            // (5p) B, P, O, P, D, D, L
-            progresionTiers = [...baseProgression, "platino", "diamante", "diamante", ...finProgression];
-        } else {
-            // (6p+) B, P, O, P, P, D, D, L
-            progresionTiers = [...baseProgression, "platino", "platino", "diamante", "diamante", ...finProgression];
+        if (numJugadores < 2) {
+            await modal.mostrarAlerta("Se necesitan al menos 2 jugadores para empezar.", "JUGADORES INSUFICIENTES");
+            return;
         }
-        // ------------------------------------
 
         const actualizaciones = {};
         let nombresDisponibles = obtenerPoolNombres(30); // Pool expandido con nombres españoles
-        let atributosBasicosDisponibles = [...Data.ATRIBUTOS_BRONCE];
 
+        // 1. Generar pools COMPLETOS primero
+        let listasAtributos = generarPoolsExpandidos();
+
+        // 2. Extraer atributos básicos del pool de BRONCE para que no se repitan
+        // (Usamos splice para sacarlos físicamente del array)
         jugadorIDs.forEach((id) => {
+            // Sacar un atributo aleatorio de la lista de bronce generada
+            const indiceAtributo = Math.floor(Math.random() * listasAtributos.bronce.length);
+            const atributoBasico = listasAtributos.bronce.splice(indiceAtributo, 1)[0];
+
             actualizaciones[`partidas/${state.salaActual}/jugadores/${id}/personaje`] = {
                 nombre: seleccionarElementoAleatorio(nombresDisponibles, true),
                 edad: Math.floor(Math.random() * 43) + 18,
-                atributoBasico: seleccionarElementoAleatorio(atributosBasicosDisponibles, true),
+                atributoBasico: atributoBasico, // Usar el extraído
                 atributosAsignados: {},
                 estaVivo: true
             };
         });
 
-        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = generarPoolsExpandidos();
-        
-        // ¡NUEVO! Guarda la progresión en Firebase
-        actualizaciones[`partidas/${state.salaActual}/progresionTiers`] = progresionTiers;
+        // 3. Guardar las listas YA RECORTADAS
+        actualizaciones[`partidas/${state.salaActual}/listasAtributosDisponibles`] = listasAtributos;
+
+        // Inicializar índice de progresión
         actualizaciones[`partidas/${state.salaActual}/progressionIndex`] = 0;
-        
+
         // Seleccionar historia aleatoria
         const historiaSeleccionada = Data.HISTORIAS[Math.floor(Math.random() * Data.HISTORIAS.length)];
         actualizaciones[`partidas/${state.salaActual}/historiaActual`] = historiaSeleccionada;
-        
+
         actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'historia';
-        actualizaciones[`partidas/${state.salaActual}/estado`] = 'jugando'; 
+        actualizaciones[`partidas/${state.salaActual}/estado`] = 'jugando';
 
         database.ref().update(actualizaciones)
             .catch((err) => console.error("Error al actualizar la partida:", err));
@@ -105,17 +96,17 @@ export async function empezarPartida() {
  */
 export function avanzarSiguienteRonda() {
     const database = getDatabase();
-    
+
     database.ref(`partidas/${state.salaActual}`).once('value').then((snapshot) => {
         const partida = snapshot.val();
-        
+
         const personajesVivos = Object.values(partida.jugadores)
             .filter(j => j.personaje?.estaVivo).length;
-        
+
         if (personajesVivos <= 1) {
             // ¡FIN DEL JUEGO!
             let ganadorData = null;
-            
+
             if (personajesVivos === 1) {
                 const jugadorGanador = Object.values(partida.jugadores).find(j => j.personaje?.estaVivo);
                 if (jugadorGanador) {
@@ -131,16 +122,19 @@ export function avanzarSiguienteRonda() {
                 ganador: ganadorData
             });
         } else {
-            // ¡NUEVO! Incrementar el índice de progresión
-            let nuevoIndex = (partida.progressionIndex || 0) + 1;
-            
-            // Evitar que el índice se salga del array
-            if (nuevoIndex >= partida.progresionTiers.length) {
-                nuevoIndex = partida.progresionTiers.length - 1;
+            // Comprobar si hubo empate
+            const ultimoEliminado = partida.ultimoEliminado;
+            let nuevoIndex = partida.progressionIndex || 0;
+
+            if (ultimoEliminado === "NADIE (EMPATE)") {
+                console.log("Empate detectado. Repitiendo ronda (mismo tier).");
+                // NO incrementamos el índice
+            } else {
+                nuevoIndex++;
             }
 
             database.ref(`partidas/${state.salaActual}`).update({
-                progressionIndex: nuevoIndex, // Actualiza el índice
+                progressionIndex: nuevoIndex,
                 faseActual: 'conocimiento'
             });
         }
