@@ -1,6 +1,7 @@
 // Contenido para: uiManager.js
 
 import { generarLotePrueba, generarLotePruebaNombres } from './logic/attributeGenerator.js';
+import * as VideoManager from './videoManager.js';
 
 // Almacén para las referencias del DOM
 let refs = {};
@@ -12,6 +13,7 @@ let logic = {}; // Almacén para la lógica (para el clic de la tarjeta)
 export function init(elementRefs, logicHandlers) {
     refs = elementRefs;
     logic = logicHandlers;
+    VideoManager.init(); // Inicializar el gestor de videos
 }
 
 // --- FUNCIONES DE NAVEGACIÓN ---
@@ -65,6 +67,9 @@ export function mostrarPantallaJuego(esAnfitrion) {
 export function volverAlMenu() {
     console.log("Volviendo al menú principal...");
 
+    // Ocultar video de fondo  
+    VideoManager.hideVideo();
+
     refs.joinScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
@@ -111,6 +116,9 @@ export function mostrarPantallaHistoria(historia, esAnfitrion) {
     refs.storyTitulo.textContent = historia.titulo;
     refs.storySubtitulo.textContent = historia.subtitulo;
     refs.storyTexto.innerHTML = historia.texto;
+
+    // Cambiar el video de fondo según la historia
+    VideoManager.setStoryVideo(historia.titulo);
 
     // Mostrar botón solo para el anfitrión
     refs.btnComenzarViaje.style.display = esAnfitrion ? 'block' : 'none';
