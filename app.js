@@ -96,7 +96,17 @@ UIManager.init(elementRefs, {
     handleCardClick: (personaje) => GameLogic.handleCardClick(personaje)
 });
 
-GameLogic.init(database, ModalManager); // 'database' viene del script de Firebase en index.html
+// ¡NUEVO! Iniciamos sesión anónima antes de nada
+firebase.auth().signInAnonymously()
+    .then(() => {
+        console.log("✅ Autenticación anónima exitosa.");
+        // Una vez tenemos "permiso", iniciamos la lógica de la base de datos
+        GameLogic.init(database, ModalManager);
+    })
+    .catch((error) => {
+        console.error("❌ Error en autenticación anónima:", error);
+        alert("Error de conexión con el servidor de seguridad.");
+    });
 
 
 // --- 3. CONECTAR "ESCUCHADORES" DE EVENTOS ---
