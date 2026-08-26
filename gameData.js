@@ -11,7 +11,7 @@ export const ATRIBUTOS_BRONCE = [
 export const ATRIBUTOS_PLATA = [
     "Aspirante a presidente de gobierno", "Cura", "Ateo", "Trauma infantil", "Diabetes", 
     "Patriótico", "Anormal", "Sintecho", "Tiene Tinder Gold", "Situación familiar jodida", 
-    "Mentiroso", "Borracho", "Budista", "Cristiano"
+    "Mentiroso", "Borracho", "Budista", "Cristiano", "Hispanchista"
 ];
 export const ATRIBUTOS_ORO = [
     "Capitalista extremo", "Comunista extremo", "Sordomudo", "Hetero básico", "Corrupto", 
@@ -19,7 +19,7 @@ export const ATRIBUTOS_ORO = [
     "En su Spotify Wrapped su canción más escuchada es Baby de Justin Bieber", "Mafioso", 
     "Solo come carne", "Negacionista", "Aun duerme abrazando a su madre\\ osito", "Obesidad", 
     "MENA", "No le gusta que digan la “M palabra”", "Borde de mierda", "Analfabeto", 
-    "Hace las mejores torrijas del mundo"
+    "Hace las mejores torrijas del mundo", "Sionista"
 ];
 export const ATRIBUTOS_PLATINO = [
     "Demencia senil", "Depresión severa", "Su mejor amigo es Enrique VIII", "Xenófobo", 

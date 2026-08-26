@@ -145,7 +145,6 @@ export function actualizarListaLobby(jugadores, jugadorIdActual) {
                 if (id === jugadorIdActual) esAnfitrionEsteJugador = true;
             }
             refs.listaJugadoresLobby.appendChild(li);
-            refs.listaJugadoresLobby.appendChild(li);
         });
 
         // Mostrar y habilitar botón si es anfitrión y hay suficientes jugadores
