@@ -37,7 +37,7 @@ export function crearNuevaPartida() {
         estado: "lobby", 
         creadaEn: Date.now(), 
         jugadores: {}, 
-        // 'rondaActual' ya no se usa
+        modosActivos: [], // Sistema de modos de juego
         faseActual: 'lobby' 
     };
     

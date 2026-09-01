@@ -288,15 +288,19 @@ export function gestionarBotonConfirmar(mostrar, confirmado, seleccionado, estoy
     // Si el jugador está muerto y NO es ronda final, mostrar mensaje narrativo
     if (!estoyVivo && !esRondaFinal) {
         btn.disabled = true;
-        btn.classList.add('locked');
-        btn.classList.add('mensaje-muerto');
 
-        // Importar y seleccionar mensaje aleatorio según la historia
-        import('./gameData.js').then(module => {
-            const tituloHistoria = historiaActual?.titulo || null;
-            const mensajeAleatorio = module.obtenerMensajeMuertoAleatorio(tituloHistoria);
-            btn.textContent = mensajeAleatorio;
-        });
+        // Solo generar el mensaje la primera vez que se bloquea el botón para evitar que parpadee
+        // cada vez que otro jugador vota y Firebase actualiza el estado.
+        if (!btn.classList.contains('mensaje-muerto')) {
+            btn.classList.add('locked', 'mensaje-muerto');
+
+            // Importar y seleccionar mensaje aleatorio según la historia
+            import('./gameData.js').then(module => {
+                const tituloHistoria = historiaActual?.titulo || null;
+                const mensajeAleatorio = module.obtenerMensajeMuertoAleatorio(tituloHistoria);
+                btn.textContent = mensajeAleatorio;
+            });
+        }
         return;
     }
 
@@ -647,3 +651,383 @@ export function updateDevOverlay(info) {
     content.innerHTML = html;
 }
 
+
+// --- SELECTOR DE MODOS DE JUEGO (LOBBY) ---
+
+/**
+ * Muestra el selector de modos en el lobby.
+ * Si es anfitrión, muestra los botones toggle interactivos.
+ * Si no es anfitrión, muestra solo un indicador de texto con los modos seleccionados.
+ * @param {boolean} esAnfitrion
+ */
+export function mostrarSelectorModos(esAnfitrion) {
+    const selector = document.getElementById('modeSelector');
+    const indicador = document.getElementById('modosActivosIndicador');
+
+    if (esAnfitrion) {
+        if (selector) selector.style.display = 'block';
+        if (indicador) indicador.style.display = 'none';
+    } else {
+        if (selector) selector.style.display = 'none';
+        if (indicador) indicador.style.display = 'block';
+    }
+}
+
+/**
+ * Oculta tanto el selector como el indicador de modos.
+ */
+export function ocultarSelectorModos() {
+    const selector = document.getElementById('modeSelector');
+    const indicador = document.getElementById('modosActivosIndicador');
+    if (selector) selector.style.display = 'none';
+    if (indicador) indicador.style.display = 'none';
+}
+
+/**
+ * Actualiza la UI del selector de modos según los modos activos en Firebase.
+ * Sincroniza los botones toggle del anfitrión y el texto del indicador de no-anfitriones.
+ * @param {string[]} modosActivos - Array de IDs de modos activos
+ */
+export function actualizarModosVisuales(modosActivos) {
+    const modos = modosActivos || [];
+
+    // 1. Actualizar botones toggle del anfitrión
+    const botones = document.querySelectorAll('.mode-toggle');
+    botones.forEach(btn => {
+        const modoId = btn.dataset.mode;
+        if (modos.includes(modoId)) {
+            btn.classList.add('activo');
+        } else {
+            btn.classList.remove('activo');
+        }
+    });
+
+    // 2. Actualizar indicador de texto para no-anfitriones
+    const textoEl = document.getElementById('modosActivosTexto');
+    if (textoEl) {
+        if (modos.length === 0) {
+            textoEl.textContent = 'Clásico';
+        } else {
+            const ICONOS = {
+                maldicion: '🔮 Maldición',
+                poderes: '⚡ Poderes',
+                alianzas: '💕 Alianzas',
+                traidor: '🕵️ Traidor'
+            };
+            textoEl.textContent = modos.map(m => ICONOS[m] || m).join(' + ');
+        }
+    }
+}
+
+
+// --- MODAL DE EVENTO PARANORMAL (MODO MALDICIÓN) ---
+
+/**
+ * Muestra el modal de evento paranormal con los datos del evento.
+ * @param {object} evento - Datos del evento: { nombre, categoria, icono, narrativa }
+ * @param {boolean} esAnfitrion - Si true, muestra el botón "Continuar"
+ */
+export function mostrarModalEvento(evento, esAnfitrion) {
+    const modal = document.getElementById('modalEvento');
+    const icono = document.getElementById('eventoIcono');
+    const titulo = document.getElementById('eventoTitulo');
+    const narrativa = document.getElementById('eventoNarrativa');
+    const btnContinuar = document.getElementById('btnContinuarEvento');
+
+    if (!modal) return;
+
+    // Rellenar datos del evento
+    if (icono) icono.textContent = evento.icono || '🔮';
+    if (titulo) titulo.textContent = evento.nombre || 'EVENTO PARANORMAL';
+    if (narrativa) narrativa.textContent = evento.narrativa || 'Algo sucede...';
+
+    // Solo el anfitrión ve el botón Continuar
+    if (btnContinuar) {
+        btnContinuar.style.display = esAnfitrion ? 'block' : 'none';
+    }
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Oculta el modal de evento paranormal.
+ */
+export function ocultarModalEvento() {
+    const modal = document.getElementById('modalEvento');
+    if (modal) modal.style.display = 'none';
+}
+
+
+// --- INDICADOR DE TRAIDOR (MODO TRAIDOR) ---
+
+/**
+ * Muestra el indicador de rol de traidor (solo para el traidor).
+ */
+export function mostrarIndicadorTraidor() {
+    const indicador = document.getElementById('traitorIndicador');
+    if (indicador) indicador.style.display = 'block';
+}
+
+/**
+ * Oculta el indicador de rol de traidor.
+ */
+export function ocultarIndicadorTraidor() {
+    const indicador = document.getElementById('traitorIndicador');
+    if (indicador) indicador.style.display = 'none';
+}
+
+/**
+ * Muestra la revelación del traidor en la pantalla de fin de juego.
+ * @param {string} nombreJugador - Nombre real del jugador traidor
+ * @param {string} nombrePersonaje - Nombre del personaje del traidor
+ * @param {boolean} fueEliminado - Si el traidor fue eliminado (victoria del traidor)
+ */
+export function mostrarRevelacionTraidor(nombreJugador, nombrePersonaje, fueEliminado) {
+    // Buscar o crear el contenedor de revelación
+    let reveal = document.getElementById('traitorReveal');
+    if (!reveal) {
+        reveal = document.createElement('div');
+        reveal.id = 'traitorReveal';
+        reveal.className = 'traitor-reveal';
+
+        // Insertar en el modal de fin de juego
+        const modalFinJuego = document.getElementById('modalFinJuego');
+        if (modalFinJuego) {
+            const modalContent = modalFinJuego.querySelector('.modal-content');
+            if (modalContent) modalContent.appendChild(reveal);
+        }
+    }
+
+    const resultado = fueEliminado
+        ? '¡VICTORIA DEL TRAIDOR! Logró ser eliminado.'
+        : 'El traidor NO logró su objetivo.';
+
+    reveal.innerHTML = `
+        <h4 class="traitor-reveal-title">🕵️ REVELACIÓN: EL TRAIDOR</h4>
+        <p class="traitor-reveal-text">
+            <strong>${nombreJugador}</strong> (${nombrePersonaje}) era el traidor.<br>
+            ${resultado}
+        </p>
+    `;
+    reveal.style.display = 'block';
+}
+
+
+// --- MODO ALIANZAS ---
+
+/**
+ * Muestra el modal de pacto mutuo con la lista de jugadores disponibles.
+ * @param {object} jugadores - Jugadores de la partida
+ * @param {string} miId - ID del jugador actual
+ * @param {object} partida - Datos de la partida
+ */
+export function mostrarModalPacto(jugadores, miId, partida) {
+    const modal = document.getElementById('modalPacto');
+    const lista = document.getElementById('pactoListaJugadores');
+    const estado = document.getElementById('pactoEstado');
+    const btnSkip = document.getElementById('btnSkipPacto');
+
+    if (!modal || !lista) return;
+
+    // Comprobar si ya tengo pacto
+    const pactos = partida.modoConfig?.alianzas?.pactos;
+    if (pactos) {
+        const tengoPackto = Object.values(pactos).some(p => 
+            p.jugadorA === miId || p.jugadorB === miId
+        );
+        if (tengoPackto) {
+            modal.style.display = 'none'; // Ya tengo pacto
+            return;
+        }
+    }
+
+    // Comprobar si ya he propuesto
+    const propuestas = partida.modoConfig?.alianzas?.propuestas;
+    if (propuestas && propuestas[miId]) {
+        if (estado) {
+            estado.style.display = 'block';
+            estado.textContent = 'Esperando respuesta a tu propuesta de pacto...';
+        }
+        lista.innerHTML = '';
+        if (btnSkip) btnSkip.style.display = 'none';
+        modal.style.display = 'flex';
+        return;
+    }
+
+    // Comprobar si alguien me ha propuesto
+    if (propuestas) {
+        const propuestaParaMi = Object.entries(propuestas).find(([_, p]) => p.a === miId);
+        if (propuestaParaMi) {
+            const [proponenteId] = propuestaParaMi;
+            const proponente = jugadores[proponenteId];
+            mostrarPropuestaPactoRecibida(proponente?.nombre || '???', proponenteId);
+            modal.style.display = 'none'; // Ocultar el selector, mostrar la propuesta
+            return;
+        }
+    }
+
+    // Mostrar lista de jugadores para proponer pacto
+    lista.innerHTML = '';
+    if (estado) estado.style.display = 'none';
+    if (btnSkip) btnSkip.style.display = 'block';
+
+    Object.entries(jugadores).forEach(([id, j]) => {
+        if (id === miId) return; // No mostrarme a mí mismo
+        if (!j.personaje?.estaVivo) return; // Solo vivos
+
+        const btn = document.createElement('button');
+        btn.className = 'pacto-jugador-btn';
+        btn.textContent = `💕 ${j.personaje.nombre}`;
+        btn.dataset.jugadorId = id;
+        btn.addEventListener('click', () => {
+            import('../logic/allianceManager.js').then(AM => {
+                AM.proponerPacto(miId, id);
+                if (estado) {
+                    estado.style.display = 'block';
+                    estado.textContent = `Propuesta enviada a ${j.personaje.nombre}...`;
+                }
+                lista.innerHTML = '';
+                if (btnSkip) btnSkip.style.display = 'none';
+            });
+        });
+        lista.appendChild(btn);
+    });
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Muestra el modal de propuesta de pacto recibida.
+ */
+export function mostrarPropuestaPactoRecibida(nombreProponente, proponenteId) {
+    const modal = document.getElementById('modalPropuestaPacto');
+    const texto = document.getElementById('propuestaPactoTexto');
+
+    if (!modal) return;
+    if (texto) texto.textContent = `${nombreProponente} quiere aliarse contigo. ¿Aceptas vincular vuestros destinos?`;
+
+    // Guardar proponenteId para los botones
+    modal.dataset.proponenteId = proponenteId;
+    modal.style.display = 'flex';
+}
+
+/**
+ * Oculta los modales de alianzas.
+ */
+export function ocultarModalesPacto() {
+    const modal1 = document.getElementById('modalPacto');
+    const modal2 = document.getElementById('modalPropuestaPacto');
+    if (modal1) modal1.style.display = 'none';
+    if (modal2) modal2.style.display = 'none';
+}
+
+/**
+ * Actualiza el indicador de aliado durante el juego.
+ * @param {string} jugadorId - Mi ID
+ * @param {object} partida - Datos de la partida
+ */
+export function actualizarIndicadorAliado(jugadorId, partida) {
+    const indicador = document.getElementById('aliadoIndicador');
+    const nombreEl = document.getElementById('aliadoNombre');
+    if (!indicador || !nombreEl) return;
+
+    const pactos = partida.modoConfig?.alianzas?.pactos;
+    if (!pactos) {
+        indicador.style.display = 'none';
+        return;
+    }
+
+    // Buscar si tengo aliado
+    for (const pacto of Object.values(pactos)) {
+        if (pacto.jugadorA === jugadorId || pacto.jugadorB === jugadorId) {
+            const aliadoId = pacto.jugadorA === jugadorId ? pacto.jugadorB : pacto.jugadorA;
+            const aliado = partida.jugadores?.[aliadoId];
+            if (aliado?.personaje) {
+                nombreEl.textContent = aliado.personaje.nombre;
+                indicador.style.display = 'block';
+
+                // Si el aliado está muerto, indicar peligro
+                if (!aliado.personaje.estaVivo) {
+                    indicador.style.borderColor = '#888';
+                    indicador.style.color = '#888';
+                    nombreEl.textContent = aliado.personaje.nombre + ' ☠️';
+                }
+                return;
+            }
+        }
+    }
+
+    indicador.style.display = 'none';
+}
+
+
+// --- MODO PODERES (TIENDA) ---
+
+/**
+ * Muestra la barra de energía y actualiza el valor.
+ * @param {number} energia - Energía actual del jugador
+ */
+export function actualizarBarraEnergia(energia) {
+    const barra = document.getElementById('poderBarraEnergia');
+    const valor = document.getElementById('poderEnergiaValor');
+    if (barra) barra.style.display = 'flex';
+    if (valor) valor.textContent = energia;
+}
+
+/**
+ * Oculta la barra de energía.
+ */
+export function ocultarBarraEnergia() {
+    const barra = document.getElementById('poderBarraEnergia');
+    if (barra) barra.style.display = 'none';
+}
+
+/**
+ * Abre la tienda de poderes con el catálogo actualizado.
+ * @param {Array} catalogo - Lista de poderes disponibles (de CATALOGO_PODERES)
+ * @param {number} energiaActual - Energía del jugador
+ * @param {object} poderesActivos - Poderes ya comprados del jugador
+ * @param {Function} onComprar - Callback al hacer clic en un poder: fn(poderId)
+ */
+export function mostrarTienda(catalogo, energiaActual, poderesActivos, onComprar) {
+    const modal = document.getElementById('modalTienda');
+    const contenedor = document.getElementById('tiendaCatalogo');
+    if (!modal || !contenedor) return;
+
+    contenedor.innerHTML = '';
+
+    catalogo.forEach(poder => {
+        const yaComprado = poderesActivos?.[poder.id]?.activado;
+        const sinEnergia = energiaActual < poder.coste;
+
+        const card = document.createElement('div');
+        card.className = 'tienda-poder-card';
+        if (yaComprado) card.classList.add('poder-comprado');
+        else if (sinEnergia) card.classList.add('poder-disabled');
+
+        card.innerHTML = `
+            <span class="poder-card-icono">${poder.icono}</span>
+            <div class="poder-card-info">
+                <div class="poder-card-nombre">${poder.nombre}</div>
+                <div class="poder-card-desc">${poder.descripcion}</div>
+            </div>
+            <span class="poder-card-coste">⚡${poder.coste}</span>
+        `;
+
+        if (!yaComprado && !sinEnergia) {
+            card.addEventListener('click', () => onComprar(poder.id));
+        }
+
+        contenedor.appendChild(card);
+    });
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Cierra la tienda de poderes.
+ */
+export function cerrarTienda() {
+    const modal = document.getElementById('modalTienda');
+    if (modal) modal.style.display = 'none';
+}

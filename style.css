@@ -250,6 +250,136 @@ body {
 }
 
 /* --- ================================= --- */
+/* ---     SELECTOR DE MODOS (LOBBY)     --- */
+/* --- ================================= --- */
+
+.mode-selector {
+    border: 1px dashed var(--color-borde);
+    padding: 15px;
+    background-color: var(--color-fondo);
+}
+
+.mode-selector-titulo {
+    font-family: var(--font-titulo);
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: var(--color-acento);
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.mode-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    background-color: var(--color-papel);
+    border: 1px solid var(--color-borde);
+    color: #888;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-cuerpo);
+    position: relative;
+    overflow: hidden;
+}
+
+.mode-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.3s ease;
+}
+
+.mode-toggle:hover {
+    border-color: #999;
+    color: var(--color-texto-principal);
+}
+
+.mode-toggle.activo {
+    border-color: var(--color-acento);
+    color: var(--color-texto-principal);
+    background-color: rgba(211, 47, 47, 0.1);
+}
+
+.mode-toggle.activo::before {
+    background: var(--color-acento);
+}
+
+/* Colores por modo cuando están activos */
+.mode-toggle[data-mode="maldicion"].activo {
+    border-color: #9b59b6;
+    background-color: rgba(155, 89, 182, 0.1);
+    box-shadow: 0 0 12px rgba(155, 89, 182, 0.2);
+}
+.mode-toggle[data-mode="maldicion"].activo::before { background: #9b59b6; }
+
+.mode-toggle[data-mode="poderes"].activo {
+    border-color: #f1c40f;
+    background-color: rgba(241, 196, 15, 0.08);
+    box-shadow: 0 0 12px rgba(241, 196, 15, 0.2);
+}
+.mode-toggle[data-mode="poderes"].activo::before { background: #f1c40f; }
+
+.mode-toggle[data-mode="alianzas"].activo {
+    border-color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.1);
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.2);
+}
+.mode-toggle[data-mode="alianzas"].activo::before { background: #e74c3c; }
+
+.mode-toggle[data-mode="traidor"].activo {
+    border-color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.1);
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
+}
+.mode-toggle[data-mode="traidor"].activo::before { background: #2ecc71; }
+
+.mode-icono {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.mode-nombre {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+/* Indicador de modos para no-anfitriones */
+.modos-activos-indicador {
+    text-align: center;
+    padding: 8px 12px;
+    border: 1px dashed var(--color-borde);
+    background-color: var(--color-fondo);
+    font-family: var(--font-cuerpo);
+    font-size: 0.85rem;
+}
+
+.modos-label {
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-right: 6px;
+}
+
+.modos-texto {
+    color: var(--color-texto-principal);
+    font-weight: 700;
+}
+
+/* --- ================================= --- */
 /* ---     ESTILOS BOTÓN SECUNDARIO      --- */
 /* --- ================================= --- */
 
@@ -402,6 +532,352 @@ body {
     list-style: none; padding: 0; margin: 10px 0 0 0; font-size: 0.9rem;
 }
 
+/* --- ================================= --- */
+/* ---  MODAL EVENTO PARANORMAL (MALDICIÓN) --- */
+/* --- ================================= --- */
+
+.modal-evento {
+    border: 1px solid #9b59b6;
+    box-shadow: 0 0 30px rgba(155, 89, 182, 0.3), 0 5px 20px rgba(0, 0, 0, 0.7);
+    animation: eventoEntrada 0.6s ease-out;
+}
+
+.evento-icono {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    animation: eventoIconoPulso 2s ease-in-out infinite;
+}
+
+.evento-titulo {
+    font-family: var(--font-titulo);
+    color: #9b59b6 !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.evento-narrativa {
+    font-family: var(--font-cuerpo);
+    font-size: 0.95rem;
+    color: var(--color-texto-principal);
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+@keyframes eventoEntrada {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes eventoIconoPulso {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+/* --- ================================= --- */
+/* ---  MODAL ALIANZAS                    --- */
+/* --- ================================= --- */
+
+.modal-alianza {
+    border: 1px solid #e74c3c;
+    box-shadow: 0 0 30px rgba(231, 76, 60, 0.3), 0 5px 20px rgba(0, 0, 0, 0.7);
+    animation: eventoEntrada 0.6s ease-out;
+}
+
+.alianza-icono {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.alianza-titulo {
+    font-family: var(--font-titulo);
+    color: #e74c3c !important;
+    font-size: 1.3rem !important;
+    letter-spacing: 2px;
+}
+
+.alianza-narrativa {
+    font-family: var(--font-cuerpo);
+    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.pacto-jugadores {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.pacto-jugador-btn {
+    padding: 10px 15px;
+    background-color: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    color: var(--color-texto-principal);
+    font-family: var(--font-cuerpo);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.pacto-jugador-btn:hover {
+    border-color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.pacto-estado {
+    padding: 8px;
+    font-size: 0.85rem;
+    color: #e74c3c;
+    font-style: italic;
+}
+
+.pacto-acciones {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* Indicador de aliado durante el juego */
+.aliado-indicator {
+    text-align: center;
+    padding: 6px 14px;
+    background-color: rgba(231, 76, 60, 0.12);
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    font-family: var(--font-cuerpo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.aliado-indicator span {
+    color: var(--color-texto-principal);
+}
+
+/* Revelación de alianzas en fin de juego */
+.alianza-reveal {
+    text-align: center;
+    padding: 12px 16px;
+    margin-top: 10px;
+    background-color: rgba(231, 76, 60, 0.15);
+    border: 1px dashed #e74c3c;
+    animation: eventoEntrada 0.6s ease-out;
+}
+
+.alianza-reveal-title {
+    font-family: var(--font-titulo);
+    color: #e74c3c;
+    font-size: 1rem;
+    margin: 0 0 5px 0;
+}
+
+.alianza-reveal-text {
+    font-family: var(--font-cuerpo);
+    color: var(--color-texto-principal);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* --- ================================= --- */
+/* ---  MODO PODERES (TIENDA)             --- */
+/* --- ================================= --- */
+
+.poder-energia-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 14px;
+    margin-bottom: 10px;
+    background-color: rgba(243, 156, 18, 0.1);
+    border: 1px solid #f39c12;
+}
+
+.poder-energia-icono {
+    font-size: 1.2rem;
+}
+
+.poder-energia-valor {
+    font-family: var(--font-titulo);
+    color: #f39c12;
+    font-size: 1.1rem;
+    font-weight: 700;
+    min-width: 20px;
+}
+
+.btn-tienda {
+    padding: 4px 12px;
+    background-color: transparent;
+    border: 1px solid #f39c12;
+    color: #f39c12;
+    font-family: var(--font-cuerpo);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: auto;
+}
+
+.btn-tienda:hover {
+    background-color: rgba(243, 156, 18, 0.2);
+}
+
+/* Modal tienda */
+.modal-tienda {
+    border: 1px solid #f39c12;
+    box-shadow: 0 0 30px rgba(243, 156, 18, 0.3), 0 5px 20px rgba(0, 0, 0, 0.7);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.tienda-titulo {
+    font-family: var(--font-titulo);
+    color: #f39c12 !important;
+    font-size: 1.3rem !important;
+    letter-spacing: 2px;
+}
+
+.tienda-subtitulo {
+    font-family: var(--font-cuerpo);
+    color: var(--color-texto-secundario);
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+.tienda-catalogo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.tienda-poder-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background-color: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tienda-poder-card:hover:not(.poder-disabled) {
+    border-color: #f39c12;
+    background-color: rgba(243, 156, 18, 0.08);
+}
+
+.tienda-poder-card.poder-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tienda-poder-card.poder-comprado {
+    border-color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.08);
+}
+
+.poder-card-icono {
+    font-size: 1.5rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+.poder-card-info {
+    flex: 1;
+}
+
+.poder-card-nombre {
+    font-family: var(--font-titulo);
+    color: var(--color-texto-principal);
+    font-size: 0.95rem;
+}
+
+.poder-card-desc {
+    font-family: var(--font-cuerpo);
+    color: var(--color-texto-secundario);
+    font-size: 0.75rem;
+    margin-top: 2px;
+}
+
+.poder-card-coste {
+    font-family: var(--font-titulo);
+    color: #f39c12;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* --- ================================= --- */
+/* ---     INDICADOR DE TRAIDOR           --- */
+/* --- ================================= --- */
+
+.traitor-indicator {
+    text-align: center;
+    padding: 8px 16px;
+    background-color: rgba(46, 204, 113, 0.12);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    font-family: var(--font-cuerpo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    animation: traitorPulso 3s ease-in-out infinite;
+}
+
+@keyframes traitorPulso {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Revelación del traidor en pantalla de fin de juego */
+.traitor-reveal {
+    text-align: center;
+    padding: 12px 16px;
+    margin-top: 15px;
+    background-color: rgba(46, 204, 113, 0.15);
+    border: 1px dashed #2ecc71;
+    animation: eventoEntrada 0.6s ease-out;
+}
+
+.traitor-reveal-title {
+    font-family: var(--font-titulo);
+    color: #2ecc71;
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+}
+
+.traitor-reveal-text {
+    font-family: var(--font-cuerpo);
+    color: var(--color-texto-principal);
+    font-size: 0.9rem;
+    margin: 0;
+}
 
 /* --- ================================= --- */
 /* ---     ESTILOS PANTALLA DE JUEGO     --- */

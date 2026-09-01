@@ -19,6 +19,7 @@ export const state = {
     refJugadoresEnLobby: null,
     refEstadoPartida: null,
     refDatosJuego: null,
+    refModosEnLobby: null,
 
     // Temporizadores
     timerInterval: null,
@@ -58,6 +59,7 @@ export function resetState() {
     if (state.refJugadoresEnLobby) state.refJugadoresEnLobby.off();
     if (state.refEstadoPartida) state.refEstadoPartida.off();
     if (state.refDatosJuego) state.refDatosJuego.off();
+    if (state.refModosEnLobby) state.refModosEnLobby.off();
 
     // Resetear variables
     Object.assign(state, {
@@ -71,6 +73,7 @@ export function resetState() {
         refJugadoresEnLobby: null,
         refEstadoPartida: null,
         refDatosJuego: null,
+        refModosEnLobby: null,
         timerInterval: null,
         heConfirmadoMiVoto: false,
         processingVote: false // ¡RESET SEMÁFORO!

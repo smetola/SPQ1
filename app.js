@@ -116,6 +116,27 @@ elementRefs.btnCrearPartida.addEventListener('click', GameLogic.crearNuevaPartid
 elementRefs.btnUnirsePartida.addEventListener('click', UIManager.mostrarPantallaUnirse);
 elementRefs.btnComoJugar.addEventListener('click', UIManager.mostrarModalComoJugar);
 
+// Selector de Modos de Juego (Lobby)
+const botonesMode = document.querySelectorAll('.mode-toggle');
+botonesMode.forEach(btn => {
+    btn.addEventListener('click', () => {
+        import('./logic/modeManager.js').then(ModeManager => {
+            // Leer modos actuales de los botones (fuente de verdad local rápida)
+            const modosActuales = [];
+            document.querySelectorAll('.mode-toggle.activo').forEach(b => modosActuales.push(b.dataset.mode));
+
+            // Toggle del modo clickeado
+            const nuevosModos = ModeManager.toggleModo(btn.dataset.mode, modosActuales);
+
+            // Guardar en Firebase (se sincronizará con todos los jugadores)
+            ModeManager.guardarModosSeleccionados(nuevosModos);
+
+            // Actualizar UI local inmediatamente (sin esperar a Firebase)
+            UIManager.actualizarModosVisuales(nuevosModos);
+        });
+    });
+});
+
 // Indicador visual de conexión (opcional pero útil)
 const crearIndicadorConexion = () => {
     const indicador = document.createElement('div');
@@ -269,6 +290,94 @@ elementRefs.btnComenzarViaje.addEventListener('click', GameLogic.comenzarFaseCon
 elementRefs.btnComenzarRonda.addEventListener('click', GameLogic.comenzarFaseAsignacion);
 elementRefs.btnComenzarDebate.addEventListener('click', GameLogic.comenzarFaseDebate);
 elementRefs.btnConfirmarVoto.addEventListener('click', GameLogic.confirmarMiVoto);
+
+// Modal de Evento Paranormal (Modo Maldición)
+const btnContinuarEvento = document.getElementById('btnContinuarEvento');
+if (btnContinuarEvento) {
+    btnContinuarEvento.addEventListener('click', () => {
+        GameLogic.continuarDesdeEvento();
+    });
+}
+
+// Modal de Alianzas (Modo Alianzas)
+const btnAceptarPacto = document.getElementById('btnAceptarPacto');
+const btnRechazarPacto = document.getElementById('btnRechazarPacto');
+const btnSkipPacto = document.getElementById('btnSkipPacto');
+
+if (btnAceptarPacto) {
+    btnAceptarPacto.addEventListener('click', () => {
+        const modal = document.getElementById('modalPropuestaPacto');
+        const proponenteId = modal?.dataset?.proponenteId;
+        if (proponenteId) {
+            import('./logic/allianceManager.js').then(AM => {
+                AM.responderPacto(GameLogic.getJugadorIdActual?.() || '', proponenteId, true);
+                UIManager.ocultarModalesPacto();
+            });
+        }
+    });
+}
+
+if (btnRechazarPacto) {
+    btnRechazarPacto.addEventListener('click', () => {
+        const modal = document.getElementById('modalPropuestaPacto');
+        const proponenteId = modal?.dataset?.proponenteId;
+        if (proponenteId) {
+            import('./logic/allianceManager.js').then(AM => {
+                AM.responderPacto(GameLogic.getJugadorIdActual?.() || '', proponenteId, false);
+                UIManager.ocultarModalesPacto();
+            });
+        }
+    });
+}
+
+if (btnSkipPacto) {
+    btnSkipPacto.addEventListener('click', () => {
+        UIManager.ocultarModalesPacto();
+    });
+}
+
+// Tienda de Poderes (Modo Poderes)
+const btnAbrirTienda = document.getElementById('btnAbrirTienda');
+const btnCerrarTienda = document.getElementById('btnCerrarTienda');
+
+if (btnAbrirTienda) {
+    btnAbrirTienda.addEventListener('click', async () => {
+        const PM = await import('./logic/powerManager.js');
+        const { state } = await import('./logic/gameState.js');
+        const db = firebase.database();
+
+        async function abrirTiendaConDatos() {
+            const snapshot = await db.ref(`partidas/${state.salaActual}`).once('value');
+            const partida = snapshot.val();
+            if (!partida) return;
+
+            const energiaActual = PM.getEnergia(state.jugadorIdActual, partida);
+            const poderesActivos = partida.modoConfig?.poderes?.poderesActivos?.[state.jugadorIdActual] || {};
+
+            UIManager.mostrarTienda(
+                PM.CATALOGO_PODERES,
+                energiaActual,
+                poderesActivos,
+                async (poderId) => {
+                    const resultado = await PM.comprarPoder(state.jugadorIdActual, poderId);
+                    if (resultado.exito) {
+                        await abrirTiendaConDatos(); // Refrescar tienda
+                    } else {
+                        console.warn('No se pudo comprar el poder:', resultado.error);
+                    }
+                }
+            );
+        }
+
+        await abrirTiendaConDatos();
+    });
+}
+
+if (btnCerrarTienda) {
+    btnCerrarTienda.addEventListener('click', () => {
+        UIManager.cerrarTienda();
+    });
+}
 
 // Botón de salida global (con confirmación)
 elementRefs.btnSalirPartida.addEventListener('click', async () => {

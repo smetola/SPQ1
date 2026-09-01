@@ -3,7 +3,7 @@
 import { state, initDatabase, initModalManager } from './logic/gameState.js';
 import { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida } from './logic/lobbyManager.js';
 import { empezarPartida, avanzarSiguienteRonda } from './logic/roundManager.js';
-import { comenzarFaseConocimiento, comenzarFaseDebate } from './logic/phaseManager.js'; // Importa fase conocimiento
+import { comenzarFaseConocimiento, comenzarFaseDebate, continuarDesdeEvento } from './logic/phaseManager.js';
 import { repartirAtributos, asignarAtributoAPersonaje } from './logic/attributeManager.js';
 import { seleccionarVoto, confirmarMiVoto } from './logic/votingManager.js'; // ¡NUEVAS importaciones!
 
@@ -18,6 +18,10 @@ export function getMiPersonaje() {
     return state.miPersonajeSecreto;
 }
 
+export function getJugadorIdActual() {
+    return state.jugadorIdActual;
+}
+
 // Re-exportar funciones del lobby
 export { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida };
 
@@ -25,7 +29,7 @@ export { crearNuevaPartida, unirseAPartida, handleSalir, reiniciarPartida };
 export { empezarPartida, avanzarSiguienteRonda };
 
 // Re-exportar funciones de fases
-export { comenzarFaseConocimiento, comenzarFaseDebate };
+export { comenzarFaseConocimiento, comenzarFaseDebate, continuarDesdeEvento };
 // 'comenzarFaseVotacion' ya no se llama desde la UI, sino desde el temporizador o el host
 
 // Re-exportar funciones de atributos

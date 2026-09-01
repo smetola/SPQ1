@@ -59,9 +59,22 @@ export function escucharJugadoresEnLobby() {
                 UI.actualizarListaLobby(jugadores, state.jugadorIdActual);
             }
         }
+
+        // Mostrar selector de modos según el rol
+        UI.mostrarSelectorModos(state.soyAnfitrion);
     }, (error) => {
         console.error('❌ Error en listener de lobby:', error);
     });
+
+    // Listener separado para sincronizar los modos seleccionados en tiempo real
+    const refModos = database.ref(`partidas/${state.salaActual}/modosActivos`);
+    refModos.on('value', (snapshot) => {
+        const modosActivos = snapshot.val() || [];
+        UI.actualizarModosVisuales(modosActivos);
+    });
+
+    // Guardar ref para poder hacer .off() al salir del lobby
+    state.refModosEnLobby = refModos;
 }
 
 // Escuchar cuando la partida comienza
@@ -79,6 +92,10 @@ export function escucharInicioPartida() {
 
             if (state.refJugadoresEnLobby) state.refJugadoresEnLobby.off();
             state.refJugadoresEnLobby = null;
+
+            // Limpiar listener de modos del lobby (ya no se necesita)
+            if (state.refModosEnLobby) state.refModosEnLobby.off();
+            state.refModosEnLobby = null;
 
             escucharDatosJuego();
         }
@@ -263,7 +280,10 @@ export function escucharDatosJuego() {
             const esRondaFinal = jugadoresVivos.length === 2;
             const estoyVivo = jugadores[state.jugadorIdActual]?.personaje?.estaVivo ?? true;
             const historiaActual = partida.historiaActual || null;
-            UI.gestionarBotonConfirmar(true, state.heConfirmadoMiVoto, !!(jugadores[state.jugadorIdActual]?.votoSeleccionado), estoyVivo, historiaActual, esRondaFinal);
+            const muertosVotanEvento = partida.modoConfig?.maldicion?.eventoEspecial === 'muertosVotan';
+            // Si el evento muertosVotan está activo, tratamos a los muertos como vivos para la UI de votación
+            const puedeVotar = estoyVivo || esRondaFinal || muertosVotanEvento;
+            UI.gestionarBotonConfirmar(true, state.heConfirmadoMiVoto, !!(jugadores[state.jugadorIdActual]?.votoSeleccionado), puedeVotar, historiaActual, esRondaFinal);
 
             if (debateEndTime && state.timerInterval === null) {
                 state.timerInterval = setInterval(() => {
@@ -284,12 +304,12 @@ export function escucharDatosJuego() {
             if (state.soyAnfitrion && jugadores) {
                 const jugadoresVivos = Object.values(jugadores).filter(j => j.personaje?.estaVivo);
                 const esRondaFinal = jugadoresVivos.length === 2;
+                const muertosVotanEvento = partida.modoConfig?.maldicion?.eventoEspecial === 'muertosVotan';
 
                 if (jugadoresVivos.length > 0) {
-                    // Si es ronda final, esperar a que TODOS voten (vivos + muertos)
-                    // Si no, solo esperar a los vivos
+                    // Si es ronda final O evento muertosVotan, esperar a que TODOS voten
                     const todosLosJugadores = Object.values(jugadores);
-                    const jugadoresQueDebenVotar = esRondaFinal ? todosLosJugadores : jugadoresVivos;
+                    const jugadoresQueDebenVotar = (esRondaFinal || muertosVotanEvento) ? todosLosJugadores : jugadoresVivos;
                     const confirmados = jugadoresQueDebenVotar.filter(j => j.votoConfirmado).length;
 
                     if (confirmados === jugadoresQueDebenVotar.length) {
@@ -321,6 +341,9 @@ export function escucharDatosJuego() {
             if (faseActual !== 'resultados') {
                 UI.ocultarModalResultados();
             }
+            if (faseActual !== 'evento') {
+                UI.ocultarModalEvento();
+            }
 
             if (faseActual === 'historia') {
                 // Nueva fase: Mostrar pantalla de historia
@@ -334,6 +357,50 @@ export function escucharDatosJuego() {
                 state.processingVote = false;
                 UI.ocultarPantallaHistoria();
                 UI.mostrarPantallaJuego(state.soyAnfitrion);
+
+                // MODO TRAIDOR: Mostrar indicador secreto al traidor
+                const traitorId = partida.modoConfig?.traidor?.traitorId;
+                if (traitorId && traitorId === state.jugadorIdActual) {
+                    UI.mostrarIndicadorTraidor();
+                } else {
+                    UI.ocultarIndicadorTraidor();
+                }
+
+                // MODO ALIANZAS: Mostrar indicador de aliado si tiene pacto
+                const miPacto = partida.modoConfig?.alianzas?.pactos;
+                if (miPacto) {
+                    UI.actualizarIndicadorAliado(state.jugadorIdActual, partida);
+                }
+
+                // MODO ALIANZAS: Fase de pactos (primera ronda)
+                const fasePactoActiva = partida.modoConfig?.alianzas?.fasePacto;
+                const variante = partida.modoConfig?.alianzas?.variante;
+                if (fasePactoActiva && variante === 'pactoMutuo') {
+                    // Mostrar modal de pacto al jugador
+                    UI.mostrarModalPacto(jugadores, state.jugadorIdActual, partida);
+                } else if (fasePactoActiva && variante === 'triangulo' && state.soyAnfitrion) {
+                    // Triángulo: el anfitrión asigna automáticamente
+                    import('./allianceManager.js').then(AM => {
+                        const vivosIds = Object.entries(jugadores)
+                            .filter(([_, j]) => j.personaje?.estaVivo)
+                            .map(([id]) => id);
+                        const triUpdates = AM.generarTriangulo(vivosIds);
+                        const database = getDatabase();
+                        // Marcar fasePacto como false después de generar
+                        triUpdates[`partidas/${state.salaActual}/modoConfig/alianzas/fasePacto`] = false;
+                        database.ref().update(triUpdates);
+                    });
+                }
+
+                // MODO PODERES: Mostrar/actualizar barra de energía
+                const modosActivos = partida.modosActivos || [];
+                if (modosActivos.includes('poderes')) {
+                    const energia = partida.modoConfig?.poderes?.energia?.[state.jugadorIdActual] || 0;
+                    UI.actualizarBarraEnergia(energia);
+                } else {
+                    UI.ocultarBarraEnergia();
+                }
+
                 // Si NO soy anfitrión, mostrar mensaje de espera
                 if (!state.soyAnfitrion) {
                     UI.mostrarMensajeEspera("Esperando a que el anfitrión comience la ronda...");
@@ -349,6 +416,15 @@ export function escucharDatosJuego() {
                     UI.mostrarModalAsignacion(state.miAtributoParaAsignar, estoyVivo);
                 }
                 UI.ocultarMensajeEspera(); // Se oculta en el modal
+            }
+            else if (faseActual === 'evento') {
+                // Fase de evento paranormal (Modo Maldición)
+                state.processingVote = false;
+                const eventoActual = partida.modoConfig?.maldicion?.eventoActual;
+                if (eventoActual) {
+                    UI.mostrarModalEvento(eventoActual, state.soyAnfitrion);
+                }
+                UI.ocultarMensajeEspera();
             }
             else if (faseActual === 'debate') {
                 state.processingVote = false;
@@ -370,8 +446,22 @@ export function escucharDatosJuego() {
             }
             else if (faseActual === 'fin') {
                 state.processingVote = false;
+                UI.ocultarIndicadorTraidor();
                 UI.mostrarPantallaFinJuego();
                 UI.mostrarModalFinJuego(ganador, state.soyAnfitrion);
+
+                // MODO TRAIDOR: Revelar al traidor al final
+                const traitorId = partida.modoConfig?.traidor?.traitorId;
+                if (traitorId && jugadores[traitorId]) {
+                    const traitor = jugadores[traitorId];
+                    const traitorEliminado = !traitor.personaje?.estaVivo;
+                    UI.mostrarRevelacionTraidor(
+                        traitor.nombre,
+                        traitor.personaje?.nombre || '???',
+                        traitorEliminado
+                    );
+                }
+
                 UI.ocultarMensajeEspera();
             }
 

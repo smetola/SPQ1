@@ -134,6 +134,66 @@ export const HISTORIAS = [
             "BraiiiiiiinnnzzzZ...",
             "CereeeebroooooosS..."
         ]
+    },
+    {
+        titulo: "LA MANSIÓN DE LOS ESPEJOS",
+        subtitulo: "Una cena que nunca termina",
+        modoVinculado: "maldicion", // Solo aparece si el modo Maldición está activo
+        texto: `Año 1923. Habéis sido invitados a la mansión del Conde Vladislav para una cena de gala. La invitación llegó en un sobre negro, sellado con cera carmesí. Ninguno de vosotros recuerda exactamente cómo llegasteis aquí.\n\nAl entrar, las puertas se sellan a vuestras espaldas. Los espejos muestran reflejos que no son los vuestros. Las velas se encienden solas. Y en la mesa del comedor, una nota escrita con tinta roja:\n\n"La mansión necesita un alma. Solo una. Elegid quién se queda... o la casa elegirá por vosotros."\n\nCada noche, la mansión despierta. Eventos inexplicables alteran la realidad. Alguien resucita. Alguien muere sin razón. Las reglas cambian cuando la casa quiere.\n\nLa única forma de escapar es que solo quede uno. La mansión solo necesita un alma... y liberará al resto.\n\n<em>Solo puede quedar uno.</em>`,
+        mensajesMuertos: [
+            "La mansión te ha reclamado.",
+            "Los espejos ya no muestran tu reflejo.",
+            "Tu alma vaga por los pasillos... sin voz.",
+            "Las paredes susurran tu nombre. Pero nadie te oye.",
+            "La casa te devoró. Ya no decides.",
+            "Eres parte de la mansión ahora.",
+            "Las sombras te abrazaron. No hay vuelta.",
+            "Los candelabros se apagaron para ti.",
+            "Tu lugar está entre los cuadros de la pared.",
+            "La cena terminó para ti. Eres el postre.",
+            "Los fantasmas no votan. Solo observan.",
+            "La mansión tiene tu alma. Y no la devuelve."
+        ]
+    },
+    {
+        titulo: "EL BÚNKER ALFA-7",
+        subtitulo: "Confía en alguien. O muere solo.",
+        modoVinculado: "alianzas",
+        texto: `Año 2087. La superficie es inhabitable. Radiación, tormentas magnéticas, y algo más... algo que se mueve entre las ruinas.\n\nHabéis encontrado refugio en el Búnker Alfa-7, un complejo militar abandonado con suministros para sobrevivir tres meses. Pero hay un problema: sois demasiados. Los recursos no dan para todos.\n\nUna voz metálica resuena por los altavoces: "PROTOCOLO DE SUPERVIVENCIA ACTIVADO. Los vínculos serán vuestra salvación... o vuestra condena. Elegid sabiamente a quién proteger."\n\nEn este búnker, nadie sobrevive solo. Pero confiar en la persona equivocada puede ser peor que la radiación.\n\nFormad alianzas. Proteged a vuestro aliado. Porque si cae... caéis con él.\n\n<em>Solo puede quedar uno... o quizás dos.</em>`,
+        mensajesMuertos: [
+            "La radiación te alcanzó. Descansa.",
+            "El búnker te expulsó.",
+            "Tus aliados no pudieron salvarte.",
+            "Las puertas se cerraron sin ti.",
+            "Tu ración fue la última.",
+            "La superficie te reclama.",
+            "Nadie escucha tus golpes en la puerta.",
+            "El protocolo te eliminó.",
+            "Tu aliado cayó... y tú con él.",
+            "Los suministros se acabaron para ti.",
+            "La radiación no perdona.",
+            "El búnker tiene memoria. Y te olvidó."
+        ]
+    },
+    {
+        titulo: "EL LABORATORIO DEL DR. KESSLER",
+        subtitulo: "El poder tiene un precio",
+        modoVinculado: "poderes",
+        texto: `Despertáis en camillas metálicas, conectados a máquinas que zumban. No recordáis cómo llegasteis aquí. Lo último que recordáis es una bebida, una sonrisa amable, y después... oscuridad.\n\nUna pantalla parpadea: "PROYECTO KESSLER — FASE 3: POTENCIACIÓN". El Dr. Kessler os seleccionó por una razón. Cada uno de vosotros ha sido modificado. Mejorado. Tenéis habilidades que antes no teníais.\n\nPero hay un problema: el laboratorio se está autodestruyendo. Las puertas solo se abren para uno. Y las habilidades que os dio... también pueden usarse los unos contra los otros.\n\nUsad vuestros poderes con astucia. Gastad vuestra energía sabiamente. Porque en este laboratorio, la inteligencia supera a la fuerza.\n\n<em>Solo puede quedar uno.</em>`,
+        mensajesMuertos: [
+            "El experimento terminó para ti.",
+            "Tu energía se agotó.",
+            "El Dr. Kessler te descartó.",
+            "Las máquinas te apagaron.",
+            "Tu potenciación fue... insuficiente.",
+            "El laboratorio te clasificó como prescindible.",
+            "Error en el sujeto. Eliminando...",
+            "Tu poder no fue suficiente.",
+            "Fase 3 completada. Sujeto descartado.",
+            "Las puertas no se abrirán para ti.",
+            "Tu modificación fue un fracaso.",
+            "El Dr. Kessler ya no te necesita."
+        ]
     }
 ];
 

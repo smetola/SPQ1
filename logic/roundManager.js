@@ -3,6 +3,10 @@
 import { state, getDatabase, getModalManager } from './gameState.js';
 import * as Data from '../gameData.js';
 import { obtenerPoolAtributos, obtenerPoolNombres } from './attributeGenerator.js';
+import { esModoActivo } from './modeManager.js';
+import { inicializarModoTraidor } from './traitorManager.js';
+import { inicializarModoAlianzas } from './allianceManager.js';
+import { inicializarModoPoderes, otorgarEnergiaRonda, limpiarPoderesRonda } from './powerManager.js';
 
 // Generar pools expandidos de atributos (originales + generados)
 function generarPoolsExpandidos() {
@@ -78,9 +82,43 @@ export async function empezarPartida() {
         // Inicializar índice de progresión
         actualizaciones[`partidas/${state.salaActual}/progressionIndex`] = 0;
 
-        // Seleccionar historia aleatoria
-        const historiaSeleccionada = Data.HISTORIAS[Math.floor(Math.random() * Data.HISTORIAS.length)];
+        // Seleccionar historia según los modos activos
+        const modosActivos = snapshot.val().modosActivos || [];
+        let historiaSeleccionada;
+
+        // Buscar historias vinculadas a modos activos
+        const historiasVinculadas = Data.HISTORIAS.filter(h => 
+            h.modoVinculado && modosActivos.includes(h.modoVinculado)
+        );
+
+        if (historiasVinculadas.length > 0) {
+            // Si hay historias vinculadas a modos activos, elegir una de ellas
+            historiaSeleccionada = historiasVinculadas[Math.floor(Math.random() * historiasVinculadas.length)];
+        } else {
+            // Si no, elegir entre las historias genéricas (sin modoVinculado)
+            const historiasGenericas = Data.HISTORIAS.filter(h => !h.modoVinculado);
+            historiaSeleccionada = historiasGenericas[Math.floor(Math.random() * historiasGenericas.length)];
+        }
+
         actualizaciones[`partidas/${state.salaActual}/historiaActual`] = historiaSeleccionada;
+
+        // MODO TRAIDOR: Inicializar si está activo
+        if (modosActivos.includes('traidor')) {
+            const traitorUpdates = inicializarModoTraidor(jugadorIDs);
+            Object.assign(actualizaciones, traitorUpdates);
+        }
+
+        // MODO ALIANZAS: Inicializar si está activo
+        if (modosActivos.includes('alianzas')) {
+            const alianzaUpdates = inicializarModoAlianzas(jugadorIDs);
+            Object.assign(actualizaciones, alianzaUpdates);
+        }
+
+        // MODO PODERES: Inicializar si está activo
+        if (modosActivos.includes('poderes')) {
+            const poderUpdates = inicializarModoPoderes(jugadorIDs);
+            Object.assign(actualizaciones, poderUpdates);
+        }
 
         actualizaciones[`partidas/${state.salaActual}/faseActual`] = 'historia';
         actualizaciones[`partidas/${state.salaActual}/estado`] = 'jugando';
@@ -137,6 +175,14 @@ export function avanzarSiguienteRonda() {
                 progressionIndex: nuevoIndex,
                 faseActual: 'conocimiento'
             });
+
+            // MODO PODERES: Otorgar energía y limpiar poderes de la ronda
+            const modosActivos = partida.modosActivos || [];
+            if (modosActivos.includes('poderes')) {
+                const energiaUpdates = otorgarEnergiaRonda(partida);
+                const limpiarUpdates = limpiarPoderesRonda(partida);
+                database.ref().update({ ...energiaUpdates, ...limpiarUpdates });
+            }
         }
     });
 }
