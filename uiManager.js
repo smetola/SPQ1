@@ -1,6 +1,7 @@
 // Contenido para: uiManager.js
 
 import { generarLotePrueba, generarLotePruebaNombres } from './logic/attributeGenerator.js';
+import * as VideoManager from './videoManager.js';
 
 // Almacén para las referencias del DOM
 let refs = {};
@@ -12,6 +13,9 @@ let logic = {}; // Almacén para la lógica (para el clic de la tarjeta)
 export function init(elementRefs, logicHandlers) {
     refs = elementRefs;
     logic = logicHandlers;
+    
+    // Inicializar el gestor de videos
+    VideoManager.init();
 }
 
 // --- FUNCIONES DE NAVEGACIÓN ---
@@ -36,6 +40,7 @@ export function mostrarLobby(codigoSala) {
 
     ocultarModalResultados();
     ocultarModalFinJuego();
+    VideoManager.hideVideo();
 }
 
 /**
@@ -60,6 +65,7 @@ export function mostrarPantallaJuego(esAnfitrion) {
 
     refs.gameRondaTitulo.textContent = "FASE DE CONOCIMIENTO";
     refs.gameRondaInstruccion.textContent = "Desliza para ver a todos los supervivientes.";
+    VideoManager.hideVideo();
 }
 
 export function volverAlMenu() {
@@ -80,6 +86,7 @@ export function volverAlMenu() {
     refs.gameTimer.style.display = 'none';
     refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida
     refs.mainMenu.style.display = 'flex';
+    VideoManager.hideVideo();
 }
 
 // --- FUNCIONES DE OCULTAR ---
@@ -114,10 +121,14 @@ export function mostrarPantallaHistoria(historia, esAnfitrion) {
 
     // Mostrar botón solo para el anfitrión
     refs.btnComenzarViaje.style.display = esAnfitrion ? 'block' : 'none';
+
+    // Cambiar el video de fondo según la historia
+    VideoManager.setStoryVideo(historia.titulo);
 }
 
 export function ocultarPantallaHistoria() {
     refs.storyScreen.style.display = 'none';
+    VideoManager.hideVideo();
 }
 
 // --- FUNCIONES DE MODAL CÓMO JUGAR ---
