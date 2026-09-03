@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
 
     <title>Solo puede quedar 1</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto:wght@400;700&display=swap"
@@ -56,6 +56,7 @@
 
             <button id="btnCrearPartida" class="btn-primary">[ CREAR PARTIDA ]</button>
             <button id="btnUnirsePartida" class="btn-primary">[ UNIRSE A PARTIDA ]</button>
+            <button id="btnVerModos" class="btn-secondary" style="border-color: #f1c40f; color: #f1c40f;">[ 🎮 MODOS DE JUEGO ]</button>
             <button id="btnComoJugar" class="btn-secondary">[ CÓMO JUGAR ]</button>
         </main>
 
@@ -351,6 +352,56 @@
         </div>
     </div>
 
+    <!-- Modal Guía de Modos de Juego -->
+    <div id="modalGuiaModos" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-como-jugar">
+            <h3 class="modal-como-jugar-titulo" style="color: #f1c40f;">🎮 MODOS DE JUEGO</h3>
+            <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px; text-align: center;">
+                ¡Puedes activar uno o combinarlos todos en el <strong>LOBBY</strong> antes de empezar!
+            </p>
+            <div class="modal-como-jugar-contenido">
+                <section class="regla-seccion" style="border-left: 3px solid #9b59b6; padding-left: 10px;">
+                    <h4 style="color: #9b59b6;">🔮 MODO MALDICIÓN</h4>
+                    <p>Antes de cada debate, los espíritus interfieren con eventos paranormales aleatorios de probabilidad creciente.</p>
+                    <p>• <strong>Efectos:</strong> Inmunidad oculta, resurrección de caídos, muertos que votan, o el temido <em>Reloj de Arena</em> (en empate, mueren todos los empatados).</p>
+                    <p>• <strong>Historia temática:</strong> <em>La Mansión de los Espejos</em>.</p>
+                </section>
+
+                <section class="regla-seccion" style="border-left: 3px solid #f1c40f; padding-left: 10px;">
+                    <h4 style="color: #f1c40f;">⚡ MODO PODERES</h4>
+                    <p>Cada jugador gana 1⚡ de energía por ronda viva para gastar en la <strong>Tienda</strong> antes del debate.</p>
+                    <p>• <strong>Poderes:</strong> Escudo defensivo (salva de la eliminación), Voto Doble (x2), Camuflaje, Robar Atributo, Espiar y Falsificar.</p>
+                    <p>• <strong>Historia temática:</strong> <em>El Laboratorio del Dr. Kessler</em>.</p>
+                </section>
+
+                <section class="regla-seccion" style="border-left: 3px solid #e74c3c; padding-left: 10px;">
+                    <h4 style="color: #e74c3c;">💕 MODO ALIANZAS</h4>
+                    <p>En la Ronda 1 se forjan pactos secretos (mutuos o en triángulo A→B→C→A).</p>
+                    <p>• <strong>Muertes Vinculadas:</strong> Si tu aliado es eliminado en la votación, ¡tú también mueres instantáneamente!</p>
+                    <p>• <strong>Victoria Conjunta:</strong> Si ambos aliados sobreviven hasta el final, ¡ganan juntos!</p>
+                    <p>• <strong>Historia temática:</strong> <em>El Búnker Alfa-7</em>.</p>
+                </section>
+
+                <section class="regla-seccion" style="border-left: 3px solid #2ecc71; padding-left: 10px;">
+                    <h4 style="color: #2ecc71;">🕵️ MODO TRAIDOR</h4>
+                    <p>Un jugador recibe un rol secreto con un objetivo invertido:</p>
+                    <p>• <strong>Objetivo del Traidor:</strong> ¡Hacer que el grupo lo vote y lo ELIMINE para ganar la partida él solo!</p>
+                    <p>• Al final de la partida se revela públicamente quién era y si consiguió su plan maestro.</p>
+                </section>
+
+                <section class="regla-seccion regla-tip" style="background: rgba(241, 196, 15, 0.08); border-left: 3px solid #f1c40f; padding: 10px;">
+                    <h4 style="color: #f1c40f;">🚀 ¿CÓMO SE ACCEDE Y SE JUEGA?</h4>
+                    <p><strong>1.</strong> Pulsa en <strong>[ CREAR PARTIDA ]</strong> en el menú principal.</p>
+                    <p><strong>2.</strong> En la pantalla del <strong>Lobby</strong>, verás el panel <strong>MODOS DE JUEGO</strong> justo debajo de la lista de jugadores.</p>
+                    <p><strong>3.</strong> Pulsa sobre los modos que quieras activar. ¡Se iluminarán con su color! (Puedes combinar varios).</p>
+                    <p><strong>4.</strong> Pulsa <strong>[ EMPEZAR PARTIDA ]</strong> cuando estéis listos.</p>
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 5px;"><em>Tip: Si pruebas tú solo, activa "Modo Desarrollador" en el engranaje ⚙️ para usar el botón [+ BOT].</em></p>
+                </section>
+            </div>
+            <button id="btnCerrarGuiaModos" class="btn-primary">[ ENTENDIDO ]</button>
+        </div>
+    </div>
+
     <!-- Modal genérico para mensajes personalizados -->
     <div id="modalGenerico" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -498,7 +549,7 @@
     </script>
 
     <!-- Cache-busting: incrementa v= cuando hagas cambios -->
-    <script type="module" src="app.js?v=1.5"></script>
+    <script type="module" src="app.js?v=2.1"></script>
 
 </body>
 

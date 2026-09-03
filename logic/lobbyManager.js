@@ -71,7 +71,7 @@ export function crearNuevaPartida() {
             // Marcar jugador como presente y configurar sistema de reconexión
             marcarJugadorPresente();
 
-            UI.mostrarLobby(codigoSala);
+            UI.mostrarLobby(codigoSala, true);
             escucharJugadoresEnLobby();
             escucharInicioPartida();
         })
@@ -112,7 +112,7 @@ export async function unirseAPartida(codigo, nombre) {
         // Marcar jugador como presente y configurar sistema de reconexión
         marcarJugadorPresente();
         
-        UI.mostrarLobby(codigo);
+        UI.mostrarLobby(codigo, false);
         escucharJugadoresEnLobby();
         escucharInicioPartida();
     }).catch((error) => console.error("Error al comprobar la sala:", error));

@@ -28,7 +28,8 @@ body {
     min-height: 100vh;
     box-sizing: border-box;
     position: relative; /* Para posicionar el botón de salida */
-    overflow: hidden; /* Evitar scrollbars por el video */
+    overflow-x: hidden; /* Evitar scrollbars horizontales por el video */
+    overflow-y: auto; /* Permitir scroll vertical cuando el contenido sea largo */
 }
 
 /* --- Video de Fondo --- */

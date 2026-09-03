@@ -116,6 +116,23 @@ elementRefs.btnCrearPartida.addEventListener('click', GameLogic.crearNuevaPartid
 elementRefs.btnUnirsePartida.addEventListener('click', UIManager.mostrarPantallaUnirse);
 elementRefs.btnComoJugar.addEventListener('click', UIManager.mostrarModalComoJugar);
 
+// Modal de Guía de Modos de Juego
+const btnVerModos = document.getElementById('btnVerModos');
+const modalGuiaModos = document.getElementById('modalGuiaModos');
+const btnCerrarGuiaModos = document.getElementById('btnCerrarGuiaModos');
+
+if (btnVerModos && modalGuiaModos) {
+    btnVerModos.addEventListener('click', () => {
+        modalGuiaModos.style.display = 'flex';
+    });
+}
+
+if (btnCerrarGuiaModos && modalGuiaModos) {
+    btnCerrarGuiaModos.addEventListener('click', () => {
+        modalGuiaModos.style.display = 'none';
+    });
+}
+
 // Selector de Modos de Juego (Lobby)
 const botonesMode = document.querySelectorAll('.mode-toggle');
 botonesMode.forEach(btn => {

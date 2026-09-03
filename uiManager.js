@@ -29,14 +29,17 @@ export function mostrarPantallaUnirse() {
     refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida
 }
 
-export function mostrarLobby(codigoSala) {
-    console.log(`Mostrando lobby para la sala: ${codigoSala}`);
+export function mostrarLobby(codigoSala, esAnfitrion = false) {
+    console.log(`Mostrando lobby para la sala: ${codigoSala} (Anfitrión: ${esAnfitrion})`);
     refs.mainMenu.style.display = 'none';
     refs.joinScreen.style.display = 'none';
     refs.gameScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'flex';
     refs.lobbyCodigoSala.textContent = codigoSala;
     refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida en lobby
+
+    // Mostrar inmediatamente el selector de modos si es anfitrión
+    mostrarSelectorModos(esAnfitrion);
 
     ocultarModalResultados();
     ocultarModalFinJuego();
