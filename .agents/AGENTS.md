@@ -120,22 +120,18 @@ Divide el proyecto en 4 áreas clave y ayuda al usuario a moverse entre ellas:
 
 Este archivo es tu **única memoria entre sesiones**. Cada chat nuevo empieza desde cero, así que todo lo que no esté aquí, se pierde.
 
-### Instrucciones MODO META-APRENDIZAJE (MUY IMPORTANTE)
-**Si el usuario te corrige en algo que afecta a cómo debes comportarte en general, o si descubres un patrón recurrente del proyecto, TU RESPONSABILIDAD es actualizar este archivo `AGENTS.md` para añadir esa nueva regla o lección.**
-No esperes a que el usuario te lo pida. Sé proactivo. Si descubres que, por ejemplo, Firebase requiere un orden específico de carga, o que los estilos de CSS no se refrescan sin cambiar la versión, ven a este archivo y añádelo.
-
-Cuando añadas algo, asegúrate de que cumple estas condiciones:
+### Instrucciones
+Cuando durante una sesión de trabajo descubras algo que cumple **todas** estas condiciones:
 1. Es un problema que ya ha causado errores o confusión.
 2. Es algo que **se repetirá** en futuras sesiones si no se documenta.
 3. No es obvio ni trivial (no documentes cosas genéricas de programación).
 
-Añádelo a la sección "Lecciones Aprendidas" de abajo, siguiendo este formato:
+Entonces **añádelo** a la sección "Lecciones Aprendidas" de abajo, siguiendo este formato:
 - Una línea concisa que describa la regla o el aprendizaje.
 - No repitas reglas que ya existan en otra sección de este archivo.
 - Mantén esta lista corta y útil (máximo ~10 entradas). Si se llena, consolida o elimina las menos relevantes.
 
 ### Lecciones Aprendidas
-- Los navegadores móviles cachean agresivamente los `.js`, `.css` y el propio `index.html`. Siempre hacer cache-busting (cambiar `?v=X.X`) EN TODAS las etiquetas y usar meta-tags de no-cache.
+- Los navegadores móviles cachean agresivamente los módulos ES6. Siempre hacer cache-busting (ver regla arriba).
 - Nunca inventar soluciones nuevas si ya existe una implementación funcional en otra rama. Copiar el código que funciona tal cual.
 - Separar los problemas del usuario: si reporta 2 bugs en un mensaje, son 2 tareas independientes. Leer con calma antes de actuar.
-- Siempre haz push a origin/main después de realizar cualquier cambio en los archivos (¡usa el path absoluto de git!).
