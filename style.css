@@ -53,6 +53,7 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.6); /* Oscurecer el video para legibilidad */
     z-index: -1;
+    display: none; /* Oculto por defecto para no oscurecer el fondo estático */
 }
 
 .container {
