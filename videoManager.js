@@ -16,7 +16,6 @@ const VIDEO_MAP = {
 let videoElement = null;
 let videoSource = null;
 let bgFixed = null;
-let videoOverlay = null;
 
 export function init() {
     // Crear el elemento de video dinámicamente
@@ -37,7 +36,6 @@ export function init() {
     document.body.insertBefore(videoElement, document.body.firstChild);
 
     bgFixed = document.querySelector('.bg-fixed');
-    videoOverlay = document.querySelector('.video-overlay');
 
     console.log('📹 Video Manager initialized');
 }
@@ -66,9 +64,6 @@ export function setStoryVideo(storyTitle) {
         if (bgFixed) {
             bgFixed.style.display = 'none';
         }
-        if (videoOverlay) {
-            videoOverlay.style.display = 'block';
-        }
 
         // Intentar reproducir (necesario en algunos navegadores)
         videoElement.play().catch(err => {
@@ -87,9 +82,6 @@ export function hideVideo() {
     if (videoElement) {
         videoElement.style.display = 'none';
         videoElement.pause();
-    }
-    if (videoOverlay) {
-        videoOverlay.style.display = 'none';
     }
     if (bgFixed) {
         bgFixed.style.display = 'block';
