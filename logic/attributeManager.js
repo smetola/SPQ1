@@ -23,9 +23,7 @@ export function repartirAtributos() {
         // --- LÓGICA DE PROGRESIÓN DINÁMICA ---
         let tierUsar = 'bronce';
 
-        if (jugadoresVivos <= 2) {
-            tierUsar = 'lifeordeath';
-        } else if (index === 0) {
+        if (index === 0) {
             tierUsar = 'bronce';
         } else if (index === 1) {
             tierUsar = 'plata';
@@ -40,6 +38,12 @@ export function repartirAtributos() {
             } else {
                 tierUsar = 'platino';
             }
+        }
+
+        // El duelo final siempre reparte atributos extremos de lifeordeath
+        // (Salvo en la primera ronda, para que al testear con 2 jugadores se vea la progresión inicial)
+        if (jugadoresVivos <= 2 && index > 0) {
+            tierUsar = 'lifeordeath';
         }
 
         console.log(`Repartiendo atributos. Índice: ${index}. Jugadores vivos: ${jugadoresVivos}. Tier: ${tierUsar}`);
