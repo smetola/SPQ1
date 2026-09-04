@@ -43,7 +43,6 @@ export function mostrarLobby(codigoSala, esAnfitrion = false) {
 
     ocultarModalResultados();
     ocultarModalFinJuego();
-    VideoManager.hideVideo();
 }
 
 /**
@@ -68,11 +67,13 @@ export function mostrarPantallaJuego(esAnfitrion) {
 
     refs.gameRondaTitulo.textContent = "FASE DE CONOCIMIENTO";
     refs.gameRondaInstruccion.textContent = "Desliza para ver a todos los supervivientes.";
-    VideoManager.hideVideo();
 }
 
 export function volverAlMenu() {
     console.log("Volviendo al menú principal...");
+
+    // Ocultar video de fondo (si lo hubiera)
+    VideoManager.hideVideo();
 
     refs.joinScreen.style.display = 'none';
     refs.lobbyScreen.style.display = 'none';
@@ -89,7 +90,6 @@ export function volverAlMenu() {
     refs.gameTimer.style.display = 'none';
     refs.btnSalirPartida.style.display = 'none'; // Ocultar botón de salida
     refs.mainMenu.style.display = 'flex';
-    VideoManager.hideVideo();
 }
 
 // --- FUNCIONES DE OCULTAR ---
@@ -131,7 +131,6 @@ export function mostrarPantallaHistoria(historia, esAnfitrion) {
 
 export function ocultarPantallaHistoria() {
     refs.storyScreen.style.display = 'none';
-    VideoManager.hideVideo();
 }
 
 // --- FUNCIONES DE MODAL CÓMO JUGAR ---
