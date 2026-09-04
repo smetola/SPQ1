@@ -115,3 +115,23 @@ Divide el proyecto en 4 áreas clave y ayuda al usuario a moverse entre ellas:
 
 - **SIEMPRE haz 'git add .', 'git commit' y 'git push origin main' despues de CADA cambio en el codigo, antes de responder al usuario.**
 - **CACHE-BUSTING:** Si modificas CUALQUIER archivo `.js` o `.css`, debes ir a `index.html` y aumentar el número de versión (ej. `?v=2.4` a `?v=2.5`) en las etiquetas `<link>` y `<script>`. Esto garantiza que los navegadores móviles del usuario descarguen el código fresco y no usen la caché antigua.
+
+## Memoria Persistente (Auto-Aprendizaje)
+
+Este archivo es tu **única memoria entre sesiones**. Cada chat nuevo empieza desde cero, así que todo lo que no esté aquí, se pierde.
+
+### Instrucciones
+Cuando durante una sesión de trabajo descubras algo que cumple **todas** estas condiciones:
+1. Es un problema que ya ha causado errores o confusión.
+2. Es algo que **se repetirá** en futuras sesiones si no se documenta.
+3. No es obvio ni trivial (no documentes cosas genéricas de programación).
+
+Entonces **añádelo** a la sección "Lecciones Aprendidas" de abajo, siguiendo este formato:
+- Una línea concisa que describa la regla o el aprendizaje.
+- No repitas reglas que ya existan en otra sección de este archivo.
+- Mantén esta lista corta y útil (máximo ~10 entradas). Si se llena, consolida o elimina las menos relevantes.
+
+### Lecciones Aprendidas
+- Los navegadores móviles cachean agresivamente los módulos ES6. Siempre hacer cache-busting (ver regla arriba).
+- Nunca inventar soluciones nuevas si ya existe una implementación funcional en otra rama. Copiar el código que funciona tal cual.
+- Separar los problemas del usuario: si reporta 2 bugs en un mensaje, son 2 tareas independientes. Leer con calma antes de actuar.
