@@ -112,3 +112,5 @@ Divide el proyecto en 4 Ã¡reas clave y ayuda al usuario a moverse entre ellas:
   - Stage changes: `& "C:\Users\ameto\.git-portable\cmd\git.exe" add .`
   - Commit: `& "C:\Users\ameto\.git-portable\cmd\git.exe" commit -m "<commit message>"`
   - Push to remote: `& "C:\Users\ameto\.git-portable\cmd\git.exe" push origin main`
+
+- **SIEMPRE haz 'git add .', 'git commit' y 'git push origin main' después de CADA cambio en el código, antes de responder al usuario.**
