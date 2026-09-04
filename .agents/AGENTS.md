@@ -113,4 +113,5 @@ Divide el proyecto en 4 áreas clave y ayuda al usuario a moverse entre ellas:
   - Commit: `& "C:\Users\ameto\.git-portable\cmd\git.exe" commit -m "<commit message>"`
   - Push to remote: `& "C:\Users\ameto\.git-portable\cmd\git.exe" push origin main`
 
-- **SIEMPRE haz 'git add .', 'git commit' y 'git push origin main' despu�s de CADA cambio en el c�digo, antes de responder al usuario.**
+- **SIEMPRE haz 'git add .', 'git commit' y 'git push origin main' despues de CADA cambio en el codigo, antes de responder al usuario.**
+- **CACHE-BUSTING:** Si modificas CUALQUIER archivo `.js` o `.css`, debes ir a `index.html` y aumentar el número de versión (ej. `?v=2.4` a `?v=2.5`) en las etiquetas `<link>` y `<script>`. Esto garantiza que los navegadores móviles del usuario descarguen el código fresco y no usen la caché antigua.
