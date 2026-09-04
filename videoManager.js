@@ -37,6 +37,9 @@ export function init() {
 
     bgFixed = document.querySelector('.bg-fixed');
 
+    console.log('📹 Video Manager initialized');
+}
+
 /**
  * Cambia el video de fondo según el título de la historia
  * @param {string} storyTitle - Título de la historia
