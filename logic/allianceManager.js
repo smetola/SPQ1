@@ -194,9 +194,46 @@ export function finalizarFasePacto() {
 
     database.ref(`partidas/${state.salaActual}/modoConfig/alianzas`).update({
         fasePacto: false,
-        propuestas: null
+        propuestas: null,
+        skipPactos: null
     });
 }
+
+/**
+ * Marca que este jugador no quiere pacto (skip).
+ * Escribe en Firebase para que el anfitrión pueda detectar si todos han decidido.
+ * @param {string} jugadorId - ID del jugador que hace skip
+ */
+export function marcarSkipPacto(jugadorId) {
+    const database = getDatabase();
+    database.ref(`partidas/${state.salaActual}/modoConfig/alianzas/skipPactos/${jugadorId}`).set(true);
+}
+
+/**
+ * Comprueba si todos los jugadores vivos ya tienen pacto o han hecho skip.
+ * Si es así, finaliza la fase de pactos automáticamente.
+ * Solo debe ser llamada por el ANFITRIÓN.
+ * @param {object} partida - Datos de la partida
+ */
+export function finalizarFasePactoSiTodos(partida) {
+    const jugadores = partida.jugadores;
+    const vivos = Object.entries(jugadores).filter(([_, j]) => j.personaje?.estaVivo);
+
+    const pactos = partida.modoConfig?.alianzas?.pactos || {};
+    const skipPactos = partida.modoConfig?.alianzas?.skipPactos || {};
+
+    const todosDecididos = vivos.every(([id]) => {
+        const tienePacto = Object.values(pactos).some(p => p.jugadorA === id || p.jugadorB === id);
+        const hizoskip = !!skipPactos[id];
+        return tienePacto || hizoskip;
+    });
+
+    if (todosDecididos) {
+        console.log('💕 Todos los jugadores han decidido. Cerrando fase de pactos.');
+        finalizarFasePacto();
+    }
+}
+
 
 /**
  * Obtiene la info del aliado de un jugador (para mostrar en la UI).

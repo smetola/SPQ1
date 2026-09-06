@@ -349,7 +349,13 @@ if (btnRechazarPacto) {
 
 if (btnSkipPacto) {
     btnSkipPacto.addEventListener('click', () => {
-        UIManager.ocultarModalesPacto();
+        // Notificar a Firebase que este jugador no quiere pacto
+        import('./logic/allianceManager.js').then(AM => {
+            import('./logic/gameState.js').then(({ state }) => {
+                AM.marcarSkipPacto(state.jugadorIdActual);
+                UIManager.ocultarModalesPacto();
+            });
+        });
     });
 }
 

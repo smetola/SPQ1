@@ -392,15 +392,6 @@ export function escucharDatosJuego() {
                     });
                 }
 
-                // MODO PODERES: Mostrar/actualizar barra de energía
-                const modosActivos = partida.modosActivos || [];
-                if (modosActivos.includes('poderes')) {
-                    const energia = partida.modoConfig?.poderes?.energia?.[state.jugadorIdActual] || 0;
-                    UI.actualizarBarraEnergia(energia);
-                } else {
-                    UI.ocultarBarraEnergia();
-                }
-
                 // Si NO soy anfitrión, mostrar mensaje de espera
                 if (!state.soyAnfitrion) {
                     UI.mostrarMensajeEspera("Esperando a que el anfitrión comience la ronda...");
@@ -468,17 +459,24 @@ export function escucharDatosJuego() {
             state.faseAnterior = faseActual;
         }
 
-        // --- 5. Mostrar mensaje de espera en votación (si NO soy anfitrión y aún no he votado) ---
+        // --- 5. MODO PODERES: Actualizar energía en tiempo real (siempre, no solo al cambiar de fase) ---
+        const modosActivosActuales = partida.modosActivos || [];
+        if (modosActivosActuales.includes('poderes')) {
+            const energia = partida.modoConfig?.poderes?.energia?.[state.jugadorIdActual] || 0;
+            UI.actualizarBarraEnergia(energia);
+        }
+
+        // --- 6. Mostrar mensaje de espera en votación (si NO soy anfitrión y aún no he votado) ---
         if (faseActual === 'votacion' && !state.soyAnfitrion && !state.heConfirmadoMiVoto) {
             UI.mostrarMensajeEspera("Esperando a que todos los jugadores voten...");
         }
 
-        // --- 6. Mostrar mensaje de espera cuando todos han votado (si NO soy anfitrión) ---
+        // --- 7. Mostrar mensaje de espera cuando todos han votado (si NO soy anfitrión) ---
         if (faseActual === 'votacion' && !state.soyAnfitrion && state.heConfirmadoMiVoto) {
             UI.mostrarMensajeEspera("Esperando a que los demás jugadores terminen de votar...");
         }
 
-        // --- 7. Actualizar Overlay de Desarrollador ---
+        // --- 8. Actualizar Overlay de Desarrollador ---
         if (faseActual && state.jugadorIdActual) {
             const currentTier = partida.currentTier || 'N/A';
             UI.updateDevOverlay({
@@ -488,9 +486,24 @@ export function escucharDatosJuego() {
             });
         }
 
-        // --- 8. GESTIÓN DE BOTS (Solo Anfitrión) ---
+        // --- 9. GESTIÓN DE BOTS (Solo Anfitrión) ---
         if (state.soyAnfitrion) {
             BotManager.gestionarTurnoBots(partida);
+        }
+
+        // --- 10. MODO ALIANZAS: Actualizar modal de pacto en tiempo real ---
+        // (fuera del bloque de cambio de fase, para que reaccione a propuestas entrantes)
+        if (partida.modoConfig?.alianzas?.fasePacto && jugadores) {
+            const variante = partida.modoConfig.alianzas.variante;
+            if (variante === 'pactoMutuo') {
+                UI.mostrarModalPacto(jugadores, state.jugadorIdActual, partida);
+            }
+            // El anfitrión comprueba si todos han decidido para cerrar la fase
+            if (state.soyAnfitrion) {
+                import('./allianceManager.js').then(AM => {
+                    AM.finalizarFasePactoSiTodos(partida);
+                });
+            }
         }
     });
 }
