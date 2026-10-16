@@ -171,18 +171,21 @@ export function avanzarSiguienteRonda() {
                 nuevoIndex++;
             }
 
-            database.ref(`partidas/${state.salaActual}`).update({
-                progressionIndex: nuevoIndex,
-                faseActual: 'conocimiento'
-            });
+            const actualizaciones = {
+                [`partidas/${state.salaActual}/progressionIndex`]: nuevoIndex,
+                [`partidas/${state.salaActual}/faseActual`]: 'conocimiento'
+            };
 
-            // MODO PODERES: Otorgar energía y limpiar poderes de la ronda
+            // MODO PODERES: Otorgar energía y limpiar poderes EN LA MISMA actualización atómica
+            // (si se hacen en dos updates separadas, la UI lee la energía vieja al cambiar de fase)
             const modosActivos = partida.modosActivos || [];
             if (modosActivos.includes('poderes')) {
                 const energiaUpdates = otorgarEnergiaRonda(partida);
                 const limpiarUpdates = limpiarPoderesRonda(partida);
-                database.ref().update({ ...energiaUpdates, ...limpiarUpdates });
+                Object.assign(actualizaciones, energiaUpdates, limpiarUpdates);
             }
+
+            database.ref().update(actualizaciones);
         }
     });
 }

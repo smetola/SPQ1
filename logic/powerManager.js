@@ -4,6 +4,9 @@
 import { state, getDatabase } from './gameState.js';
 
 // Catálogo de poderes disponibles
+// NOTA: Solo están aquí los poderes que tienen lógica de efecto implementada.
+// Escudo → votingManager.js (cancela eliminación)
+// Voto Doble → votingManager.js (cuenta doble en recuento)
 export const CATALOGO_PODERES = [
     {
         id: 'escudo',
@@ -11,7 +14,7 @@ export const CATALOGO_PODERES = [
         icono: '🛡️',
         coste: 3,
         descripcion: 'Te protege de la eliminación esta ronda.',
-        tipo: 'votacion', // Afecta a la votación
+        tipo: 'votacion',
         usoUnico: true
     },
     {
@@ -21,42 +24,6 @@ export const CATALOGO_PODERES = [
         coste: 2,
         descripcion: 'Tu voto cuenta el doble esta ronda.',
         tipo: 'votacion',
-        usoUnico: true
-    },
-    {
-        id: 'camuflaje',
-        nombre: 'Camuflaje',
-        icono: '🎭',
-        coste: 2,
-        descripcion: 'Oculta uno de tus atributos esta ronda.',
-        tipo: 'atributo',
-        usoUnico: true
-    },
-    {
-        id: 'robar',
-        nombre: 'Robar Atributo',
-        icono: '🤏',
-        coste: 4,
-        descripcion: 'Mueve un atributo de un personaje a otro.',
-        tipo: 'atributo',
-        usoUnico: true
-    },
-    {
-        id: 'espiar',
-        nombre: 'Espiar',
-        icono: '👁️',
-        coste: 1,
-        descripcion: 'Revela quién asignó un atributo a un personaje.',
-        tipo: 'informacion',
-        usoUnico: true
-    },
-    {
-        id: 'falsificar',
-        nombre: 'Falsificar',
-        icono: '📝',
-        coste: 3,
-        descripcion: 'Cambia el nombre de uno de tus atributos visibles.',
-        tipo: 'atributo',
         usoUnico: true
     }
 ];

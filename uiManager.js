@@ -893,7 +893,7 @@ export function mostrarModalPacto(jugadores, miId, partida) {
         btn.textContent = `💕 ${j.personaje.nombre}`;
         btn.dataset.jugadorId = id;
         btn.addEventListener('click', () => {
-            import('../logic/allianceManager.js').then(AM => {
+            import('./logic/allianceManager.js').then(AM => {
                 AM.proponerPacto(miId, id);
                 if (estado) {
                     estado.style.display = 'block';
