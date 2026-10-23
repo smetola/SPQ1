@@ -201,7 +201,7 @@ export function mostrarModalQuienSoy(personaje) {
     refs.modalQuienSoy.style.display = 'flex';
 }
 
-export function actualizarCarousel(jugadores, miVotoActual, recuentoVotos) {
+export function actualizarCarousel(jugadores, miVotoActual, recuentoVotos, partida = null) {
     refs.characterCarousel.innerHTML = '';
     const personajes = [];
     Object.entries(jugadores).forEach(([id, jugador]) => {
@@ -215,7 +215,7 @@ export function actualizarCarousel(jugadores, miVotoActual, recuentoVotos) {
 
     personajes.forEach(personaje => {
         refs.characterCarousel.appendChild(
-            crearTarjetaPersonaje(personaje, logic.handleCardClick, miVotoActual, recuentoVotos)
+            crearTarjetaPersonaje(personaje, logic.handleCardClick, miVotoActual, recuentoVotos, partida)
         );
     });
 }
@@ -413,7 +413,7 @@ export function mostrarModalFinJuego(ganador, esAnfitrion) {
 
 // --- FUNCIONES AUXILIARES DE UI (Privadas) ---
 
-function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVotos) {
+function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVotos, partida = null) {
     const card = document.createElement('div');
     card.className = 'character-card';
 
@@ -426,14 +426,23 @@ function crearTarjetaPersonaje(personaje, clickHandler, miVotoActual, recuentoVo
     }
 
     const atributosObj = personaje.atributosAsignados || {};
-    const atributosHTML = Object.values(atributosObj);
+    let atributosValues = Object.entries(atributosObj);
+
+    // MODO PODERES: Camuflaje — ocultar el ÚLTIMO atributo asignado si el jugador tiene el poder activo
+    const tieneCamuflaje = partida?.modoConfig?.poderes?.poderesActivos?.[personaje.jugadorId]?.camuflaje?.activado;
+    if (tieneCamuflaje && atributosValues.length > 0) {
+        // Ocultamos el último atributo (el más recientemente añadido)
+        atributosValues = atributosValues.slice(0, -1);
+        card.classList.add('camuflado');
+    }
 
     card.innerHTML = `
         <h4>${personaje.nombre.toUpperCase()}</h4>
         <span>Edad: ${personaje.edad}</span>
         <ul>
             <li>${personaje.atributoBasico}</li>
-            ${atributosHTML.map(attr => `<li>${attr}</li>`).join('')}
+            ${atributosValues.map(([, attr]) => `<li>${attr}</li>`).join('')}
+            ${tieneCamuflaje && Object.keys(atributosObj).length > 0 ? '<li class="atributo-oculto">🎭 [OCULTO POR CAMUFLAJE]</li>' : ''}
         </ul>
     `;
 
@@ -1042,5 +1051,215 @@ export function mostrarTienda(catalogo, energiaActual, poderesActivos, onComprar
  */
 export function cerrarTienda() {
     const modal = document.getElementById('modalTienda');
+    if (modal) modal.style.display = 'none';
+}
+
+
+// --- PODERES: MODALES DE EFECTO ---
+
+/**
+ * ESPIAR: Muestra un modal para que el jugador elija un personaje objetivo
+ * y uno de sus atributos. Llama a onSeleccionar(objetivoId, atributoKey, jugadores)
+ * @param {object} jugadores - Todos los jugadores
+ * @param {string} miId - ID del jugador que espía
+ * @param {Function} onSeleccionar - Callback: fn(objetivoId, atributoKey, jugadores)
+ */
+export function mostrarModalEspiar(jugadores, miId, onSeleccionar) {
+    const modal = document.getElementById('modalPoderEspiar');
+    const lista = document.getElementById('espiarListaPersonajes');
+    const resultado = document.getElementById('espiarResultado');
+    if (!modal || !lista) return;
+
+    lista.innerHTML = '';
+    if (resultado) resultado.style.display = 'none';
+
+    // Mostrar lista de personajes objetivo (todos los vivos excepto yo)
+    Object.entries(jugadores).forEach(([id, j]) => {
+        if (id === miId) return;
+        if (!j.personaje?.estaVivo) return;
+        const atributosAsignados = j.personaje.atributosAsignados || {};
+        if (Object.keys(atributosAsignados).length === 0) return; // Sin atributos que espiar
+
+        const bloque = document.createElement('div');
+        bloque.className = 'espiar-personaje-bloque';
+        bloque.innerHTML = `<div class="espiar-personaje-nombre">🎭 ${j.personaje.nombre}</div>`;
+
+        const listaAtributos = document.createElement('div');
+        listaAtributos.className = 'espiar-atributos-lista';
+
+        Object.entries(atributosAsignados).forEach(([key, valor]) => {
+            const btnAtributo = document.createElement('button');
+            btnAtributo.className = 'espiar-atributo-btn';
+            btnAtributo.textContent = valor;
+            btnAtributo.addEventListener('click', () => {
+                // Deshabilitar todos los botones para evitar doble clic
+                modal.querySelectorAll('.espiar-atributo-btn').forEach(b => b.disabled = true);
+                onSeleccionar(id, key, jugadores);
+            });
+            listaAtributos.appendChild(btnAtributo);
+        });
+
+        bloque.appendChild(listaAtributos);
+        lista.appendChild(bloque);
+    });
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * ESPIAR: Muestra el resultado (quién asignó el atributo).
+ * @param {string} atributoValor - Texto del atributo espiado
+ * @param {string} nombreAsignador - Nombre del jugador que asignó el atributo
+ */
+export function mostrarResultadoEspiar(atributoValor, nombreAsignador) {
+    const resultado = document.getElementById('espiarResultado');
+    if (!resultado) return;
+    resultado.innerHTML = `
+        <p>El atributo <strong>"${atributoValor}"</strong> fue asignado por:</p>
+        <p class="espiar-asignador">🕵️ ${nombreAsignador}</p>
+    `;
+    resultado.style.display = 'block';
+}
+
+/**
+ * Cierra el modal de Espiar.
+ */
+export function cerrarModalEspiar() {
+    const modal = document.getElementById('modalPoderEspiar');
+    if (modal) modal.style.display = 'none';
+}
+
+/**
+ * ROBAR: Muestra un modal de 2 pasos:
+ *   Paso 1: Elige personaje ORIGEN y su atributo
+ *   Paso 2: Elige personaje DESTINO al que mover el atributo
+ * @param {object} jugadores
+ * @param {string} miId
+ * @param {Function} onRobar - Callback: fn(origenId, atributoKey, destinoId)
+ */
+export function mostrarModalRobar(jugadores, miId, onRobar) {
+    const modal = document.getElementById('modalPoderRobar');
+    const contenido = document.getElementById('robarContenido');
+    if (!modal || !contenido) return;
+
+    contenido.innerHTML = '<p class="poder-modal-subtitulo">Paso 1: Elige el personaje al que robar un atributo</p>';
+
+    // Paso 1: Elegir origen
+    Object.entries(jugadores).forEach(([origenId, j]) => {
+        if (origenId === miId) return;
+        if (!j.personaje?.estaVivo) return;
+        const atributos = j.personaje.atributosAsignados || {};
+        if (Object.keys(atributos).length === 0) return;
+
+        const bloque = document.createElement('div');
+        bloque.className = 'espiar-personaje-bloque';
+        bloque.innerHTML = `<div class="espiar-personaje-nombre">🎭 ${j.personaje.nombre}</div>`;
+
+        const listaAtributos = document.createElement('div');
+        listaAtributos.className = 'espiar-atributos-lista';
+
+        Object.entries(atributos).forEach(([key, valor]) => {
+            const btn = document.createElement('button');
+            btn.className = 'espiar-atributo-btn';
+            btn.textContent = valor;
+            btn.addEventListener('click', () => {
+                // Paso 2: Elegir destino
+                contenido.innerHTML = `
+                    <p class="poder-modal-subtitulo">Robar: <strong>"${valor}"</strong> de <strong>${j.personaje.nombre}</strong></p>
+                    <p class="poder-modal-subtitulo">Paso 2: Elige el personaje al que asignar el atributo robado</p>
+                `;
+                Object.entries(jugadores).forEach(([destinoId, jDestino]) => {
+                    if (!jDestino.personaje?.estaVivo) return;
+                    const btnDestino = document.createElement('button');
+                    btnDestino.className = 'espiar-atributo-btn';
+                    btnDestino.textContent = `➡️ ${jDestino.personaje.nombre}`;
+                    btnDestino.addEventListener('click', () => {
+                        contenido.querySelectorAll('button').forEach(b => b.disabled = true);
+                        onRobar(origenId, key, destinoId);
+                    });
+                    contenido.appendChild(btnDestino);
+                });
+            });
+            listaAtributos.appendChild(btn);
+        });
+
+        bloque.appendChild(listaAtributos);
+        contenido.appendChild(bloque);
+    });
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Cierra el modal de Robar.
+ */
+export function cerrarModalRobar() {
+    const modal = document.getElementById('modalPoderRobar');
+    if (modal) modal.style.display = 'none';
+}
+
+/**
+ * FALSIFICAR: Muestra un modal para que el jugador elija uno de sus propios atributos
+ * e introduzca un nuevo nombre.
+ * @param {object} miPersonaje - Personaje del jugador actual
+ * @param {string} miId
+ * @param {Function} onFalsificar - Callback: fn(atributoKey, nuevoNombre)
+ */
+export function mostrarModalFalsificar(miPersonaje, miId, onFalsificar) {
+    const modal = document.getElementById('modalPoderFalsificar');
+    const lista = document.getElementById('falsificarListaAtributos');
+    const inputNuevo = document.getElementById('falsificarInputNombre');
+    const btnConfirmar = document.getElementById('falsificarBtnConfirmar');
+    if (!modal || !lista) return;
+
+    lista.innerHTML = '';
+    if (inputNuevo) inputNuevo.value = '';
+
+    let claveSeleccionada = null;
+
+    const atributos = miPersonaje?.atributosAsignados || {};
+    if (Object.keys(atributos).length === 0) {
+        lista.innerHTML = '<p style="color:#888;">Aún no tienes atributos asignados para falsificar.</p>';
+    } else {
+        Object.entries(atributos).forEach(([key, valor]) => {
+            const btn = document.createElement('button');
+            btn.className = 'espiar-atributo-btn';
+            btn.textContent = valor;
+            btn.addEventListener('click', () => {
+                lista.querySelectorAll('.espiar-atributo-btn').forEach(b => b.classList.remove('seleccionado'));
+                btn.classList.add('seleccionado');
+                claveSeleccionada = key;
+            });
+            lista.appendChild(btn);
+        });
+    }
+
+    if (btnConfirmar) {
+        // Reemplazar listener anterior para no acumular
+        const nuevoBtn = btnConfirmar.cloneNode(true);
+        btnConfirmar.parentNode.replaceChild(nuevoBtn, btnConfirmar);
+        nuevoBtn.addEventListener('click', () => {
+            const nuevoNombre = document.getElementById('falsificarInputNombre')?.value?.trim();
+            if (!claveSeleccionada) {
+                alert('Selecciona primero un atributo.');
+                return;
+            }
+            if (!nuevoNombre) {
+                alert('Escribe el nuevo nombre del atributo.');
+                return;
+            }
+            nuevoBtn.disabled = true;
+            onFalsificar(claveSeleccionada, nuevoNombre);
+        });
+    }
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Cierra el modal de Falsificar.
+ */
+export function cerrarModalFalsificar() {
+    const modal = document.getElementById('modalPoderFalsificar');
     if (modal) modal.style.display = 'none';
 }

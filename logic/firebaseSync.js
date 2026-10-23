@@ -223,7 +223,7 @@ export function escucharDatosJuego() {
             const miVotoActual = miEstado.votoSeleccionado || null;
             state.heConfirmadoMiVoto = miEstado.votoConfirmado || false;
 
-            UI.actualizarCarousel(jugadores, miVotoActual, recuentoVotos);
+            UI.actualizarCarousel(jugadores, miVotoActual, recuentoVotos, partida);
 
             if (miEstado.personaje) {
                 state.miPersonajeSecreto = miEstado.personaje;

@@ -839,6 +839,118 @@ body {
 }
 
 /* --- ================================= --- */
+/* ---  MODALES DE ACCIÓN DE PODERES     --- */
+/* --- ================================= --- */
+
+.modal-poder-accion {
+    max-height: 85vh;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.poder-modal-icono {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.poder-modal-titulo {
+    font-family: var(--font-titulo);
+    color: #f1c40f;
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+}
+
+.poder-modal-subtitulo {
+    color: #ccc;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.poder-modal-lista {
+    width: 100%;
+    text-align: left;
+}
+
+.espiar-personaje-bloque {
+    margin-bottom: 14px;
+}
+
+.espiar-personaje-nombre {
+    color: #f1c40f;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.espiar-atributos-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.espiar-atributo-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ddd;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.espiar-atributo-btn:hover:not(:disabled) {
+    background: rgba(241, 196, 15, 0.15);
+    border-color: #f1c40f;
+    color: #f1c40f;
+}
+
+.espiar-atributo-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.espiar-atributo-btn.seleccionado {
+    background: rgba(241, 196, 15, 0.25);
+    border-color: #f1c40f;
+    color: #f1c40f;
+}
+
+.espiar-resultado {
+    background: rgba(241, 196, 15, 0.08);
+    border: 1px solid rgba(241, 196, 15, 0.3);
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+    text-align: center;
+    color: #ddd;
+    font-size: 0.9rem;
+}
+
+.espiar-asignador {
+    font-size: 1.2rem;
+    color: #f1c40f;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+/* Camuflaje: tarjeta camuflada en el carrusel */
+.character-card.camuflado {
+    border-color: rgba(100, 200, 100, 0.4) !important;
+    box-shadow: 0 0 8px rgba(100, 200, 100, 0.2);
+}
+
+.atributo-oculto {
+    color: #888;
+    font-style: italic;
+    font-size: 0.8rem;
+    list-style: none;
+}
+
+/* --- ================================= --- */
 /* ---     INDICADOR DE TRAIDOR           --- */
 /* --- ================================= --- */
 

@@ -383,11 +383,73 @@ if (btnAbrirTienda) {
                 poderesActivos,
                 async (poderId) => {
                     const resultado = await PM.comprarPoder(state.jugadorIdActual, poderId);
-                    if (resultado.exito) {
-                        await abrirTiendaConDatos(); // Refrescar tienda
-                    } else {
+                    if (!resultado.exito) {
                         console.warn('No se pudo comprar el poder:', resultado.error);
+                        return;
                     }
+
+                    // Refrescar tienda con los nuevos datos
+                    await abrirTiendaConDatos();
+
+                    // Poderes con flujo de UI inmediato tras la compra
+                    if (poderId === 'espiar') {
+                        const snapFresco = await db.ref(`partidas/${state.salaActual}`).once('value');
+                        const partidaFresca = snapFresco.val();
+                        UIManager.cerrarTienda();
+                        UIManager.mostrarModalEspiar(
+                            partidaFresca.jugadores,
+                            state.jugadorIdActual,
+                            async (objetivoId, atributoKey, jugadores) => {
+                                const res = await PM.ejecutarEspiar(state.jugadorIdActual, objetivoId, atributoKey, jugadores);
+                                if (res.exito) {
+                                    UIManager.mostrarResultadoEspiar(res.atributoValor, res.nombreAsignador);
+                                } else {
+                                    console.warn('Error al espiar:', res.error);
+                                }
+                            }
+                        );
+                    } else if (poderId === 'robar') {
+                        const snapFresco = await db.ref(`partidas/${state.salaActual}`).once('value');
+                        const partidaFresca = snapFresco.val();
+                        UIManager.cerrarTienda();
+                        UIManager.mostrarModalRobar(
+                            partidaFresca.jugadores,
+                            state.jugadorIdActual,
+                            async (origenId, atributoKey, destinoId) => {
+                                const res = await PM.ejecutarRobar(state.jugadorIdActual, origenId, atributoKey, destinoId);
+                                if (res.exito) {
+                                    UIManager.cerrarModalRobar();
+                                    await import('./modalManager.js').then(MM =>
+                                        MM.mostrarAlerta('¡Atributo robado con éxito!', '🤏 ROBO EJECUTADO')
+                                    );
+                                } else {
+                                    console.warn('Error al robar:', res.error);
+                                }
+                            }
+                        );
+                    } else if (poderId === 'falsificar') {
+                        const snapFresco = await db.ref(`partidas/${state.salaActual}`).once('value');
+                        const partidaFresca = snapFresco.val();
+                        const miPersonaje = partidaFresca.jugadores[state.jugadorIdActual]?.personaje;
+                        UIManager.cerrarTienda();
+                        UIManager.mostrarModalFalsificar(
+                            miPersonaje,
+                            state.jugadorIdActual,
+                            async (atributoKey, nuevoNombre) => {
+                                const res = await PM.ejecutarFalsificar(state.jugadorIdActual, atributoKey, nuevoNombre);
+                                if (res.exito) {
+                                    UIManager.cerrarModalFalsificar();
+                                    await import('./modalManager.js').then(MM =>
+                                        MM.mostrarAlerta(`Atributo falsificado: ahora dice "${nuevoNombre}"`, '📝 FALSIFICACIÓN')
+                                    );
+                                } else {
+                                    console.warn('Error al falsificar:', res.error);
+                                }
+                            }
+                        );
+                    }
+                    // Camuflaje, Escudo y Voto Doble: no necesitan flujo adicional.
+                    // Sus efectos se aplican automáticamente (camuflaje en el carrusel, los otros en votingManager).
                 }
             );
         }
@@ -400,6 +462,22 @@ if (btnCerrarTienda) {
     btnCerrarTienda.addEventListener('click', () => {
         UIManager.cerrarTienda();
     });
+}
+
+// Botones de cierre de modales de poderes
+const btnCerrarEspiar = document.getElementById('btnCerrarEspiar');
+if (btnCerrarEspiar) {
+    btnCerrarEspiar.addEventListener('click', () => UIManager.cerrarModalEspiar());
+}
+
+const btnCerrarRobar = document.getElementById('btnCerrarRobar');
+if (btnCerrarRobar) {
+    btnCerrarRobar.addEventListener('click', () => UIManager.cerrarModalRobar());
+}
+
+const btnCerrarFalsificar = document.getElementById('btnCerrarFalsificar');
+if (btnCerrarFalsificar) {
+    btnCerrarFalsificar.addEventListener('click', () => UIManager.cerrarModalFalsificar());
 }
 
 // Botón de salida global (con confirmación)
